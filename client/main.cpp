@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     (void) argc;
     (void) argv;
 
-    auto service = new CloudManagementClient::Daemon();
+    auto service = std::make_unique<CloudManagementClient::Daemon>();
 
     // This blocks till we're stopped
     service->start();

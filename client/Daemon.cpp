@@ -17,21 +17,11 @@ void Daemon::start() {
     this->isRunning_ = true;
 
     this->task_ = std::thread(&Daemon::mainTask, this);
-
-    while (this->isRunning_) {
-        using namespace std::chrono_literals;
-
-        //! Wait...
-
-        auto start = std::chrono::high_resolution_clock::now();
-        std::this_thread::sleep_for(1000ms);
-        auto end = std::chrono::high_resolution_clock::now();
-    }
+    this->task_.join();
 }
 
 void Daemon::stop() {
     this->isRunning_ = false;
-    task_.join();
 }
 
 Daemon::~Daemon() {
@@ -44,15 +34,16 @@ void Daemon::mainTask()
     //!
     //! Entire contents below will be removed
     while(this->isRunning_) {
+        using namespace std;
         using namespace std::chrono_literals;
 
-        umask(0);
+        umask(0077);
 
-        std::cout << "Do things here!" << std::endl;
+        cout << "Do things here!" << endl;
 
-        auto start = std::chrono::high_resolution_clock::now();
-        std::this_thread::sleep_for(2000ms);
-        auto end = std::chrono::high_resolution_clock::now();
+        auto start = chrono::high_resolution_clock::now();
+        this_thread::sleep_for(1000ms);
+        auto end = chrono::high_resolution_clock::now();
     }
 }
 
