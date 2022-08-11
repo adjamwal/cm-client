@@ -5,8 +5,6 @@
 
 #include "Daemon.hpp"
 
-#include <chrono>
-
 int main(int argc, char *argv[])
 {
     // TODO:

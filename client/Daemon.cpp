@@ -25,8 +25,8 @@ void Daemon::stop() {
 }
 
 Daemon::~Daemon() {
-     this->stop();
-}        
+    this->stop();
+}
 
 void Daemon::mainTask()
 {
