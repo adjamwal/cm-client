@@ -22,4 +22,6 @@ set(CMAKE_C_FLAGS_DEBUG "-DDEBUG")
 include(ConfigureChecks.cmake)
 configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
+include(ExternalProject_jsoncpp)
+
 add_subdirectory(client)
