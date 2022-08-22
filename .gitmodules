@@ -4,3 +4,18 @@
 [submodule "PackageManager"]
 	path = PackageManager
 	url = ../../UnifiedConnector/PackageManager.git
+[submodule "third-party/jsoncpp"]
+	path = third-party/jsoncpp
+	url = ../../Cloud/fireamp-win-jsoncpp.git
+[submodule "third-party/curl"]
+	path = third-party/curl
+	url = ../../Cloud/curl-rel.git
+[submodule "third-party/ciscossl"]
+	path = third-party/ciscossl
+	url = ../../Cloud/ciscossl-rel.git
+[submodule "third-party/gtest"]
+	path = third-party/gtest
+	url = ../../Cloud/fireamp-win-google-test.git
+[submodule "third-party/fff"]
+	path = third-party/fff
+	url = ../../Cloud/fff-rel.git
