@@ -13,6 +13,7 @@ set(XCODE_NM "${XCODE_TOOLCHAIN_BIN}/nm")
 set(XCODE_RANLIB "${XCODE_TOOLCHAIN_BIN}/ranlib")
 
 set(CURL_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/src")
+set(CURL_EXPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/export")
 
 #
 # TODO Also support Linux toolchain
@@ -20,12 +21,15 @@ set(CURL_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/src")
 ExternalProject_Add(
     third-party-curl
     SOURCE_DIR "${CURL_SRC_DIR}"
+    # If needed we may want to add touch to ensure configure files and such are more recent
+    # than the configure.ac files and such
+    #COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/src/configure
     CONFIGURE_COMMAND "${CURL_SRC_DIR}/configure"
         CC=${XCODE_CC}
         CPP=${XCODE_CPP}
         CPPFLAGS=-I${CISCOSSL_EXPORT_DIR}/include
         LDFLAGS=-L${CISCOSSL_EXPORT_DIR}/lib
-        --prefix=${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/export
+        --prefix=${CURL_EXPORT_DIR}
         --enable-fts5=no
         --enable-json1=no
         --without-libidn2
@@ -55,3 +59,7 @@ ExternalProject_Add(
 )
 
 add_custom_command(TARGET third-party-curl PRE_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/export")
+#
+# If needed we can use it to add touch commands to give build generated files a newer timestamp to avoid
+# regeneration of autotools build products
+#add_custom_command(TARGET third-party-curl PRE_BUILD COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/src/_autotool_generated_file_")

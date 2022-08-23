@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 # Copyright 2022 Cisco Systems, Inc.
 
 clean=false

@@ -15,6 +15,10 @@ set(CMAKE_CXX_STANDARD 17)
 if(APPLE)
     set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15 CACHE STRING "Minimum OS X deployment version" FORCE)
     set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Architectures" FORCE)
+
+    #
+    # The `;` must be escaped when passed into ExternalProject_Add()
+    string(REPLACE ";" "$<SEMICOLON>" CMAKE_OSX_ARCHITECTURES_ "${CMAKE_OSX_ARCHITECTURES}")
 endif()
 
 # remove ZERO_CHECK target from xcode
@@ -29,5 +33,8 @@ configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)
+include(ExternalProject_gtest)
+# Disabling for now, currently not building on macOS (or Linux)
+#include(ExternalProject_PackageManager)
 
 add_subdirectory(client)
