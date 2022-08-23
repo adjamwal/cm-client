@@ -3,7 +3,7 @@
 
 include(ExternalProject)
 
-set(GTEST_EXPORT_DIR "{CMAKE_CURRENT_SOURCE_DIR}/third-party/gtest/export")
+set(GTEST_EXPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/gtest/export")
 
 #
 # TODO Be more specific about tool chain

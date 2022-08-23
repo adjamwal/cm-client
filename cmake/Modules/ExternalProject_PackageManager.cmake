@@ -3,7 +3,7 @@
 
 include(ExternalProject)
 
-set(FFF_EXPORT_DIR "{CMAKE_CURRENT_SOURCE_DIR}/third-party/fff")
+set(FFF_EXPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/fff")
 
 set(PACKGE_MANAGER_EXPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/PackageManager/export")
 
