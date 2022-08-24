@@ -68,9 +68,9 @@ Usage: build [-c|-h]
  * Run without any arguments to build cm-client
 ~~~
 
-This will build all third-party dependencies and the Cloud Management connector client.  After the build is complete, navigate to the `debug` directory for subsequent builds.
+This will build all third-party dependencies and the Cloud Management connector client.
 
-On a subsequent build after making code changes, to build just use `make` (TODO it's easy to switch the build system to Xcode instead but for simplicity, we currently only support `make`).
+On a subsequent build after making code changes, to build just use `make` (**TODO** it's easy to switch the build system to Xcode instead but for simplicity, we currently only support `make`).
 
 ~~~
 * make code changes *
