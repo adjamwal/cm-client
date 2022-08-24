@@ -33,10 +33,12 @@ configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 set(CM_THIRDPARTY_EXPORT "${CMAKE_CURRENT_BINARY_DIR}/export")
 
+include(ExternalProject_ciscossl)
 include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)
 include(ExternalProject_gtest)
 # Disabling for now, currently not building on macOS (or Linux)
 #include(ExternalProject_PackageManager)
+include(ExternalProject_cmid)
 
 add_subdirectory(client)

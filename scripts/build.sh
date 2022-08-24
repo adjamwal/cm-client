@@ -25,6 +25,7 @@ if [ "${usage}" = "true" ]; then
 fi
 
 if [ "${clean}" = "true" ]; then
+    # We clean CiscoSSL because its build is done in the source directory
     ./scripts/build_ciscossl.sh -c
     if [ -d debug ]; then
         rm -fr debug
@@ -32,11 +33,6 @@ if [ "${clean}" = "true" ]; then
     echo
     echo "** Build clean completed **"
 else
-    # Build CiscoSSL first
-    ./scripts/build_ciscossl.sh
-
-    # TODO Remove other third-party export directories
-
     mkdir -p debug
     pushd debug
         cmake ../ .
