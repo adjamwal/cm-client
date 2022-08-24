@@ -46,7 +46,7 @@ else
     echo
     echo "** Build completed **"
     echo
-    echo " - build directory:   ./debug"
+    echo " - build directory:	./debug"
     echo " - 3rd party exports:	./debug/export/{lib,include}"
     echo
     echo " Go to build directory, and run 'make' after making changes"
