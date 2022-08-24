@@ -87,3 +87,17 @@ cd debug
 # cmake --build .
 make
 ~~~
+
+## Exported third-party and first-party libraries
+
+First and third party libraries are all exported into the cmake build directory `debug` under the directory `export`.  In the `debug/export`, it will contain exported headers and libraries for the following -
+
+Third-party components:
+* curl
+* ciscossl
+* jsoncpp
+* Google Test
+
+First-party components:
+* PackageManager (PM)
+* Cloud Management Identity (CMID)
