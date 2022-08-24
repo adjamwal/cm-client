@@ -31,6 +31,8 @@ set(CMAKE_C_FLAGS_DEBUG "-DDEBUG")
 include(ConfigureChecks.cmake)
 configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
+set(CM_THIRDPARTY_EXPORT "${CMAKE_CURRENT_BINARY_DIR}/export")
+
 include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)
 include(ExternalProject_gtest)

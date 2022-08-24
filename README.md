@@ -56,12 +56,20 @@ git push -u origin <branch name>
 * Create pull request in GitHub *
 ```
 
+# Environment
+
+To be able to build cm-client, the following software packages are required:
+
+- CMake - which can be acquired from [here](https://cmake.org/download/)
+- Xcode - 12.2 and higher (Minimum for Universal binaries)
+- Xcode Command Line Tools - running `clang`, `gcc` or similar commands will trigger a prompt, or just run `xcode-select --install` to begin the install process.
+
 # Build
 
 To build cm-client, use the `build` symlink on the root of the repository.  Usage for this script is as follows:
 
 ~~~
-Usage: build [-c|-h]
+Usage: build [-c|clean] [-h]
  -c    clean build
  -h    help (this usage)
 

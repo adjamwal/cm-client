@@ -3,13 +3,17 @@
 
 clean=false
 usage=false
-while getopts ch flag
-do
-  case "${flag}" in
-    c) clean=true;;
-    h) usage=true;;
-  esac
+if [ $# -ge 1 ] && [ "$1" = "clean" ]; then
+    clean=true
+else
+    while getopts ch flag
+    do
+      case "${flag}" in
+        c) clean=true;;
+        *) usage=true;;
+      esac
 done
+fi
 
 if [ "${usage}" = "true" ]; then
     echo "Usage: build [-c|-h]"
@@ -42,7 +46,8 @@ else
     echo
     echo "** Build completed **"
     echo
-    echo " - build directory: debug"
+    echo " - build directory:   ./debug"
+    echo " - 3rd party exports:	./debug/export/{lib,include}"
     echo
     echo " Go to build directory, and run 'make' after making changes"
 fi

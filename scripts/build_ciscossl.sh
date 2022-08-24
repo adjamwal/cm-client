@@ -33,7 +33,10 @@ if [ -z "${WORKSPACE_ROOT}" ]; then
     echo "Using WORKSPACE_ROOT=${WORKSPACE_ROOT}"
 fi
 
-CISCOSSL_EXPORT_DIR="${WORKSPACE_ROOT}/third-party/ciscossl/export"
+#
+# **TODO** Support both a Debug and Release directory configuration
+CMAKE_EXPORT_DIR=${WORKSPACE_ROOT}/debug/export
+CISCOSSL_EXPORT_DIR="${CMAKE_EXPORT_DIR}"
 
 build_ciscossl_forarch()
 {
@@ -154,6 +157,11 @@ build_ciscossl_mac()
       -output "${CISCOSSL_EXPORT_DIR}/libshared/libssl.1.1.dylib"
     ln -s "${CISCOSSL_EXPORT_DIR}/libshared/libssl.1.1.dylib" \
       "${CISCOSSL_EXPORT_DIR}/libshared/libssl.dylib"
+
+    # Clean up
+    for i in "${BUILD_ARCHS[@]}"; do
+        rm -fr "${CISCOSSL_EXPORT_DIR}-${i}"
+    done
 }
 
 build_ciscossl_linux()

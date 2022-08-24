@@ -3,7 +3,6 @@
 
 include(ExternalProject)
 
-set(CISCOSSL_EXPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/ciscossl/export")
 set(XCODE_TOOLCHAIN_BIN "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin")
 set(XCODE_MACOS_SDK "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
 set(XCODE_CC "${XCODE_TOOLCHAIN_BIN}/clang -mmacosx-version-min=10.15 -isysroot ${XCODE_MACOS_SDK} -g -arch x86_64 -arch arm64")
@@ -13,7 +12,6 @@ set(XCODE_NM "${XCODE_TOOLCHAIN_BIN}/nm")
 set(XCODE_RANLIB "${XCODE_TOOLCHAIN_BIN}/ranlib")
 
 set(CURL_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/src")
-set(CURL_EXPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/export")
 
 #
 # TODO Also support Linux toolchain
@@ -27,9 +25,9 @@ ExternalProject_Add(
     CONFIGURE_COMMAND "${CURL_SRC_DIR}/configure"
         CC=${XCODE_CC}
         CPP=${XCODE_CPP}
-        CPPFLAGS=-I${CISCOSSL_EXPORT_DIR}/include
-        LDFLAGS=-L${CISCOSSL_EXPORT_DIR}/lib
-        --prefix=${CURL_EXPORT_DIR}
+        CPPFLAGS=-I${CM_THIRDPARTY_EXPORT}/include
+        LDFLAGS=-L${CM_THIRDPARTY_EXPORT}/lib
+        --prefix=${CM_THIRDPARTY_EXPORT}
         --enable-fts5=no
         --enable-json1=no
         --without-libidn2
@@ -50,7 +48,7 @@ ExternalProject_Add(
         --disable-gopher
         --disable-mqtt
         --disable-shared
-        --with-ssl=${CISCOSSL_EXPORT_DIR}
+        --with-ssl=${CM_THIRDPARTY_EXPORT}
         --without-ca-bundle
         --without-ca-path
         curl_disallow_poll=yes
