@@ -15,6 +15,8 @@ if [ "${usage}" = "true" ]; then
     echo "Usage: build [-c|-h]"
     echo " -c    clean build"
     echo " -h    help (this usage)"
+    echo
+    echo " * Run without any arguments to build cm-client"
     exit 0
 fi
 
@@ -28,6 +30,8 @@ if [ "${clean}" = "true" ]; then
 else
     # Build CiscoSSL first
     ./scripts/build_ciscossl.sh
+
+    # TODO Remove other third-party export directories
 
     mkdir -p debug
     pushd debug
