@@ -75,5 +75,7 @@ On a subsequent build after making code changes, to build just use `make` (**TOD
 ~~~
 * make code changes *
 cd debug
+# Alternatively, you can also build with the command
+# cmake --build .
 make
 ~~~
