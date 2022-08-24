@@ -41,9 +41,11 @@ void Daemon::mainTask()
 
         cout << "Do things here!" << endl;
 
-        auto start = chrono::high_resolution_clock::now();
+        //auto start = chrono::high_resolution_clock::now();
+        (void) chrono::high_resolution_clock::now();
         this_thread::sleep_for(1000ms);
-        auto end = chrono::high_resolution_clock::now();
+        //auto end = chrono::high_resolution_clock::now();
+        (void) chrono::high_resolution_clock::now();
     }
 }
 

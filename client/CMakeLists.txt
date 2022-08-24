@@ -24,4 +24,6 @@ target_include_directories(cm-client-daemon
 #    ${EXTRA_LIBRARIES}
 #)
 
+target_enable_warnings(cm-client-daemon)
+
 install(TARGETS cm-client-daemon DESTINATION ${cm-client_SOURCE_DIR}/export/bin/)
