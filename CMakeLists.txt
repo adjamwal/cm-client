@@ -33,6 +33,8 @@ configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 set(CM_THIRDPARTY_EXPORT "${CMAKE_CURRENT_BINARY_DIR}/export")
 
+##
+## External Package Definitions for third-party and first-party dependencies
 include(ExternalProject_ciscossl)
 include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)
@@ -41,4 +43,6 @@ include(ExternalProject_gtest)
 #include(ExternalProject_PackageManager)
 include(ExternalProject_cmid)
 
+##
+## The Cloud Management Connector client
 add_subdirectory(client)

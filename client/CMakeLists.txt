@@ -17,6 +17,12 @@ add_dependencies(cm-client-daemon third-party-jsoncpp)
 target_include_directories(cm-client-daemon
     PUBLIC
     ${cm-client_SOURCE_DIR}
+    ${CM_THIRDPARTY_EXPORT}/include
+)
+
+target_link_directories(cm-client-daemon BEFORE
+    PRIVATE
+    ${CM_THIRDPARTY_EXPORT}/lib
 )
 
 #target_link_libraries(cm-client-daemon

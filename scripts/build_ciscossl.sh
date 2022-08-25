@@ -195,7 +195,7 @@ if [ "$clean" = "true" ]; then
         ARCHS_PATTERN="${ARCHS_PATTERN%?})"
         rm -fr "${CISCOSSL_EXPORT_DIR}-${ARCHS_PATTERN}"
     fi
-elif [ ! -d "${CISCOSSL_EXPORT_DIR}" ]; then
+elif [ ! -d "${CISCOSSL_EXPORT_DIR}/include/openssl" ]; then
     build_ciscossl
 else
     echo
