@@ -61,3 +61,5 @@ add_custom_command(TARGET third-party-curl PRE_BUILD COMMAND ${CMAKE_COMMAND} -E
 # If needed we can use it to add touch commands to give build generated files a newer timestamp to avoid
 # regeneration of autotools build products
 #add_custom_command(TARGET third-party-curl PRE_BUILD COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/src/_autotool_generated_file_")
+
+add_dependencies(third-party-curl third-party-ciscossl)

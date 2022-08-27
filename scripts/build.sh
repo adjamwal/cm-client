@@ -1,6 +1,8 @@
 #!/bin/sh -e
 # Copyright 2022 Cisco Systems, Inc.
 
+SYSTEM="$(uname -s)"
+
 clean=false
 usage=false
 if [ $# -ge 1 ] && [ "$1" = "clean" ]; then
@@ -34,8 +36,12 @@ if [ "${clean}" = "true" ]; then
     echo "** Build clean completed **"
 else
     mkdir -p debug
+    CMAKE_EXTRA_ARGS=""
+    if [ "${SYSTEM}" == "Darwin" ]; then
+        CMAKE_EXTRA_ARGS="-G Xcode"
+    fi
     pushd debug
-        cmake ../ .
+        cmake ${CMAKE_EXTRA_ARGS} ../ .
         cmake --build .
     popd
 
