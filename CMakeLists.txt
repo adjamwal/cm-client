@@ -24,9 +24,6 @@ endif()
 # remove ZERO_CHECK target from xcode
 set(CMAKE_SUPPRESS_REGENERATION true)
 
-# define DEBUG for all debug builds
-set(CMAKE_C_FLAGS_DEBUG "-DDEBUG")
-
 # config.h checks
 include(ConfigureChecks.cmake)
 configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)

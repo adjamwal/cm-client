@@ -5,10 +5,18 @@
 
 #include "Daemon.hpp"
 
+#include "ComponentLoader/CMIDLoader.hpp"
+#include "Configuration/Config.hpp"
+
+#include "cmid/CMIDAgentController.h"
+#include "cmid/CMIDLogger.h"
+
 #include <sys/stat.h>
 
 #include <chrono>
 #include <iostream>
+
+using namespace CloudManagementConfiguration;
 
 namespace CloudManagementClient
 {
@@ -28,11 +36,41 @@ Daemon::~Daemon() {
     this->stop();
 }
 
+void Daemon::startCMIDLoader()
+{
+    using namespace cmid;
+
+    try {
+        const std::string strLogFilePath = Config::CM_LOG_PATH + "csc_cmid_control_plugin.log";
+        //Initialise logger
+        CMID_LOG_INIT(strLogFilePath);
+    }
+    catch(const std::exception& rExcep) {
+        std::cerr << "Failed to Initialize logger: " << rExcep.what() << std::endl;
+        return;
+    }
+
+    auto cmid_controller = new ComponentLoader::CMIDLoader{
+                    std::make_unique<CCMIDAgentController>(Config::CMID_EXEC_PATH,
+                                                           Config::CM_CFG_PATH) };
+
+    cmid_controller->load();
+}
+
+void Daemon::startPackageManagerLoader()
+{
+    /// @todo Do this!
+}
+
 void Daemon::mainTask()
 {
-    //! TODO: Make this actually do things...
+    startCMIDLoader();
+
+    startPackageManagerLoader();
+
+    //! TODO: Just busy wait??
     //!
-    //! Entire contents below will be removed
+    //! Change as needed...
     while(this->isRunning_) {
         using namespace std;
         using namespace std::chrono_literals;

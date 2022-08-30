@@ -24,6 +24,9 @@ private:
     std::thread task_;
 
     void mainTask();
+
+    void startCMIDLoader();
+    void startPackageManagerLoader();
 };
 
 } // namespace CloudManagementClient

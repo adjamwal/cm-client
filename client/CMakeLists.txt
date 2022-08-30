@@ -11,6 +11,8 @@ set(CM_CLIENT_DAEMON_SRCS
     main.cpp
     ComponentLoader/CMIDLoader.hpp
     ComponentLoader/CMIDLoader.cpp
+    Configuration/Config.hpp
+    Configuration/Config.cpp
 )
 
 add_executable(cm-client-daemon ${CM_CLIENT_DAEMON_SRCS})
@@ -43,6 +45,14 @@ target_link_libraries(cm-client-daemon
     "-framework IOKit"
     "-framework CoreServices"
     "-framework Security"
+)
+
+target_compile_definitions(cm-client-daemon
+    PUBLIC
+    "$<$<CONFIG:DEBUG>:DEBUG>"
+    "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CM_THIRDPARTY_EXPORT}/bin\">"
+    "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/client/config\">"
+    "$<$<CONFIG:DEBUG>:CM_SHARED_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
 )
 
 target_enable_warnings(cm-client-daemon)
