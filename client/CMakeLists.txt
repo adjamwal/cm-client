@@ -7,12 +7,22 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CM_CLIENT_DAEMON_SRCS
     Daemon.cpp
+    Daemon.hpp
     main.cpp
+    ComponentLoader/CMIDLoader.hpp
+    ComponentLoader/CMIDLoader.cpp
 )
 
 add_executable(cm-client-daemon ${CM_CLIENT_DAEMON_SRCS})
 
-add_dependencies(cm-client-daemon third-party-jsoncpp)
+add_dependencies(cm-client-daemon
+    third-party-ciscossl
+    third-party-curl
+    third-party-gtest
+    third-party-jsoncpp
+    third-party-cmid
+#    third-party-PackageManager
+)
 
 target_include_directories(cm-client-daemon
     PUBLIC
@@ -25,10 +35,15 @@ target_link_directories(cm-client-daemon BEFORE
     ${CM_THIRDPARTY_EXPORT}/lib
 )
 
-#target_link_libraries(cm-client-daemon
-#    PUBLIC
-#    ${EXTRA_LIBRARIES}
-#)
+target_link_libraries(cm-client-daemon
+    PUBLIC
+    cmidcontrolplugin
+    common
+    "-framework SystemConfiguration"
+    "-framework IOKit"
+    "-framework CoreServices"
+    "-framework Security"
+)
 
 target_enable_warnings(cm-client-daemon)
 
