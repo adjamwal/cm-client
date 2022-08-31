@@ -36,10 +36,8 @@ Daemon::~Daemon() {
     this->stop();
 }
 
-void Daemon::startCMIDLoader()
+void Daemon::init()
 {
-    using namespace cmid;
-
     try {
         const std::string strLogFilePath = Config::CM_LOG_PATH + "csc_cmid_control_plugin.log";
         //Initialise logger
@@ -49,24 +47,19 @@ void Daemon::startCMIDLoader()
         std::cerr << "Failed to Initialize logger: " << rExcep.what() << std::endl;
         return;
     }
-
-    auto cmid_controller = new ComponentLoader::CMIDLoader{
-                    std::make_unique<CCMIDAgentController>(Config::CMID_EXEC_PATH,
-                                                           Config::CM_CFG_PATH) };
-
-    cmid_controller->load();
-}
-
-void Daemon::startPackageManagerLoader()
-{
-    /// @todo Do this!
 }
 
 void Daemon::mainTask()
 {
-    startCMIDLoader();
+    using namespace cmid;
 
-    startPackageManagerLoader();
+    /* Load and start CMID controller... */
+    auto cmid_controller = new ComponentLoader::CMIDLoader{
+                    std::make_unique<CCMIDAgentController>(Config::CMID_EXEC_PATH,
+                                                           Config::CM_CFG_PATH) };
+    cmid_controller->load();
+
+    //! @todo Load and start Package Manager
 
     //! TODO: Just busy wait??
     //!

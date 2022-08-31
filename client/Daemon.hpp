@@ -25,8 +25,7 @@ private:
 
     void mainTask();
 
-    void startCMIDLoader();
-    void startPackageManagerLoader();
+    void init();
 };
 
 } // namespace CloudManagementClient
