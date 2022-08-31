@@ -53,6 +53,8 @@ void Daemon::mainTask()
 {
     using namespace cmid;
 
+    init();
+
     /* Load and start CMID controller... */
     auto cmid_controller = new ComponentLoader::CMIDLoader{
                     std::make_unique<CCMIDAgentController>(Config::CMID_EXEC_PATH,
