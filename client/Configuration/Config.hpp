@@ -18,13 +18,17 @@ using namespace std;
 class Config {
 public:
 #if defined(DEBUG) && defined(CMID_DAEMON_PATH) && defined(CM_CONFIG_PATH) && defined(CM_SHARED_LOG_PATH)
-    inline static const string CMID_EXEC_PATH = CMID_DAEMON_PATH;
-    inline static const string CM_CFG_PATH    = CM_CONFIG_PATH;
-    inline static const string CM_LOG_PATH    = CM_SHARED_LOG_PATH;
+    inline static const string CMID_EXEC_PATH  = CMID_DAEMON_PATH;
+    inline static const string CM_CFG_PATH     = CM_CONFIG_PATH;
+    inline static const string CM_LOG_PATH     = CM_SHARED_LOG_PATH;
 #else
-    inline static const string CMID_EXEC_PATH = "/opt/cisco/csc/bin";
-    inline static const string CM_CFG_PATH    = "/opt/cisco/csc/etc";
-    inline static const string CM_LOG_PATH    = "/Library/Logs/Cisco/Cisco Secure Client";
+    inline static const string CMID_EXEC_PATH  = "/opt/cisco/secureclient/cloudmanagement/bin";
+    inline static const string CM_CFG_PATH     = "/opt/cisco/secureclient/cloudmanagement/etc";
+#   ifdef __APPLE__
+        inline static const string CM_LOG_PATH = "/Library/Logs/Cisco/Cisco Secure Client/Cloud Management/";
+#   else
+        inline static const string CM_LOG_PATH = "/var/logs/cisco/secureclient/cloudmanagement/";
+#   endif
 #endif /* DEBUG */
 
     Config();

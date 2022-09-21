@@ -36,8 +36,7 @@ include(ExternalProject_ciscossl)
 include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)
 include(ExternalProject_gtest)
-# Disabling for now, currently not building on macOS (or Linux)
-#include(ExternalProject_PackageManager)
+include(ExternalProject_PackageManager)
 include(ExternalProject_cmid)
 
 ##
