@@ -9,7 +9,7 @@ set(FFF_EXPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/fff")
 # TODO Be more specific about tool chain
 ExternalProject_Add(
     third-party-PackageManager
-    DEPENDS third-party-ciscossl third-party-curl third-party-gtest third-party-jsoncpp
+    DEPENDS third-party-ciscossl third-party-curl third-party-jsoncpp third-party-gtest
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/PackageManager/cmake
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/PackageManager/export
     CMAKE_ARGS
