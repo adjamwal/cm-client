@@ -23,7 +23,7 @@ add_dependencies(cm-client-daemon
     third-party-gtest
     third-party-jsoncpp
     third-party-cmid
-#    third-party-PackageManager
+    third-party-PackageManager
 )
 
 target_include_directories(cm-client-daemon
