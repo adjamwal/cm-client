@@ -1,7 +1,7 @@
 # CMakeLists.txt
 # Copyright 2022, Cisco Systems, Inc.
 
-cmake_minimum_required(VERSION 3.6.1)
+cmake_minimum_required(VERSION 3.19)
 
 # Specify search path for CMake modules to be loaded by include()
 # and find_package()
