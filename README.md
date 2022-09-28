@@ -69,9 +69,10 @@ To be able to build cm-client, the following software packages are required:
 To build cm-client, use the `build` symlink on the root of the repository.  Usage for this script is as follows:
 
 ~~~
-Usage: build [-c|clean] [-h]
+Usage: build [-c|-h]
  -c    clean build
  -h    help (this usage)
+ -x    Xcode project generator (macOS only)
 
  * Run without any arguments to build cm-client
 ~~~
@@ -101,3 +102,24 @@ Third-party components:
 First-party components:
 * PackageManager (PM)
 * Cloud Management Identity (CMID)
+
+## Xcode (experimental)
+
+To use the Xcode build system in macOS, configure the build using the following command.
+
+~~~sh
+$ ./build -x
+~~~
+
+It's currently labelled as experimental because the install steps will succeed, but for some reason the artifacts that are supposed to be copied over are not available after install.  At this point it's not clear why that is the case.
+
+If this does occur then the install step must be run manually to export the header for the particular library that failed to install its headers and libraries to the cmake `export` directory.
+
+~~~sh
+# Find the build directory for the specific third-party component where the exports are missing
+cd ./debug/third-party/<third-party-component>/src/third-party-<third-party-component>-build
+# From within that directory run
+cmake --build . --config Debug --target install
+~~~
+
+Examples where this might be the case include `<third-party-components>` such as `jsoncpp`, and `gtest`.
