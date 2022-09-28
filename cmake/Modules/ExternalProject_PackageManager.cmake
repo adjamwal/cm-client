@@ -13,6 +13,7 @@ ExternalProject_Add(
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/PackageManager/cmake
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/third-party/PackageManager/export
     CMAKE_ARGS
+        -G ${CMAKE_GENERATOR}
         -Djsoncpp_INCLUDE_DIRS=${CM_THIRDPARTY_EXPORT}/include
         -Djsoncpp_LIBRARY=${CM_THIRDPARTY_EXPORT}/lib
         -Dcurl_INCLUDE_DIRS=${CM_THIRDPARTY_EXPORT}/include
@@ -22,7 +23,7 @@ ExternalProject_Add(
         -Dfff_INCLUDE_DIRS=${FFF_EXPORT_DIR}
         -Dgtest_INCLUDE_DIRS=${CM_THIRDPARTY_EXPORT}/include
         -Dgtest_LIBRARY=${CM_THIRDPARTY_EXPORT}/lib
-        -DSKIP_TESTS=TRUE
+        -DSKIP_TESTS=FALSE
         -DCMAKE_INSTALL_PREFIX:PATH=${CM_THIRDPARTY_EXPORT}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES_}
