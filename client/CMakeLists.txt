@@ -9,8 +9,8 @@ set(CM_CLIENT_DAEMON_SRCS
     Daemon.cpp
     Daemon.hpp
     main.cpp
-    ComponentLoader/CMIDLoader.hpp
-    ComponentLoader/CMIDLoader.cpp
+#    ComponentLoader/CMIDLoader.hpp
+#    ComponentLoader/CMIDLoader.cpp
     Configuration/Config.hpp
     Configuration/Config.cpp
 )

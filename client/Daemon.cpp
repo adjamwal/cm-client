@@ -8,8 +8,7 @@
 #include "ComponentLoader/CMIDLoader.hpp"
 #include "Configuration/Config.hpp"
 
-#include "cmid/CMIDAgentController.h"
-#include "cmid/CMIDLogger.h"
+#include "cmid/PackageManagerInternalModuleAPI.h"
 
 #include <sys/stat.h>
 
@@ -38,14 +37,6 @@ Daemon::~Daemon() {
 
 void Daemon::init()
 {
-    try {
-        const std::string strLogFilePath = Config::CM_LOG_PATH + "csc_cmid_control_plugin.log";
-        //Initialise logger
-        CMID_LOG_INIT(strLogFilePath);
-    } catch(const std::exception& rExcep) {
-        std::cerr << "Failed to initialize CMID control plugin logger: " << rExcep.what() << std::endl;
-        return;
-    }
 }
 
 void Daemon::mainTask()
@@ -54,11 +45,14 @@ void Daemon::mainTask()
 
     init();
 
-    /* Load and start CMID controller... */
-    auto cmid_loader = new ComponentLoader::CMIDLoader{
-                    std::make_unique<CCMIDAgentController>(Config::CMID_EXEC_PATH,
-                                                           Config::CM_CFG_PATH) };
-    cmid_loader->load();
+    PM_MODULE_CTX_T  modContext = { 0 };
+    modContext.nVersion = PM_MODULE_INTERFACE_VERSION;
+    CreateModuleInstance(&modContext);
+
+    /** @todo replace 2nd parameter with data directory */
+    modContext.fpStart(Config::CMID_EXEC_PATH.c_str(),
+                       Config::CM_CFG_PATH.c_str(),
+                       Config::CM_CFG_PATH.c_str());
 
     //! @todo Load and start Package Manager
 
@@ -79,6 +73,10 @@ void Daemon::mainTask()
         //auto end = chrono::high_resolution_clock::now();
         (void) chrono::high_resolution_clock::now();
     }
+
+    modContext.fpStop();
+
+    ReleaseModuleInstance(&modContext);
 }
 
 } // namespace CloudManagementClient

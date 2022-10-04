@@ -4,8 +4,6 @@
  * @copyright (c) 2022 Cisco Systems, Inc. All rights reserved
  */
 
-#include "cmid/CMIDAgentController.h"
-
 #include "CMIDLoader.hpp"
 
 #include <memory>
