@@ -6,53 +6,47 @@
 #include "Daemon.hpp"
 
 #include "ComponentLoader/CMIDLoader.hpp"
-#include "Configuration/Config.hpp"
-
-#include "cmid/PackageManagerInternalModuleAPI.h"
 
 #include <sys/stat.h>
 
 #include <chrono>
 #include <iostream>
 
-using namespace CloudManagementConfiguration;
-
 namespace CloudManagementClient
 {
 
-void Daemon::start() {
-    this->isRunning_ = true;
-
-    this->task_ = std::thread(&Daemon::mainTask, this);
-    this->task_.join();
-}
-
-void Daemon::stop() {
-    this->isRunning_ = false;
-}
-
-Daemon::~Daemon() {
-    this->stop();
+Daemon::Daemon()
+    : cmidLoader_ { std::make_unique<ComponentLoader::CMIDLoader>() }
+{
 }
 
 void Daemon::init()
 {
 }
 
+void Daemon::start()
+{
+    this->isRunning_ = true;
+
+    this->task_ = std::thread(&Daemon::mainTask, this);
+    this->task_.join();
+}
+
+void Daemon::stop()
+{
+    this->isRunning_ = false;
+}
+
+Daemon::~Daemon()
+{
+    this->stop();
+}
+
 void Daemon::mainTask()
 {
-    using namespace cmid;
-
     init();
 
-    PM_MODULE_CTX_T  modContext = { 0 };
-    modContext.nVersion = PM_MODULE_INTERFACE_VERSION;
-    CreateModuleInstance(&modContext);
-
-    /** @todo replace 2nd parameter with data directory */
-    modContext.fpStart(Config::CMID_EXEC_PATH.c_str(),
-                       Config::CM_CFG_PATH.c_str(),
-                       Config::CM_CFG_PATH.c_str());
+    cmidLoader_->start();
 
     //! @todo Load and start Package Manager
 
@@ -74,9 +68,7 @@ void Daemon::mainTask()
         (void) chrono::high_resolution_clock::now();
     }
 
-    modContext.fpStop();
-
-    ReleaseModuleInstance(&modContext);
+    cmidLoader_->stop();
 }
 
 } // namespace CloudManagementClient

@@ -9,17 +9,24 @@
 #include <atomic>
 #include <thread>
 
+namespace ComponentLoader {
+    class CMIDLoader;
+}
+
 namespace CloudManagementClient
 {
 
 class Daemon {
 public:
+    Daemon();
     ~Daemon();
 
     void start();
     void stop();
 
 private:
+    std::unique_ptr<ComponentLoader::CMIDLoader> cmidLoader_;
+
     std::atomic<bool> isRunning_;
     std::thread task_;
 

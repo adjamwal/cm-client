@@ -6,32 +6,31 @@
 
 #pragma once
 
+#include "cmid/PackageManagerInternalModuleAPI.h"
+
 #include <atomic>
 #include <thread>
 
-namespace cmid {
-    class CCMIDAgentController;
-}
 
 namespace ComponentLoader
 {
 
 class CMIDLoader {
 public:
-    CMIDLoader(std::unique_ptr<cmid::CCMIDAgentController> cmid_agent);
-    ~CMIDLoader() = default;
-    CMIDLoader() = delete;
+    CMIDLoader();
+    ~CMIDLoader();
     CMIDLoader(const CMIDLoader &other) = delete;
     CMIDLoader &operator=(const CMIDLoader &other) = delete;
     CMIDLoader(CMIDLoader &&other) = delete;
     CMIDLoader &operator=(CMIDLoader &&other) = delete;
 
-    void load();
-    void unload();
+    void start();
+    void stop();
+    void reloadConfig();
 
 private:
-    std::atomic<bool> is_loaded_;
-    std::unique_ptr<cmid::CCMIDAgentController> cmid_agent_;
+    std::atomic<bool> is_running_;
+    PM_MODULE_CTX_T cmid_module_context_;
 };
 
 } // namespace ComponentLoader
