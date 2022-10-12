@@ -9,15 +9,7 @@
 #include <atomic>
 #include <thread>
 
-namespace ComponentLoader {
-    class CMIDLoader;
-}
-
-namespace CloudManagementConfiguration {
-    class Config;
-}
-
-namespace CloudManagementClient
+namespace PackageManager
 {
 
 class Daemon {
@@ -29,9 +21,6 @@ public:
     void stop();
 
 private:
-    std::unique_ptr<ComponentLoader::CMIDLoader> cmidLoader_;
-    std::unique_ptr<CloudManagementConfiguration::Config> config_;
-
     std::atomic<bool> isRunning_;
     std::thread task_;
 
@@ -40,4 +29,4 @@ private:
     void init();
 };
 
-} // namespace CloudManagementClient
+} // namespace PackageManager

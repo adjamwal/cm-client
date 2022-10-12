@@ -5,26 +5,20 @@
 
 #include "Daemon.hpp"
 
-#include "ComponentLoader/CMIDLoader.hpp"
-#include "Configuration/Config.hpp"
-
 #include <sys/stat.h>
 
 #include <chrono>
 #include <iostream>
 
-namespace CloudManagementClient
+namespace PackageManager
 {
 
 Daemon::Daemon()
-    : cmidLoader_ { std::make_unique<ComponentLoader::CMIDLoader>() },
-      config_ { std::make_unique<CloudManagementConfiguration::Config>()}
 {
 }
 
 void Daemon::init()
 {
-    config_->load();
 }
 
 void Daemon::start()
@@ -49,10 +43,6 @@ void Daemon::mainTask()
 {
     init();
 
-    cmidLoader_->start();
-
-    //! @todo Load and start Package Manager
-
     //! TODO: Just busy wait??
     //!
     //! Change as needed...
@@ -70,8 +60,6 @@ void Daemon::mainTask()
         //auto end = chrono::high_resolution_clock::now();
         (void) chrono::high_resolution_clock::now();
     }
-
-    cmidLoader_->stop();
 }
 
-} // namespace CloudManagementClient
+} // namespace PackageManager

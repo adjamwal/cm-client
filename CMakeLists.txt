@@ -41,5 +41,9 @@ include(ExternalProject_PackageManager)
 include(ExternalProject_cmid)
 
 ##
+## Package Manager client
+add_subdirectory(OSPackageManager)
+
+##
 ## The Cloud Management Connector client
 add_subdirectory(client)

@@ -7,6 +7,7 @@ include(ExternalProject)
 # TODO Be more specific about tool chain
 # TODO Adapt to make OSX options based on target
 # TODO Update CMAKE_COMMAND to take in actual version numbers
+# TODO Pass CM_SHARED_LOG_PATH on Debug builds only
 # TODO Currently project has no rules to install, add INSTALL_COMMAND (such as below)
 #      Right now, it's been forked and we added our own install directives
 #    INSTALL_COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cmid/src/third-party-cmid-build/controlplugin/libcmidcontrolplugin.dylib ${CM_THIRDPARTY_EXPORT}/lib/.
@@ -21,5 +22,6 @@ ExternalProject_Add(
         -DCMAKE_INSTALL_PREFIX:PATH=${CM_THIRDPARTY_EXPORT}
         -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES_}
         -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        -DCM_SHARED_LOG_PATH=${CMAKE_CURRENT_BINARY_DIR}
     CMAKE_COMMAND VERSION=1.1 RELNUM=1111 ${CMAKE_COMMAND}
 )
