@@ -3,14 +3,6 @@
 
 include(ExternalProject)
 
-set(XCODE_TOOLCHAIN_BIN "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin")
-set(XCODE_MACOS_SDK "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
-set(XCODE_CC "${XCODE_TOOLCHAIN_BIN}/clang -mmacosx-version-min=10.15 -isysroot ${XCODE_MACOS_SDK} -g -arch x86_64 -arch arm64")
-set(XCODE_CPP "${XCODE_TOOLCHAIN_BIN}/clang -mmacosx-version-min=10.15 -isysroot ${XCODE_MACOS_SDK} -E")
-set(XCODE_AR "${XCODE_TOOLCHAIN_BIN}/ar r")
-set(XCODE_NM "${XCODE_TOOLCHAIN_BIN}/nm")
-set(XCODE_RANLIB "${XCODE_TOOLCHAIN_BIN}/ranlib")
-
 set(CURL_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/src")
 
 #

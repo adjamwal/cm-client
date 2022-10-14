@@ -20,6 +20,14 @@ if(APPLE)
     #
     # The `;` must be escaped when passed into ExternalProject_Add()
     string(REPLACE ";" "$<SEMICOLON>" CMAKE_OSX_ARCHITECTURES_ "${CMAKE_OSX_ARCHITECTURES}")
+
+    set(XCODE_TOOLCHAIN_BIN "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin")
+    set(XCODE_MACOS_SDK "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
+    set(XCODE_CC "${XCODE_TOOLCHAIN_BIN}/clang -mmacosx-version-min=10.15 -isysroot ${XCODE_MACOS_SDK} -g -arch x86_64 -arch arm64")
+    set(XCODE_CPP "${XCODE_TOOLCHAIN_BIN}/clang -mmacosx-version-min=10.15 -isysroot ${XCODE_MACOS_SDK} -E")
+    set(XCODE_AR "${XCODE_TOOLCHAIN_BIN}/ar r")
+    set(XCODE_NM "${XCODE_TOOLCHAIN_BIN}/nm")
+    set(XCODE_RANLIB "${XCODE_TOOLCHAIN_BIN}/ranlib")
 endif()
 
 # remove ZERO_CHECK target from xcode
@@ -33,6 +41,7 @@ set(CM_THIRDPARTY_EXPORT "${CMAKE_CURRENT_BINARY_DIR}/export")
 
 ##
 ## External Package Definitions for third-party and first-party dependencies
+include(ExternalProject_spdlog)
 include(ExternalProject_ciscossl)
 include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)

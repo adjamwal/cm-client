@@ -19,3 +19,6 @@
 [submodule "third-party/fff"]
 	path = third-party/fff
 	url = ../../Cloud/fff-rel.git
+[submodule "third-party/spdlog"]
+	path = third-party/spdlog
+	url = ../../UnifiedConnector/spdlog-rel.git
