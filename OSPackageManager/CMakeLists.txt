@@ -9,6 +9,14 @@ set(PM_CLIENT_PROCESS_SRCS
     Daemon.cpp
     Daemon.hpp
     main.cpp
+    macOS/PmLogger.cpp
+    macOS/PmLogger.hpp
+    macOS/PmPlatformComponentManager.cpp
+    macOS/PmPlatformComponentManager.hpp
+    macOS/PmPlatformConfiguration.cpp
+    macOS/PmPlatformConfiguration.hpp
+    macOS/PmPlatformDependencies.cpp
+    macOS/PmPlatformDependencies.hpp
 )
 
 add_executable(cm-pm-client ${PM_CLIENT_PROCESS_SRCS})
@@ -25,7 +33,7 @@ add_dependencies(cm-pm-client
 target_include_directories(cm-pm-client
     PUBLIC
     ${CM_THIRDPARTY_EXPORT}/include
-    ${CM_THIRDPARTY_EXPORT}/include/PackageManager
+    ${CMAKE_CURRENT_SOURCE_DIR}/cm-pm-client/macOS
 )
 
 target_link_directories(cm-pm-client BEFORE
