@@ -16,8 +16,10 @@ Config::Config() {
 
 void Config::load()
 {
-    // Create directories (i.e. log paths, data directory, etc...)
-    //! @todo make them
+    // Create log path directory (assume data and config paths exists?)
+    if (!filesystem::is_directory(Config::CM_LOG_PATH)) {
+        filesystem::create_directories(Config::CM_LOG_PATH);
+    }
 
     // Do something...
     is_loaded_ = true;

@@ -72,6 +72,7 @@ To build cm-client, use the `build` symlink on the root of the repository.  Usag
 Usage: build [-c|-h]
  -c    clean build
  -h    help (this usage)
+ -r    release (default: debug)
  -x    Xcode project generator (macOS only)
 
  * Run without any arguments to build cm-client
