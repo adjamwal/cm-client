@@ -5,7 +5,7 @@ include(TargetEnableWarnings)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CM_CLIENT_DAEMON_SRCS
+set(CM_CLIENT_SRCS
     Daemon.cpp
     Daemon.hpp
     main.cpp
@@ -15,9 +15,9 @@ set(CM_CLIENT_DAEMON_SRCS
     Configuration/Config.cpp
 )
 
-add_executable(cm-client-daemon ${CM_CLIENT_DAEMON_SRCS})
+add_executable(csccloudmanagement ${CM_CLIENT_SRCS})
 
-add_dependencies(cm-client-daemon
+add_dependencies(csccloudmanagement
     third-party-ciscossl
     third-party-curl
     third-party-gtest
@@ -26,18 +26,18 @@ add_dependencies(cm-client-daemon
     third-party-PackageManager
 )
 
-target_include_directories(cm-client-daemon
+target_include_directories(csccloudmanagement
     PUBLIC
     ${cm-client_SOURCE_DIR}
     ${CM_THIRDPARTY_EXPORT}/include
 )
 
-target_link_directories(cm-client-daemon BEFORE
+target_link_directories(csccloudmanagement BEFORE
     PRIVATE
     ${CM_THIRDPARTY_EXPORT}/lib
 )
 
-target_link_libraries(cm-client-daemon
+target_link_libraries(csccloudmanagement
     PUBLIC
     cmidcontrolplugin
     common
@@ -47,7 +47,7 @@ target_link_libraries(cm-client-daemon
     "-framework Security"
 )
 
-target_compile_definitions(cm-client-daemon
+target_compile_definitions(csccloudmanagement
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CM_THIRDPARTY_EXPORT}/bin\">"
@@ -61,10 +61,10 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
         ${XCODE_VALUE})
     endmacro (set_xcode_property)
 
-    set_xcode_property(cm-client-daemon CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
-    set_xcode_property(cm-client-daemon CLANG_CXX_LIBRARY "libc++")
+    set_xcode_property(csccloudmanagement CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
+    set_xcode_property(csccloudmanagement CLANG_CXX_LIBRARY "libc++")
 endif()
 
-target_enable_warnings(cm-client-daemon)
+target_enable_warnings(csccloudmanagement)
 
-install(TARGETS cm-client-daemon DESTINATION ${cm-client_SOURCE_DIR}/export/bin/)
+install(TARGETS csccloudmanagement DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)

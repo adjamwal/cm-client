@@ -5,10 +5,12 @@ include(TargetEnableWarnings)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(PM_CLIENT_PROCESS_SRCS
+set(OS_PACKAGE_MANAGER_SRCS
     Daemon.cpp
     Daemon.hpp
     main.cpp
+    agent/PackageManagerAgent.cpp
+    agent/PackageManagerAgent.hpp
     macOS/PmLogger.cpp
     macOS/PmLogger.hpp
     macOS/PmPlatformComponentManager.cpp
@@ -19,9 +21,9 @@ set(PM_CLIENT_PROCESS_SRCS
     macOS/PmPlatformDependencies.hpp
 )
 
-add_executable(cm-pm-client ${PM_CLIENT_PROCESS_SRCS})
+add_executable(cmpackagemanager ${OS_PACKAGE_MANAGER_SRCS})
 
-add_dependencies(cm-pm-client
+add_dependencies(cmpackagemanager
     third-party-ciscossl
     third-party-curl
     third-party-gtest
@@ -30,28 +32,37 @@ add_dependencies(cm-pm-client
     third-party-PackageManager
 )
 
-target_include_directories(cm-pm-client
+target_include_directories(cmpackagemanager
     PUBLIC
     ${CM_THIRDPARTY_EXPORT}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/cm-pm-client/macOS
+    # This include should be based on platform when we extend support for Linux
+    ${CMAKE_CURRENT_SOURCE_DIR}/macOS
 )
 
-target_link_directories(cm-pm-client BEFORE
+target_link_directories(cmpackagemanager BEFORE
     PRIVATE
     ${CM_THIRDPARTY_EXPORT}/lib
 )
 
-target_link_libraries(cm-pm-client
+target_link_libraries(cmpackagemanager
     PUBLIC
     cmidapi
-    common
+    pmclient
+    pmcloud
+    pmconfig
+    pmutil
+    jsoncpp
+    curl
+    crypto
+    ssl
+    z
     "-framework SystemConfiguration"
     "-framework IOKit"
     "-framework CoreServices"
     "-framework Security"
 )
 
-target_compile_definitions(cm-pm-client
+target_compile_definitions(cmpackagemanager
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CM_THIRDPARTY_EXPORT}/bin\">"
@@ -65,10 +76,10 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
         ${XCODE_VALUE})
     endmacro (set_xcode_property)
 
-    set_xcode_property(cm-pm-client CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
-    set_xcode_property(cm-pm-client CLANG_CXX_LIBRARY "libc++")
+    set_xcode_property(cmpackagemanager CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
+    set_xcode_property(cmpackagemanager CLANG_CXX_LIBRARY "libc++")
 endif()
 
-target_enable_warnings(cm-pm-client)
+target_enable_warnings(cmpackagemanager)
 
-install(TARGETS cm-pm-client DESTINATION ${CM_THIRDPARTY_EXPORT}/export/bin/)
+install(TARGETS cmpackagemanager DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)
