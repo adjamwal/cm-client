@@ -82,10 +82,9 @@ def run_mac_ci() {
   }
   stage("Test") {
     if (continueCI()) {
-      dir("cm-client/debug"){
-        // Is this ready yet?
-        //sh 'make test'
-        echo "TODO: Add Tests"
+      // Do this for each individual test suite, i.e. add PackageManager when available
+      dir("cm-client/debug/client/tests"){
+        sh 'ctest'
       }
     }
   }

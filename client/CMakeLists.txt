@@ -20,7 +20,6 @@ add_executable(csccloudmanagement ${CM_CLIENT_SRCS})
 add_dependencies(csccloudmanagement
     third-party-ciscossl
     third-party-curl
-    third-party-gtest
     third-party-jsoncpp
     third-party-cmid
     third-party-PackageManager
@@ -68,3 +67,7 @@ endif()
 target_enable_warnings(csccloudmanagement)
 
 install(TARGETS csccloudmanagement DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)
+
+#
+# Include tests
+add_subdirectory(tests)
