@@ -65,8 +65,10 @@ def run_mac_ci() {
   stage("Build Debug") {
     if (continueCI()) {
       withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
-        dir("cm-client"){
-          sh './build'
+        withCredentials([string(credentialsId: 'ARTIFACTORY_TOKEN', variable: 'ARTIFACTORY_TOKEN')]) {
+          dir("cm-client"){
+            sh './build'
+          }
         }
       }
     }

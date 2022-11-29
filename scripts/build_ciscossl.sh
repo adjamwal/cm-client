@@ -33,14 +33,7 @@ if [ -z "${WORKSPACE_ROOT}" ]; then
     echo "Using WORKSPACE_ROOT=${WORKSPACE_ROOT}"
 fi
 
-#
-# **TODO** Support both a Debug and Release directory configuration
-if [ "${CMAKE_BUILD_TYPE}" = "Debug" ]; then
-    CMAKE_EXPORT_DIR=${WORKSPACE_ROOT}/debug/export
-else
-    CMAKE_EXPORT_DIR=${WORKSPACE_ROOT}/release/export
-fi
-CISCOSSL_EXPORT_DIR="${CMAKE_EXPORT_DIR}"
+CISCOSSL_EXPORT_DIR="${WORKSPACE_ROOT}/third-party/ciscossl/export"
 
 build_ciscossl_forarch()
 {

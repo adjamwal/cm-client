@@ -21,7 +21,7 @@ add_dependencies(csccloudmanagement
     third-party-ciscossl
     third-party-curl
     third-party-jsoncpp
-    third-party-cmid
+    third-party-EndpointIdentity
     third-party-PackageManager
 )
 

@@ -28,7 +28,7 @@ add_dependencies(cmpackagemanager
     third-party-curl
     third-party-gtest
     third-party-jsoncpp
-    third-party-cmid
+    third-party-EndpointIdentity
     third-party-PackageManager
 )
 

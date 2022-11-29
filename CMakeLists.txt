@@ -11,6 +11,7 @@ project(cm-client VERSION 1.0.0)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
+set(CXX_EXTENSIONS ON) # -std=gnu++11 instead of -std=c++11.
 
 if(APPLE)
     message("** Building on macOS, generator ${CMAKE_GENERATOR} **")
@@ -33,11 +34,25 @@ endif()
 # remove ZERO_CHECK target from xcode
 set(CMAKE_SUPPRESS_REGENERATION true)
 
+# TODO - Make this configurable
+set(BUILD_ALL_THIRD_PARTY false)
+# Change manually to force an individual library to be built instead
+set(BUILD_PACKAGE_MANAGER_THIRD_PARTY false)
+set(BUILD_ENDPOINT_IDENTITY_THIRD_PARTY false)
+
 # config.h checks
 include(ConfigureChecks.cmake)
 configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
+set(CM_SCRIPTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
 set(CM_THIRDPARTY_EXPORT "${CMAKE_CURRENT_BINARY_DIR}/export")
+
+file(MAKE_DIRECTORY ${CM_THIRDPARTY_EXPORT})
+
+##
+## Include Artifactory Helpers
+include(ArtifactoryDownload)
+include(ArtifactoryUpload)
 
 ##
 ## External Package Definitions for third-party and first-party dependencies
@@ -47,7 +62,7 @@ include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)
 include(ExternalProject_gtest)
 include(ExternalProject_PackageManager)
-include(ExternalProject_cmid)
+include(ExternalProject_EndpointIdentity)
 
 ##
 ## Package Manager client
