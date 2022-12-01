@@ -41,6 +41,7 @@ target_link_libraries(csccloudmanagement
     PUBLIC
     cmidcontrolplugin
     common
+    jsoncpp
     "-framework SystemConfiguration"
     "-framework IOKit"
     "-framework CoreServices"
