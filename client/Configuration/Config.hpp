@@ -9,6 +9,7 @@
 #include <atomic>
 #include <thread>
 #include <string>
+#include <mutex>
 
 namespace CloudManagementConfiguration
 {
@@ -39,10 +40,13 @@ public:
     Config &operator=(Config &&other) = delete;
 
     void load();
+    int getLogLevel();
 
 private:
 
     std::atomic<bool> is_loaded_;
+    uint32_t m_logLevel = 7; //default loglevel
+    std::mutex m_mutex;
 };
 
 } // namespace ComponentLoader
