@@ -69,7 +69,7 @@ void Config::load()
     is_loaded_ = true;
 }
 
-int Config::getLogLevel()
+uint32_t Config::getLogLevel()
 {
     std::lock_guard<std::mutex> lock( m_mutex );
     return m_logLevel;

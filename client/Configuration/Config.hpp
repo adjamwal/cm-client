@@ -40,7 +40,7 @@ public:
     Config &operator=(Config &&other) = delete;
 
     void load();
-    int getLogLevel();
+    uint32_t getLogLevel();
 
 private:
 
