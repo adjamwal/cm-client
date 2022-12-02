@@ -64,7 +64,7 @@ if(NOT TARGET "third-party-${component_name}")
     # regeneration of autotools build products
     #add_custom_command(TARGET third-party-curl PRE_BUILD COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/src/_autotool_generated_file_")
 
-   upload_component(${component_name})
+   upload_component(${component_name} not_used)
 endif()
 
 add_dependencies(third-party-curl third-party-ciscossl)

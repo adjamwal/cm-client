@@ -7,6 +7,11 @@ set(component_name gtest)
 set(component_dst_dir "${CMAKE_CURRENT_BINARY_DIR}/third-party-${component_name}-prefix/src/third-party-${component_name}")
 set(component_install_prefix "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/export")
 
+set(GTEST_LIBS
+    gtest_maind
+    gtestd
+)
+
 if(NOT BUILD_ALL_THIRD_PARTY)
     download_component(${component_name} ${component_dst_dir})
 endif()
@@ -25,5 +30,12 @@ if(NOT TARGET "third-party-${component_name}")
             -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
 
-    upload_component(${component_name})
+    upload_component(${component_name} not_used)
+
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(GTEST_LIBS
+            gtest_main
+            gtest
+        )
+    endif()
 endif()

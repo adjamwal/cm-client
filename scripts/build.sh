@@ -8,12 +8,21 @@ usage=false
 if [ $# -ge 1 ] && [ "$1" = "clean" ]; then
     clean=true
 else
-    while getopts chrx flag
+    while getopts chrxs: flag
     do
       case "${flag}" in
         c) clean=true;;
         x) xcode=true;; # Only applicable to macOS
         r) release=true;;
+        s) sign=true
+           # Use - to let script choose the signing certificate
+           if [ "${OPTARG}" != "-" ]; then
+               echo "**Using signing certificate ${OPTARG}"
+               SIGNING_CERT=${OPTARG}
+           else
+               echo "**No certificate specified, will find suitable certificate in Keychain"
+           fi
+           ;; # Only applicable to macOS
         *) usage=true;;
       esac
 done
@@ -21,12 +30,21 @@ fi
 
 if [ "${usage}" = "true" ]; then
     echo "Usage: build [-c|-h]"
-    echo " -c    clean build"
-    echo " -h    help (this usage)"
-    echo " -r    release (default: debug)"
-    echo " -x    Xcode project generator (macOS only)"
+    echo " -c		clean build"
+    echo " -h		help (this usage)"
+    echo " -r		release (default: debug)"
+    echo " -x		Xcode project generator (macOS only)"
+    echo " -s <cert>	Sign binaries (use - for <cert> for build to select automatically)"
     echo
     echo " * Run without any arguments to build cm-client"
+    echo
+    echo "Examples:"
+    echo
+    echo " # Use Xcode, and find *developer* signing certificate in Keychain"
+    echo " % ./build -x -s -"
+    echo
+    echo " # Create a Makefile build signing using specified certificate in Keychain"
+    echo " % ./build -s \"Apple Development: John Smith (F34ACD4F4E)\""
     exit 0
 fi
 
@@ -35,6 +53,26 @@ CMAKE_BUILD_DIR="debug"
 if [ "${release}" = "true"  ]; then
     CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
     CMAKE_BUILD_DIR="release"
+fi
+
+if [ "${sign}" = "true" ]; then
+    # If SIGNING_CERT is not defined, try to find appropriate signing certificate
+    if [ -z "${SIGNING_CERT}" ]; then
+        sign_cert_count=$(security find-identity -p codesigning -v | grep "Apple Development" | wc -l | xargs)
+        echo "**Found ${sign_cert_count} matching certificate(s) in Keychain"
+        if [ ${sign_cert_count} -eq 0 ]; then
+            echo "ERROR: No certificate found in Keychain for codesigning"
+            exit 1
+        elif [ ${sign_cert_count} -eq 1 ]; then
+            # If there's only one match, then we can just use "Apple Development" and let
+            # codesign choose
+            SIGNING_CERT="Apple Development"
+        else
+            # In the case where more than one signing certificate is available
+            # we just choose the last match (assuming last is newest)
+            SIGNING_CERT=$(security find-identity -p codesigning -v | grep "Apple Development" | cut -f 2 -d '"' | tail -1)
+        fi
+    fi
 fi
 
 if [ "${clean}" = "true" ]; then
@@ -53,7 +91,11 @@ else
     if [ "${SYSTEM}" = "Darwin" ] && [ "${xcode}" = "true" ]; then
         CMAKE_EXTRA_ARGS="-G Xcode ${CMAKE_EXTRA_ARGS}"
         pushd "${CMAKE_BUILD_DIR}"
-            cmake ${CMAKE_EXTRA_ARGS} ../ .
+            if [ "${sign}" = "true" ]; then
+                cmake ${CMAKE_EXTRA_ARGS} -DSIGNING_CERT="${SIGNING_CERT}" ../ .
+            else
+                cmake ${CMAKE_EXTRA_ARGS} ../ .
+            fi
         popd
 
         #
@@ -79,7 +121,11 @@ else
         echo "       line may be necessary for some third-party components"
     else
         pushd "${CMAKE_BUILD_DIR}"
-            cmake ${CMAKE_EXTRA_ARGS} ../ .
+            if [ "${sign}" = "true" ]; then
+                cmake ${CMAKE_EXTRA_ARGS} -DSIGNING_CERT="${SIGNING_CERT}" ../ .
+            else
+                cmake ${CMAKE_EXTRA_ARGS} ../ .
+            fi
             cmake --build .
         popd
 

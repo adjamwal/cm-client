@@ -9,7 +9,7 @@ function(get_artifactory_url component output)
 
     string(REGEX MATCH "https:\/\/.+\.tar\.gz" artifactory_url "${get_artifactory_url_output}")
 
-    if (artifactory_url STREQUAL "")
+    if(artifactory_url STREQUAL "")
         set(${output} "" PARENT_SCOPE)
         message("ERROR: download URL for ${component} is not available.")
         #
