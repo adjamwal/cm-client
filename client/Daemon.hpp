@@ -17,6 +17,9 @@ namespace CloudManagementConfiguration {
     class Config;
 }
 
+class ICMLogFile;
+class CMLogger;
+
 namespace CloudManagementClient
 {
 
@@ -31,6 +34,8 @@ public:
 private:
     std::unique_ptr<ComponentLoader::CMIDLoader> cmidLoader_;
     std::unique_ptr<CloudManagementConfiguration::Config> config_;
+    std::unique_ptr<ICMLogFile> m_logFile;
+    std::unique_ptr<CMLogger> m_logger;
 
     std::atomic<bool> isRunning_;
     std::thread task_;
