@@ -23,9 +23,9 @@ class ICMLogger
 {
 public:
     virtual ~ICMLogger() {}
-    virtual void LogMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
+    virtual void logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
     const char* funcName, long lineNumber, const char* message, ... ) = 0;
-    virtual void SetLogLevel( CM_LOG_LVL_T loglevel ) = 0;
+    virtual void setLogLevel( CM_LOG_LVL_T loglevel ) = 0;
 };
 
 ICMLogger* GetCMLogger();
@@ -34,10 +34,10 @@ void SetCMLogger( ICMLogger* logger );
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define CM_LOG( severity, message, ... ) \
-    {GetCMLogger()->LogMessage( severity, false, __FILENAME__, __FUNCTION__, __LINE__, message, ##__VA_ARGS__ );}
+    {GetCMLogger()->logMessage( severity, false, __FILENAME__, __FUNCTION__, __LINE__, message, ##__VA_ARGS__ );}
 
 #define CM_LOG_STRERR( severity, message, ... ) \
-    {GetCMLogger()->LogMessage( severity, true, __FILENAME__, __FUNCTION__, __LINE__, message, ##__VA_ARGS__ );}
+    {GetCMLogger()->logMessage( severity, true, __FILENAME__, __FUNCTION__, __LINE__, message, ##__VA_ARGS__ );}
 
 #define CM_LOG_ALERT( message, ... ) CM_LOG( CM_LOG_LVL_T::CM_LOG_ALERT, message, ##__VA_ARGS__ )
 #define CM_LOG_CRITICAL( message, ... ) CM_LOG( CM_LOG_LVL_T::CM_LOG_CRITICAL, message, ##__VA_ARGS__ )

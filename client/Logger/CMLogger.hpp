@@ -16,10 +16,10 @@ public:
 
     CMLogger( ICMLogFile& logFile );
     ~CMLogger();
-    void LogMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
+    void logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
     const char* funcName, long lineNumber, const char* message, ... ) override;
-    void SetLogLevel( CM_LOG_LVL_T severity ) override;
+    void setLogLevel( CM_LOG_LVL_T severity ) override;
 private:
-    CM_LOG_LVL_T m_logLevel;
-    ICMLogFile& m_logFile;
+    CM_LOG_LVL_T logLevel_;
+    ICMLogFile& logFile_;
 };

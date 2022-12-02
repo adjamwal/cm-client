@@ -11,9 +11,9 @@ class DefaultCMLogger : public ICMLogger
 public:
     DefaultCMLogger();
     ~DefaultCMLogger();
-    virtual void LogMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
+    virtual void logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
     const char* funcName, long lineNumber, const char* message, ... ) override;
-    virtual void SetLogLevel( CM_LOG_LVL_T loglevel ) override;
+    virtual void setLogLevel( CM_LOG_LVL_T loglevel ) override;
 };
 
 static DefaultCMLogger defaultLogger;
@@ -55,7 +55,7 @@ static void printTime()
 }
 #endif
 
-void DefaultCMLogger::LogMessage( [[maybe_unused]] const CM_LOG_LVL_T severity, 
+void DefaultCMLogger::logMessage( [[maybe_unused]] const CM_LOG_LVL_T severity, 
                                   [[maybe_unused]] const bool bIsStrErr, 
                                   [[maybe_unused]] const char* fileName,
                                   [[maybe_unused]] const char* funcName, 
@@ -75,7 +75,7 @@ void DefaultCMLogger::LogMessage( [[maybe_unused]] const CM_LOG_LVL_T severity,
 #endif
 }
 
-void DefaultCMLogger::SetLogLevel( [[maybe_unused]] CM_LOG_LVL_T severity )
+void DefaultCMLogger::setLogLevel( [[maybe_unused]] CM_LOG_LVL_T severity )
 {
 
 }

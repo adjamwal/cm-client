@@ -43,8 +43,8 @@ const char* LogLevelStr( const CM_LOG_LVL_T level )
 }
 
 CMLogger::CMLogger( ICMLogFile& logFile ) :
-    m_logLevel( CM_LOG_LVL_T::CM_LOG_ERROR )
-    , m_logFile( logFile )
+    logLevel_ ( CM_LOG_LVL_T::CM_LOG_ERROR ),
+    logFile_ ( logFile )
 {
 }
 
@@ -52,23 +52,23 @@ CMLogger::~CMLogger()
 {
 }
 
-void CMLogger::SetLogLevel( CM_LOG_LVL_T logLevel )
+void CMLogger::setLogLevel( CM_LOG_LVL_T logLevel )
 {
     if( ( logLevel >= CM_LOG_LVL_T::CM_LOG_ALERT ) && ( logLevel <= CM_LOG_LVL_T::CM_LOG_DEBUG ) ) {
-        if( m_logLevel != logLevel ) {
-            m_logLevel = logLevel;
-            CM_LOG_DEBUG("Set Debug Level to %d", m_logLevel);
+        if( logLevel_ != logLevel ) {
+            logLevel_ = logLevel;
+            CM_LOG_DEBUG( "Set Debug Level to %d", logLevel_ );
         }
     }
     else {
-        CM_LOG_ERROR("Invalid Debug level %d", logLevel); 
+        CM_LOG_ERROR( "Invalid Debug level %d", logLevel ); 
     }
 }
 
-void CMLogger::LogMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
+void CMLogger::logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
     const char* funcName, long lineNumber, const char* message, ... )
 {
-    if( m_logLevel < severity ) {
+    if( logLevel_ < severity ) {
         return;
     }
 
@@ -94,6 +94,6 @@ void CMLogger::LogMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, co
     snprintf( logBuf, sizeof( logBuf ), "%s:%s:%ld: %s %s", fileName, funcName, lineNumber, message, errStr );
     va_start( va_args, message );
     vsnprintf( logLine, sizeof( logLine ), logBuf, va_args );
-    m_logFile.WriteLogLine( LogLevelStr( severity ), logLine );
+    logFile_.writeLogLine( LogLevelStr( severity ), logLine );
     va_end( va_args );
 }

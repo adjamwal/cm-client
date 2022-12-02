@@ -14,9 +14,9 @@ class ICMLogFile
 public:
     ICMLogFile() {};
     virtual ~ICMLogFile() {};
-    virtual void Init( const char* logname = NULL ) = 0;
-    virtual void WriteLogLine( const char* logLevel, const char* logLine ) = 0;
-    virtual void SetLogConfig( uint32_t fileSize, uint32_t logFiles ) = 0;
+    virtual void init( const char* logname = NULL ) = 0;
+    virtual void writeLogLine( const char* logLevel, const char* logLine ) = 0;
+    virtual void setLogConfig( uint32_t fileSize, uint32_t logFiles ) = 0;
 };
 
 

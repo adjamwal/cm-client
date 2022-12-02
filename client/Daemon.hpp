@@ -34,8 +34,8 @@ public:
 private:
     std::unique_ptr<ComponentLoader::CMIDLoader> cmidLoader_;
     std::unique_ptr<CloudManagementConfiguration::Config> config_;
-    std::unique_ptr<ICMLogFile> m_logFile;
-    std::unique_ptr<CMLogger> m_logger;
+    std::unique_ptr<ICMLogFile> logFile_;
+    std::unique_ptr<CMLogger> logger_;
 
     std::atomic<bool> isRunning_;
     std::thread task_;

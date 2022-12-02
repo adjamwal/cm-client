@@ -16,24 +16,24 @@ class CMLogFile : public ICMLogFile
 public:
     CMLogFile();
     ~CMLogFile();
-    void Init( const char* logname = NULL ) override;
-    void WriteLogLine( const char* logLevel, const char* logLine ) override;
-    void SetLogConfig( uint32_t fileSize, uint32_t logFiles ) override;
-    void Deinit();
+    void init( const char* logname = NULL ) override;
+    void writeLogLine( const char* logLevel, const char* logLine ) override;
+    void setLogConfig( uint32_t fileSize, uint32_t logFiles ) override;
+    void deinit();
 
 private:
-    std::filesystem::path m_logFileName;
-    std::mutex m_mutex;
-    uint32_t m_maxFileSize;
-    uint32_t m_maxLogFiles;
-    std::string m_loggerName;
+    std::filesystem::path logFileName_;
+    std::mutex mutex_;
+    uint32_t maxFileSize_;
+    uint32_t maxLogFiles_;
+    std::string loggerName_;
 
     static const uint32_t DEFAULT_MAX_FILE_SIZE = 52428800;
     static const uint32_t DEFAULT_MAX_LOGFILES = 10;
     
-    bool IsLoggerInitialized();
-    void DropLogger();
-    void Flush();
-    bool CreateLogFile();
+    bool isLoggerInitialized();
+    void dropLogger();
+    void flush();
+    bool createLogFile();
 };
 

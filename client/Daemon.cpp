@@ -23,14 +23,14 @@ const std::string logFileName = "csc_cms.log";
 Daemon::Daemon()
     : cmidLoader_ { std::make_unique<ComponentLoader::CMIDLoader>() },
       config_ { std::make_unique<CloudManagementConfiguration::Config>()},
-      m_logFile( nullptr ),
-      m_logger( nullptr )
+      logFile_ ( nullptr ),
+      logger_ ( nullptr )
 {
-    m_logFile = std::unique_ptr<ICMLogFile>( new CMLogFile() );
+    logFile_ = std::unique_ptr<ICMLogFile>( new CMLogFile() );
     const auto logFilePath = CloudManagementConfiguration::Config::CM_LOG_PATH + logFileName;
-    m_logFile->Init( logFilePath.c_str() );
-    m_logger = std::unique_ptr<CMLogger>( new CMLogger( *m_logFile ) );
-    SetCMLogger( m_logger.get() );
+    logFile_->init( logFilePath.c_str() );
+    logger_ = std::unique_ptr<CMLogger>( new CMLogger( *logFile_ ) );
+    SetCMLogger( logger_.get() );
 }
 
 void Daemon::init()
