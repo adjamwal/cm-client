@@ -10,6 +10,13 @@
 #include <thread>
 #include <string>
 #include <mutex>
+#include <json/json.h>
+
+
+//TODO : replace these with enum from logger 
+#define DEFAULT_LOG_LEVEL_DEBUG 7
+#define DEFAULT_LOG_LEVEL_RELEASE 4
+#define DEFAULT_LOG_LEVEL DEFAULT_LOG_LEVEL_DEBUG
 
 namespace CloudManagementConfiguration
 {
@@ -44,9 +51,13 @@ public:
 
 private:
 
+    static constexpr const char uc_element[] = "uc";
+    static constexpr const char loglevel_element[] = "loglevel";
+
     std::atomic<bool> is_loaded_;
-    uint32_t m_logLevel = 7; //default loglevel
-    std::mutex m_mutex;
+    uint32_t logLevel_ = DEFAULT_LOG_LEVEL; //default loglevel
+    std::mutex mutex_;
+    Json::Value readCmConfig(const std::string);
 };
 
-} // namespace ComponentLoader
+} // namespace CloudManagementConfiguration

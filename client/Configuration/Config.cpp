@@ -4,14 +4,18 @@
  * @copyright (c) 2022 Cisco Systems, Inc. All rights reserved
  */
 
+
+//TODO : Add logs using logger 
+
 #include "Config.hpp"
 
 #include <filesystem>
-#include <json/value.h>
 #include <json/json.h>
 #include <iostream>
 #include <fstream>
 
+#define PATH_DELIMITER "/"
+#define CONFIG_FILE "cm_config.json"
 
 namespace CloudManagementConfiguration
 {
@@ -22,7 +26,16 @@ Config::Config() {
 void Config::load()
 {
 
-    std::lock_guard<std::mutex> lock( m_mutex );
+#ifdef DEBUG
+    logLevel_ = DEFAULT_LOG_LEVEL_DEBUG;
+#else
+    logLevel_ = DEFAULT_LOG_LEVEL_RELEASE;
+#endif
+
+    const std::string m_filePath = CM_CFG_PATH + PATH_DELIMITER + CONFIG_FILE;
+
+
+    std::lock_guard<std::mutex> lock( mutex_ );
     is_loaded_ = false;
 
     // Create log path directory (assume data and config paths exists?)
@@ -30,49 +43,58 @@ void Config::load()
         filesystem::create_directories(Config::CM_LOG_PATH);
     }
 
-    std::filesystem::path cfgPath(CM_CFG_PATH+"/"+"cm_config.json");
+    std::filesystem::path cfgPath(m_filePath);
 
-    if(!filesystem::exists(cfgPath))
+    try
     {
-        std::cout << "Config file doesn't exist." << std::endl;
-        return;
+        if(!filesystem::exists(cfgPath))
+        {
+            std::cout << m_filePath << std::endl;
+            throw( std::runtime_error( "Config file doesn't exist." ) );
+        }
+        
+        Json::Value root = Config::readCmConfig(m_filePath);
+        logLevel_ = root[uc_element][loglevel_element].asInt();
+    }
+    catch(exception ex)
+    {
+        //TODO : log exception.
     }
 
+    is_loaded_ = true;
+}
+
+Json::Value Config::readCmConfig(const std::string filename)
+{
     Json::CharReaderBuilder builder;
     builder["collectComments"] = true;
-    std::ifstream file;
-    file.open(CM_CFG_PATH+"/"+"cm_config.json");
+    std::ifstream file (filename, std::ifstream::in);
     Json::Value root;
     JSONCPP_STRING errors;
 
     if(!parseFromStream(builder, file, &root, &errors))
     {
-        std::cout << errors << std::endl;
-        return;
+        throw( std::runtime_error( errors ) );
     }
 
-    if(!root.isMember("uc"))
+    if(!root.isMember(uc_element))
     {
-        std::cout << "missing uc_service element" << std::endl;
-        return;
+        throw( std::runtime_error( "missing uc_service element" ) );
     }
 
-    if(!root["uc"]["loglevel"].isInt())
+    if(!root[uc_element][loglevel_element].isInt())
     {
-        std::cout << "loglevel missing or invalid." << std::endl;
-        return;
+        throw( std::runtime_error( "loglevel missing or invalid." ) );
     }
 
-    //std::cout << root << std::endl;
-    //std::cout << root["loglevel"] << std::endl;
-    m_logLevel = root["uc"]["loglevel"].asInt();
-    is_loaded_ = true;
+    return root;
+
 }
 
 uint32_t Config::getLogLevel()
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
-    return m_logLevel;
+    std::lock_guard<std::mutex> lock( mutex_ );
+    return logLevel_;
 }
 
-} // namespace ComponentLoader
+} // namespace CloudManagementConfiguration
