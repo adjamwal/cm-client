@@ -7,7 +7,6 @@
 
 #include "ComponentLoader/CMIDLoader.hpp"
 #include "Configuration/Config.hpp"
-#include "Logger/CMLogFile.hpp"
 #include "Logger/CMLogger.hpp"
 
 #include <sys/stat.h>
@@ -22,15 +21,11 @@ const std::string logFileName = "csc_cms.log";
 
 Daemon::Daemon()
     : cmidLoader_ { std::make_unique<ComponentLoader::CMIDLoader>() },
-      config_ { std::make_unique<CloudManagementConfiguration::Config>()},
-      logFile_ ( nullptr ),
-      logger_ ( nullptr )
+      config_ { std::make_unique<CloudManagementConfiguration::Config>()}
 {
-    logFile_ = std::unique_ptr<ICMLogFile>( new CMLogFile() );
     const auto logFilePath = CloudManagementConfiguration::Config::CM_LOG_PATH + logFileName;
-    logFile_->init( logFilePath.c_str() );
-    logger_ = std::unique_ptr<CMLogger>( new CMLogger( *logFile_ ) );
-    SetCMLogger( logger_.get() );
+    //initialise Logger before anything else.
+    CM_LOG_INIT(logFilePath);
 }
 
 void Daemon::init()
@@ -40,7 +35,7 @@ void Daemon::init()
 
 void Daemon::start()
 {
-    CM_LOG_DEBUG("Starting cloud management");
+    CM_LOG_ERROR("Starting cloud management");
     this->isRunning_ = true;
     this->task_ = std::thread(&Daemon::mainTask, this);
     this->task_.join();

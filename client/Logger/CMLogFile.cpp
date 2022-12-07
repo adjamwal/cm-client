@@ -8,7 +8,7 @@
 #include "spdlog/sinks/rotating_file_sink.h"
 #include <chrono>
 
-CMLogFile::CMLogFile() : logFileName_ ( "" ),
+CMLogFile::CMLogFile(const char* logname) : logFileName_ ( logname ),
                          maxFileSize_ ( DEFAULT_MAX_FILE_SIZE ),
                          maxLogFiles_ ( DEFAULT_MAX_LOGFILES ),
                          loggerName_ ( "rot_log" )
@@ -33,39 +33,25 @@ CMLogFile::CMLogFile() : logFileName_ ( "" ),
     auto formatter = std::make_unique< spdlog::pattern_formatter >();
     formatter->add_flag< trace_formatter >( '*' ).set_pattern( "(%*, +%o ms) %b %d %T [%t] %v" );
     spdlog::set_formatter( std::move(formatter) );
+
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    createLogFile();
 }
 
 CMLogFile::~CMLogFile()
 {
-    deinit();
+    std::lock_guard<std::mutex> lock(mutex_);
+    dropLogger();
 }
 
 void CMLogFile::writeLogLine( const char* logLevel, const char* logLine )
 {
-    init(); // Takes mutex
-
     std::string strLevel(logLevel);
     std::string strLog(logLine);
 
-    if ( isLoggerInitialized() ) {
-        spdlog::get(loggerName_)->info(strLevel + ": " + strLog);
-        flush();
-    }
-    else {
-        spdlog::error("failed to log ({})", strLog);
-    }
-}
-
-void CMLogFile::init( const char* logname )
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-
-    if ( !isLoggerInitialized() ) {
-        if ( logname ) {
-        logFileName_ = logname;
-        }
-        createLogFile();
-    }
+    spdlog::get(loggerName_)->info(strLevel + ": " + strLog);
+    flush();
 }
 
 void CMLogFile::setLogConfig( uint32_t fileSize, uint32_t logFiles )
@@ -74,23 +60,10 @@ void CMLogFile::setLogConfig( uint32_t fileSize, uint32_t logFiles )
     maxFileSize_ = fileSize;
     maxLogFiles_ = logFiles;
 
-    if ( isLoggerInitialized() && std::filesystem::exists( logFileName_.parent_path() ) ) {
+    if ( std::filesystem::exists( logFileName_.parent_path() ) ) {
         dropLogger();
         spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 );
     }
-}
-
-void CMLogFile::deinit()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    if ( isLoggerInitialized() ) {
-        dropLogger();
-    }
-}
-
-bool CMLogFile::isLoggerInitialized()
-{
-    return !( spdlog::get( loggerName_ ) == NULL );
 }
 
 void CMLogFile::dropLogger()
@@ -101,15 +74,13 @@ void CMLogFile::dropLogger()
 
 void CMLogFile::flush()
 {
-    if (isLoggerInitialized()) {
-        spdlog::get( loggerName_ )->flush();
-    }
+    spdlog::get( loggerName_ )->flush();
 }
 
 bool CMLogFile::createLogFile()
 {
     std::shared_ptr<spdlog::logger> logInstance = NULL;
-    if ( !isLoggerInitialized() && !logFileName_.empty() ) {
+    if ( !logFileName_.empty() ) {
         try
         {
             if ( !std::filesystem::exists( logFileName_.parent_path() ) ) {

@@ -6,20 +6,17 @@
 
 #pragma once
 
-#include "ICMLogFile.hpp"
 #include <string>
 #include <mutex>
 #include <filesystem>
 
-class CMLogFile : public ICMLogFile
+class CMLogFile
 {
 public:
-    CMLogFile();
+    CMLogFile(const char* logname = NULL);
     ~CMLogFile();
-    void init( const char* logname = NULL ) override;
-    void writeLogLine( const char* logLevel, const char* logLine ) override;
-    void setLogConfig( uint32_t fileSize, uint32_t logFiles ) override;
-    void deinit();
+    void writeLogLine( const char* logLevel, const char* logLine );
+    void setLogConfig( uint32_t fileSize, uint32_t logFiles );
 
 private:
     std::filesystem::path logFileName_;
@@ -31,7 +28,6 @@ private:
     static const uint32_t DEFAULT_MAX_FILE_SIZE = 52428800;
     static const uint32_t DEFAULT_MAX_LOGFILES = 10;
     
-    bool isLoggerInitialized();
     void dropLogger();
     void flush();
     bool createLogFile();

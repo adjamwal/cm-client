@@ -4,7 +4,6 @@
  * @copyright (c) 2022 Cisco Systems, Inc. All rights reserved
  */
 #include "CMLogger.hpp"
-#include "ICMLogFile.hpp"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -42,9 +41,10 @@ const char* LogLevelStr( const CM_LOG_LVL_T level )
     return levelStr;
 }
 
-CMLogger::CMLogger( ICMLogFile& logFile ) :
+CMLogger::CMLogger( const std::string& fileName ) :
     logLevel_ ( CM_LOG_LVL_T::CM_LOG_ERROR ),
-    logFile_ ( logFile )
+    logFile_ ( fileName.c_str() ),
+    fileName_ ( fileName )    
 {
 }
 

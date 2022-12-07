@@ -15,7 +15,6 @@ set(CM_CLIENT_SRCS
     Configuration/Config.cpp
     Logger/CMLogFile.cpp
     Logger/CMLogger.cpp
-    Logger/DefaultCMLogger.cpp
 )
 
 add_executable(csccloudmanagement ${CM_CLIENT_SRCS})
