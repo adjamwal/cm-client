@@ -25,15 +25,7 @@ Config::Config() {
 
 void Config::load()
 {
-
-#ifdef DEBUG
-    logLevel_ = DEFAULT_LOG_LEVEL_DEBUG;
-#else
-    logLevel_ = DEFAULT_LOG_LEVEL_RELEASE;
-#endif
-
-    const std::string m_filePath = CM_CFG_PATH + PATH_DELIMITER + CONFIG_FILE;
-
+    const std::string filePath = CM_CFG_PATH + PATH_DELIMITER + CONFIG_FILE;
 
     std::lock_guard<std::mutex> lock( mutex_ );
     is_loaded_ = false;
@@ -43,21 +35,21 @@ void Config::load()
         filesystem::create_directories(Config::CM_LOG_PATH);
     }
 
-    std::filesystem::path cfgPath(m_filePath);
+    std::filesystem::path cfgPath(filePath);
 
     try
     {
         if(!filesystem::exists(cfgPath))
         {
-            std::cout << m_filePath << std::endl;
             throw( std::runtime_error( "Config file doesn't exist." ) );
         }
         
-        Json::Value root = Config::readCmConfig(m_filePath);
+        Json::Value root = Config::readCmConfig(filePath);
         logLevel_ = root[uc_element][loglevel_element].asInt();
     }
     catch(exception ex)
     {
+        logLevel_ = DEFAULT_LOG_LEVEL;
         //TODO : log exception.
     }
 

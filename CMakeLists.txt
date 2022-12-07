@@ -56,6 +56,3 @@ add_subdirectory(OSPackageManager)
 ##
 ## The Cloud Management Connector client
 add_subdirectory(client)
-
-# For creating installer packages
-include(cpack)

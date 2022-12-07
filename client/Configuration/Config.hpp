@@ -13,10 +13,12 @@
 #include <json/json.h>
 
 
-//TODO : replace these with enum from logger 
-#define DEFAULT_LOG_LEVEL_DEBUG 7
-#define DEFAULT_LOG_LEVEL_RELEASE 4
-#define DEFAULT_LOG_LEVEL DEFAULT_LOG_LEVEL_DEBUG
+//TODO : replace these with enum from logger
+#if defined (DEBUG)
+#define DEFAULT_LOG_LEVEL 7
+#else
+#define DEFAULT_LOG_LEVEL 4
+#endif
 
 namespace CloudManagementConfiguration
 {
