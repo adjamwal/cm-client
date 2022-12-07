@@ -1,7 +1,7 @@
 # Attempts to download the component from Artifactory
 # Copyright Cisco Systems, Inc. 2022
 
-function(upload_component component_name)
+function(upload_component component_name output)
     if(DEFINED ENV{ARTIFACTORY_TOKEN})
         ExternalProject_Add_Step(
             third-party-${component_name}
@@ -10,6 +10,7 @@ function(upload_component component_name)
             COMMAND ${COMMAND} cp -aR "${component_install_prefix}/." "${CM_THIRDPARTY_EXPORT}"
             DEPENDEES install
         )
+        set(${output} artifactory_upload PARENT_SCOPE)
     else()
         ExternalProject_Add_Step(
             third-party-${component_name}
@@ -18,5 +19,6 @@ function(upload_component component_name)
             COMMAND ${COMMAND} cp -aR "${component_install_prefix}/." "${CM_THIRDPARTY_EXPORT}"
             DEPENDEES install
         )
+        set(${output} copy_exports PARENT_SCOPE)
     endif()
 endfunction()

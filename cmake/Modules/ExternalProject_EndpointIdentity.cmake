@@ -9,6 +9,17 @@ set(component_install_prefix "${CMAKE_CURRENT_SOURCE_DIR}/${component_name}/expo
 
 if(NOT BUILD_ALL_THIRD_PARTY AND NOT BUILD_ENDPOINT_IDENTITY_THIRD_PARTY)
     download_component(${component_name} ${component_dst_dir})
+
+    if(APPLE AND TARGET "third-party-${component_name}" AND DEFINED SIGNING_CERT)
+        ExternalProject_Add_Step(
+            third-party-${component_name}
+            sign_binaries
+            COMMENT "-- Signing binaries after Artifactory download"
+            COMMAND /usr/bin/codesign -o runtime --verbose --force --deep --sign ${SIGNING_CERT} "${CM_THIRDPARTY_EXPORT}/bin/csc_cmid"
+            COMMAND /usr/bin/codesign -o runtime --verbose --force --deep --sign ${SIGNING_CERT} "${CM_THIRDPARTY_EXPORT}/lib/libcmidapi.dylib"
+            DEPENDEES install
+        )
+    endif()
 endif()
 
 if(NOT TARGET "third-party-${component_name}")
@@ -36,5 +47,16 @@ if(NOT TARGET "third-party-${component_name}")
         CMAKE_COMMAND VERSION=1.1 RELNUM=1111 ${CMAKE_COMMAND}
     )
 
-    upload_component(${component_name})
+    upload_component(${component_name} sign_dependee_step)
+
+    if(APPLE AND DEFINED SIGNING_CERT)
+        ExternalProject_Add_Step(
+            third-party-${component_name}
+            sign_binaries
+            COMMENT "-- Signing binaries after build of EndpointIdentity"
+            COMMAND /usr/bin/codesign -o runtime --verbose --force --deep --sign ${SIGNING_CERT} "${CM_THIRDPARTY_EXPORT}/bin/csc_cmid"
+            COMMAND /usr/bin/codesign -o runtime --verbose --force --deep --sign ${SIGNING_CERT} "${CM_THIRDPARTY_EXPORT}/lib/libcmidapi.dylib"
+            DEPENDEES ${sign_dependee_step}
+        )
+    endif()
 endif()

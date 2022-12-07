@@ -25,5 +25,5 @@ if(NOT TARGET "third-party-${component_name}")
             -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
     )
 
-    upload_component(${component_name})
+    upload_component(${component_name} not_used)
 endif()

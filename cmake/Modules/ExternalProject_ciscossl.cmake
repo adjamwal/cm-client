@@ -25,5 +25,5 @@ if(NOT TARGET "third-party-${component_name}")
         INSTALL_COMMAND echo "Auto-installed by build"
     )
 
-    upload_component(${component_name})
+    upload_component(${component_name} not_used)
 endif()

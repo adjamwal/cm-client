@@ -15,18 +15,6 @@ add_dependencies(
     third-party-gtest
 )
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_GENERATOR STREQUAL "Xcode")
-set(GTEST_LIBS
-    gtest_maind
-    gtestd
-)
-else()
-set(GTEST_LIBS
-    gtest_main
-    gtest
-)
-endif()
-
 target_link_libraries(
   example_test
   ${GTEST_LIBS}

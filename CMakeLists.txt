@@ -29,6 +29,10 @@ if(APPLE)
     set(XCODE_AR "${XCODE_TOOLCHAIN_BIN}/ar r")
     set(XCODE_NM "${XCODE_TOOLCHAIN_BIN}/nm")
     set(XCODE_RANLIB "${XCODE_TOOLCHAIN_BIN}/ranlib")
+
+    if(DEFINED SIGNING_CERT)
+        message("--Build will sign using ${SIGNING_CERT}")
+    endif()
 endif()
 
 # remove ZERO_CHECK target from xcode
