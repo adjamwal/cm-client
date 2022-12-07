@@ -7,9 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <chrono>
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/rotating_file_sink.h"
-#include <chrono>
 
 std::string LogLevelStr( const CM_LOG_LVL_T level )
 {

@@ -25,7 +25,7 @@ Daemon::Daemon()
 {
     const auto logFilePath = CloudManagementConfiguration::Config::CM_LOG_PATH + logFileName;
     //initialise Logger before anything else.
-    CM_LOG_INIT(logFilePath);
+    CMLogger::getInstance(logFilePath);
 }
 
 void Daemon::init()
@@ -35,7 +35,7 @@ void Daemon::init()
 
 void Daemon::start()
 {
-    CM_LOG_ERROR("Starting cloud management");
+    CM_LOG_DEBUG("Starting cloud management");
     this->isRunning_ = true;
     this->task_ = std::thread(&Daemon::mainTask, this);
     this->task_.join();

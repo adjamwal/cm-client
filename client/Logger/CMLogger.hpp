@@ -29,7 +29,7 @@ public:
     class logger_exception : public std::runtime_error
     {
     public:
-        logger_exception(const std::string& rstrMsg) : std::runtime_error(rstrMsg) {}
+        logger_exception(const std::string& msg) : std::runtime_error(msg) {}
     };
 
     static CMLogger& getInstance(const std::string& fileName = std::string())
@@ -48,7 +48,7 @@ public:
     void setLogLevel( CM_LOG_LVL_T severity );
     void setLogConfig( uint32_t fileSize, uint32_t logFiles );
 private:
-	void writeLogLine( const std::string& logLevel, const std::string& logLine );
+    void writeLogLine( const std::string& logLevel, const std::string& logLine );
     bool createLogFile();
     CMLogger(const std::string& fileName);
     ~CMLogger();
@@ -71,11 +71,11 @@ private:
 #define CM_LOG_STRERR( severity, message, ... ) \
     {CMLogger::getInstance().logMessage( severity, true, __FILENAME__, __FUNCTION__, __LINE__, message, ##__VA_ARGS__ );}
 
-#define CM_LOG_INIT(FileName)         CMLogger::getInstance(FileName)
-#define CM_LOG_ALERT( message, ... ) CM_LOG( CM_LOG_LVL_T::CM_LOG_ALERT, message, ##__VA_ARGS__ )
+#define CM_LOG_INIT(FileName)           CMLogger::getInstance(FileName)
+#define CM_LOG_ALERT( message, ... )    CM_LOG( CM_LOG_LVL_T::CM_LOG_ALERT, message, ##__VA_ARGS__ )
 #define CM_LOG_CRITICAL( message, ... ) CM_LOG( CM_LOG_LVL_T::CM_LOG_CRITICAL, message, ##__VA_ARGS__ )
-#define CM_LOG_ERROR( message, ... ) CM_LOG( CM_LOG_LVL_T::CM_LOG_ERROR, message, ##__VA_ARGS__ )
-#define CM_LOG_WARNING( message, ... ) CM_LOG( CM_LOG_LVL_T::CM_LOG_WARNING, message, ##__VA_ARGS__ )
-#define CM_LOG_NOTICE( message, ... ) CM_LOG( CM_LOG_LVL_T::CM_LOG_NOTICE, message, ##__VA_ARGS__ )
-#define CM_LOG_INFO( message, ... ) CM_LOG( CM_LOG_LVL_T::CM_LOG_INFO, message, ##__VA_ARGS__ )
-#define CM_LOG_DEBUG( message, ... ) CM_LOG( CM_LOG_LVL_T::CM_LOG_DEBUG, message, ##__VA_ARGS__ )
+#define CM_LOG_ERROR( message, ... )    CM_LOG( CM_LOG_LVL_T::CM_LOG_ERROR, message, ##__VA_ARGS__ )
+#define CM_LOG_WARNING( message, ... )  CM_LOG( CM_LOG_LVL_T::CM_LOG_WARNING, message, ##__VA_ARGS__ )
+#define CM_LOG_NOTICE( message, ... )   CM_LOG( CM_LOG_LVL_T::CM_LOG_NOTICE, message, ##__VA_ARGS__ )
+#define CM_LOG_INFO( message, ... )     CM_LOG( CM_LOG_LVL_T::CM_LOG_INFO, message, ##__VA_ARGS__ )
+#define CM_LOG_DEBUG( message, ... )    CM_LOG( CM_LOG_LVL_T::CM_LOG_DEBUG, message, ##__VA_ARGS__ )
