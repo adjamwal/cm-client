@@ -7,7 +7,9 @@
 #pragma once
 
 #include <stdarg.h>
-#include "CMLogFile.hpp"
+#include <string>
+#include <mutex>
+#include <filesystem>
 
 enum class CM_LOG_LVL_T
 {
@@ -23,6 +25,13 @@ enum class CM_LOG_LVL_T
 class CMLogger
 {
 public:
+	//Exception class to differentiate with standard exceptions
+    class logger_exception : public std::runtime_error
+    {
+    public:
+        logger_exception(const std::string& rstrMsg) : std::runtime_error(rstrMsg) {}
+    };
+
     static CMLogger& getInstance(const std::string& fileName = std::string())
     {
         static CMLogger logger(fileName);
@@ -33,16 +42,25 @@ public:
     CMLogger(const CMLogger&) = delete;
     CMLogger& operator=(const CMLogger&) = delete;
     CMLogger(CMLogger &&) = delete;
-
+ 
     void logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
-    const char* funcName, long lineNumber, const char* message, ... );
+                     const char* funcName, long lineNumber, const char* message, ... );
     void setLogLevel( CM_LOG_LVL_T severity );
+    void setLogConfig( uint32_t fileSize, uint32_t logFiles );
 private:
-    CM_LOG_LVL_T logLevel_;
-    CMLogFile logFile_;
-    const std::string fileName_;
+	void writeLogLine( const std::string& logLevel, const std::string& logLine );
+    bool createLogFile();
     CMLogger(const std::string& fileName);
     ~CMLogger();
+
+    static const uint32_t DEFAULT_MAX_FILE_SIZE = 52428800;
+    static const uint32_t DEFAULT_MAX_LOGFILES = 10;  
+    CM_LOG_LVL_T logLevel_;
+    std::filesystem::path logFileName_;
+    std::mutex mutex_;
+    uint32_t maxFileSize_;
+    uint32_t maxLogFiles_;
+    std::string loggerName_; 
 };
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

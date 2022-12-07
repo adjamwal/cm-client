@@ -5,14 +5,16 @@
  */
 #include "CMLogger.hpp"
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/rotating_file_sink.h"
+#include <chrono>
 
-const char* LogLevelStr( const CM_LOG_LVL_T level )
+std::string LogLevelStr( const CM_LOG_LVL_T level )
 {
-    const char* levelStr = "";
-    switch( level ) {
+    std::string levelStr;
+    switch ( level ) {
     case CM_LOG_LVL_T::CM_LOG_ALERT:
         levelStr = "ALERT";
         break;
@@ -43,24 +45,35 @@ const char* LogLevelStr( const CM_LOG_LVL_T level )
 
 CMLogger::CMLogger( const std::string& fileName ) :
     logLevel_ ( CM_LOG_LVL_T::CM_LOG_ERROR ),
-    logFile_ ( fileName.c_str() ),
-    fileName_ ( fileName )    
+    logFileName_ ( fileName ),
+    maxFileSize_ ( DEFAULT_MAX_FILE_SIZE ),
+    maxLogFiles_ ( DEFAULT_MAX_LOGFILES ),
+    loggerName_ ( "rot_log" )  
 {
+    if ( logFileName_.empty() ) {
+        throw logger_exception( "Empty log filename" );
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if ( false == createLogFile() ) {
+        throw logger_exception( "Logger creation failed" );
+    }
 }
 
 CMLogger::~CMLogger()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+    spdlog::get( loggerName_ )->flush();
+    spdlog::drop( loggerName_ );
 }
 
 void CMLogger::setLogLevel( CM_LOG_LVL_T logLevel )
 {
-    if( ( logLevel >= CM_LOG_LVL_T::CM_LOG_ALERT ) && ( logLevel <= CM_LOG_LVL_T::CM_LOG_DEBUG ) ) {
-        if( logLevel_ != logLevel ) {
+    if ( ( logLevel >= CM_LOG_LVL_T::CM_LOG_ALERT ) && ( logLevel <= CM_LOG_LVL_T::CM_LOG_DEBUG ) ) {
+        if ( logLevel_ != logLevel ) {
             logLevel_ = logLevel;
             CM_LOG_DEBUG( "Set Debug Level to %d", logLevel_ );
         }
-    }
-    else {
+    } else {
         CM_LOG_ERROR( "Invalid Debug level %d", logLevel ); 
     }
 }
@@ -94,6 +107,65 @@ void CMLogger::logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, co
     snprintf( logBuf, sizeof( logBuf ), "%s:%s:%ld: %s %s", fileName, funcName, lineNumber, message, errStr );
     va_start( va_args, message );
     vsnprintf( logLine, sizeof( logLine ), logBuf, va_args );
-    logFile_.writeLogLine( LogLevelStr( severity ), logLine );
+    writeLogLine( LogLevelStr( severity ), logLine );
     va_end( va_args );
+}
+
+void CMLogger::writeLogLine( const std::string& logLevel, const std::string& logLine )
+{
+    spdlog::get(loggerName_)->info(logLevel + ": " + logLine);
+    spdlog::get( loggerName_ )->flush();
+}
+
+void CMLogger::setLogConfig( uint32_t fileSize, uint32_t logFiles )
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    maxFileSize_ = fileSize;
+    maxLogFiles_ = logFiles;
+
+    if ( std::filesystem::exists( logFileName_.parent_path() ) ) {
+        spdlog::get( loggerName_ )->flush();
+        spdlog::drop( loggerName_ );
+        spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 );
+    }
+}
+
+bool CMLogger::createLogFile()
+{
+    class trace_formatter : public spdlog::custom_flag_formatter
+    {
+    public:
+        void format( const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest ) override
+        {
+            std::chrono::milliseconds millisec = std::chrono::duration_cast<std::chrono::milliseconds>( std::chrono::system_clock::now().time_since_epoch() );
+            unsigned long ms = static_cast<unsigned int>( millisec.count() );
+            std::string tickStr = std::to_string( ms );
+            dest.append(tickStr.data(), tickStr.data() + tickStr.size());
+        }
+
+        std::unique_ptr< custom_flag_formatter > clone() const override
+        {
+            return spdlog::details::make_unique< trace_formatter >();
+        }
+    };
+
+    auto formatter = std::make_unique< spdlog::pattern_formatter >();
+    formatter->add_flag< trace_formatter >( '*' ).set_pattern( "(%*, +%o ms) %b %d %T [%t] %v" );
+    spdlog::set_formatter( std::move(formatter) );
+
+    std::shared_ptr<spdlog::logger> logInstance = NULL;
+
+    try
+    {
+        if ( !std::filesystem::exists( logFileName_.parent_path() ) ) {
+            std::filesystem::create_directories( logFileName_.parent_path() );
+        }
+        logInstance = spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 );
+    }
+    catch( ... )
+    {
+        throw logger_exception("Failed to create/open logger : " + logFileName_.string());
+    }
+
+    return ( NULL != logInstance ) ? true : false;
 }

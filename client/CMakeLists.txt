@@ -13,7 +13,6 @@ set(CM_CLIENT_SRCS
     ComponentLoader/CMIDLoader.cpp
     Configuration/Config.hpp
     Configuration/Config.cpp
-    Logger/CMLogFile.cpp
     Logger/CMLogger.cpp
 )
 
