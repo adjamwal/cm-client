@@ -3,15 +3,27 @@
 
 include(ExternalProject)
 
-#
-# TODO Be more specific about tool chain
-ExternalProject_Add(
-    third-party-ciscossl
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-    BUILD_IN_SOURCE 1
-    CONFIGURE_COMMAND echo "No configuration necessary."
-    BUILD_COMMAND
-        ${CMAKE_COMMAND} -E env CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        sh "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ciscossl.sh"
-    INSTALL_COMMAND echo "Auto-installed by build"
-)
+set(component_name ciscossl)
+set(component_dst_dir "${CMAKE_CURRENT_BINARY_DIR}/third-party-${component_name}-prefix/src/third-party-${component_name}")
+set(component_install_prefix "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/export")
+
+if(NOT BUILD_ALL_THIRD_PARTY)
+    download_component(${component_name} ${component_dst_dir})
+endif()
+
+if(NOT TARGET "third-party-${component_name}")
+    #
+    # TODO Be more specific about tool chain
+    ExternalProject_Add(
+        third-party-${component_name}
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+        BUILD_IN_SOURCE 1
+        CONFIGURE_COMMAND echo "No configuration necessary."
+        BUILD_COMMAND
+            ${CMAKE_COMMAND} -E env CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            sh "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ciscossl.sh"
+        INSTALL_COMMAND echo "Auto-installed by build"
+    )
+
+    upload_component(${component_name} not_used)
+endif()

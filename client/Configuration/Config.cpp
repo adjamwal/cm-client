@@ -34,6 +34,11 @@ void Config::load()
     if (!filesystem::is_directory(Config::CM_LOG_PATH)) {
         filesystem::create_directories(Config::CM_LOG_PATH);
     }
+#if defined(DEBUG) && defined(CM_CONFIG_PATH) && defined(CM_SHARED_LOG_PATH)
+    if (!filesystem::is_directory(Config::CMID_LOG_PATH)) {
+        filesystem::create_directories(Config::CMID_LOG_PATH);
+    }
+#endif /* !DEBUG */
 
     std::filesystem::path cfgPath(filePath);
 

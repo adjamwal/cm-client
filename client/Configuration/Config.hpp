@@ -31,11 +31,16 @@ public:
     inline static const string CMID_EXEC_PATH  = CMID_DAEMON_PATH;
     inline static const string CM_CFG_PATH     = CM_CONFIG_PATH;
     inline static const string CM_LOG_PATH     = CM_SHARED_LOG_PATH;
+    /*
+     CMID will try to create a log file here in the call to CreateModuleInstance so we need
+     to define this separately and build this directory so it's available prior to loading CMID
+     */
+    inline static const string CMID_LOG_PATH   = "/Library/Logs/Cisco/SecureClient/CloudManagement/";
 #else
     inline static const string CMID_EXEC_PATH  = "/opt/cisco/secureclient/cloudmanagement/bin";
     inline static const string CM_CFG_PATH     = "/opt/cisco/secureclient/cloudmanagement/etc";
 #   ifdef __APPLE__
-        inline static const string CM_LOG_PATH = "/Library/Logs/Cisco/Cisco Secure Client/Cloud Management/";
+        inline static const string CM_LOG_PATH = "/Library/Logs/Cisco/SecureClient/CloudManagement/";
 #   else
         inline static const string CM_LOG_PATH = "/var/logs/cisco/secureclient/cloudmanagement/";
 #   endif

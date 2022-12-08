@@ -65,8 +65,10 @@ def run_mac_ci() {
   stage("Build Debug") {
     if (continueCI()) {
       withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
-        dir("cm-client"){
-          sh './build'
+        withCredentials([string(credentialsId: 'ARTIFACTORY_TOKEN', variable: 'ARTIFACTORY_TOKEN')]) {
+          dir("cm-client"){
+            sh './build'
+          }
         }
       }
     }
@@ -82,10 +84,9 @@ def run_mac_ci() {
   }
   stage("Test") {
     if (continueCI()) {
-      dir("cm-client/debug"){
-        // Is this ready yet?
-        //sh 'make test'
-        echo "TODO: Add Tests"
+      // Do this for each individual test suite, i.e. add PackageManager when available
+      dir("cm-client/debug/client/tests"){
+        sh 'ctest'
       }
     }
   }

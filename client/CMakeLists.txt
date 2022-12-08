@@ -20,9 +20,8 @@ add_executable(csccloudmanagement ${CM_CLIENT_SRCS})
 add_dependencies(csccloudmanagement
     third-party-ciscossl
     third-party-curl
-    third-party-gtest
     third-party-jsoncpp
-    third-party-cmid
+    third-party-EndpointIdentity
     third-party-PackageManager
 )
 
@@ -64,8 +63,22 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
 
     set_xcode_property(csccloudmanagement CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
     set_xcode_property(csccloudmanagement CLANG_CXX_LIBRARY "libc++")
+
+    # For code signing
+    if(DEFINED SIGNING_CERT)
+        set_xcode_property(csccloudmanagement CODE_SIGN_IDENTITY "${SIGNING_CERT}")
+    endif()
+    # Other signing attributes of interest
+    # CODE_SIGN_ENTITLEMENTS my.entitlements
+    # PRODUCT_NAME "My Product"
+    # DEVELOPMENT_TEAM ${DEVELOPMENT_TEAM_ID}
+    # PROVISIONING_PROFILE_SPECIFIER my_profile_name
 endif()
 
 target_enable_warnings(csccloudmanagement)
 
 install(TARGETS csccloudmanagement DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)
+
+#
+# Include tests
+add_subdirectory(tests)
