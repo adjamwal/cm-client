@@ -1,39 +1,42 @@
 # CMakeLists.txt
 # Copyright 2022, Cisco Systems, Inc.
 
-#
-#  Not an actual test -- meant as a template / example
-#
-
 add_executable(
-  example_test
-  example_test.cpp
+  ConfigTest
+  ${cm-client_SOURCE_DIR}/client/Configuration/Config.hpp
+  ${cm-client_SOURCE_DIR}/client/Configuration/Config.cpp
+
+  # Test files
+  ConfigTest.cpp
 )
 
 add_dependencies(
-    example_test
+    ConfigTest
+    third-party-jsoncpp
     third-party-gtest
 )
 
 target_link_libraries(
-  example_test
+  ConfigTest
+  jsoncpp
   ${GTEST_LIBS}
 )
 
 target_include_directories(
-  example_test
+  ConfigTest
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
+      ${cm-client_SOURCE_DIR}/client
 )
 
 target_link_directories(
-  example_test BEFORE
+  ConfigTest BEFORE
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/lib
 )
 
 include(GoogleTest)
-gtest_discover_tests(example_test)
+gtest_discover_tests(ConfigTest)
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")
     macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
