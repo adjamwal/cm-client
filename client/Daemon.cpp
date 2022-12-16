@@ -7,6 +7,7 @@
 
 #include "ComponentLoader/CMIDLoader.hpp"
 #include "Configuration/Config.hpp"
+#include "Logger/CMLogger.hpp"
 
 #include <sys/stat.h>
 
@@ -15,11 +16,16 @@
 
 namespace CloudManagementClient
 {
+//TODO : finalise log file name
+const std::string logFileName = "csc_cms.log";
 
 Daemon::Daemon()
     : cmidLoader_ { std::make_unique<ComponentLoader::CMIDLoader>() },
       config_ { std::make_unique<CloudManagementConfiguration::Config>()}
 {
+    const auto logFilePath = CloudManagementConfiguration::Config::CM_LOG_PATH + logFileName;
+    //initialise Logger before anything else.
+    CMLogger::getInstance(logFilePath);
 }
 
 void Daemon::init()
@@ -29,8 +35,8 @@ void Daemon::init()
 
 void Daemon::start()
 {
+    CM_LOG_DEBUG("Starting cloud management");
     this->isRunning_ = true;
-
     this->task_ = std::thread(&Daemon::mainTask, this);
     this->task_.join();
 }
@@ -50,7 +56,6 @@ void Daemon::mainTask()
     init();
 
     cmidLoader_->start();
-
     //! @todo Load and start Package Manager
 
     //! TODO: Just busy wait??
