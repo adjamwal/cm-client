@@ -117,17 +117,31 @@ void CMLogger::writeLogLine( const std::string& logLevel, const std::string& log
     spdlog::get( loggerName_ )->flush();
 }
 
-void CMLogger::setLogConfig( uint32_t fileSize, uint32_t logFiles )
+bool CMLogger::setLogConfig( uint32_t fileSize, uint32_t logFiles )
 {
+    bool status = false;
     std::lock_guard<std::mutex> lock(mutex_);
     maxFileSize_ = fileSize;
     maxLogFiles_ = logFiles;
 
-    if ( std::filesystem::exists( logFileName_.parent_path() ) ) {
-        spdlog::get( loggerName_ )->flush();
-        spdlog::drop( loggerName_ );
-        spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 );
+    try
+    {
+        if ( std::filesystem::exists( logFileName_.parent_path() ) ) {
+            spdlog::get( loggerName_ )->flush();
+            spdlog::drop( loggerName_ );
+        
+            if( NULL != spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 ) )
+            {
+                status = true;
+            }
+        }
     }
+    catch( ... )
+    {
+        status = false;
+    }
+    
+    return status;
 }
 
 bool CMLogger::createLogFile()
@@ -164,7 +178,7 @@ bool CMLogger::createLogFile()
     }
     catch( ... )
     {
-        throw logger_exception("Failed to create/open logger : " + logFileName_.string());
+        throw logger_exception( "Failed to create/open logger : " + logFileName_.string() );
     }
 
     return ( NULL != logInstance ) ? true : false;
