@@ -84,15 +84,12 @@ TEST_F( CMLoggerTest, logFromMultipleThreads )
         logString.append( line );
     }  
     in_file.close();
-    size_t idx = logString.find( "HELLO" );
-    unsigned occurances = 0;
-    while ( idx != std::string::npos )
-    {
+    unsigned int occurrences = 0;
+    for ( size_t idx = logString.find( "HELLO" ); idx != std::string::npos; occurrences++ ) {
         idx = logString.find( "HELLO", idx + 1 );
-        occurances++;
     }
 
-    EXPECT_EQ( occurances, 6 );
+    EXPECT_EQ( occurrences, 6 );
 }
 
 TEST_F( CMLoggerTest, logRotate )
@@ -102,29 +99,34 @@ TEST_F( CMLoggerTest, logRotate )
     CM_LOG_ERROR( "This is a test" );
     CM_LOG_ERROR( "This is a test" );
     CM_LOG_ERROR( "This is a test" );
-
+    
+    /*
+    The rotating logger creates as many log files as per the log config set before rotating.
+    The log files are expected to be named csc_cms_test.1.log , csc_cms_test.2.log etc.
+    So we drop off the .log from the full log file path and use the path + log filename string
+    to search through all the file paths in the log directory to verify the expected number of log
+    files are created.
+    */
     std::string tempPathName = TEST_LOG_FILEPATH;
     tempPathName = tempPathName.substr( 0, tempPathName.length() - 4 ); // strip off .log
     
     std::filesystem::path logFilePath = std::filesystem::path( "./" );
     std::filesystem::path pa;
-    unsigned occurances = 0;
-    try
-    {
+    unsigned int occurrences = 0;
+    try {
         for ( auto const& dirEntry : std::filesystem::directory_iterator{logFilePath} ) {
             if ( std::filesystem::exists( dirEntry ) && !std::filesystem::is_directory( dirEntry ) ) {
                 pa = dirEntry.path();
-                if( std::filesystem::is_regular_file( pa ) ) {
-                    if( std::string::npos != pa.string().find( tempPathName ) ) {
-                        occurances++;
+                if ( std::filesystem::is_regular_file( pa ) ) {
+                    if ( std::string::npos != pa.string().find( tempPathName ) ) {
+                        occurrences++;
                     }
                 }
             }
         }
     }
-    catch( std::filesystem::filesystem_error& e )
-    {
-      std::cout << e.what() << "\n";
+    catch( std::filesystem::filesystem_error& e ) {
+        std::cout << e.what() << "\n";
     }
-    EXPECT_EQ( occurances, 3 );
+    EXPECT_EQ( occurrences, 3 );
 }

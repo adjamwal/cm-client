@@ -78,8 +78,8 @@ void CMLogger::setLogLevel( CM_LOG_LVL_T logLevel )
     }
 }
 
-void CMLogger::logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
-    const char* funcName, long lineNumber, const char* message, ... )
+void CMLogger::logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char *fileName,
+    const char *funcName, long lineNumber, const char *message, ... )
 {
     if( logLevel_ < severity ) {
         return;
@@ -124,20 +124,17 @@ bool CMLogger::setLogConfig( uint32_t fileSize, uint32_t logFiles )
     maxFileSize_ = fileSize;
     maxLogFiles_ = logFiles;
 
-    try
-    {
+    try {
         if ( std::filesystem::exists( logFileName_.parent_path() ) ) {
             spdlog::get( loggerName_ )->flush();
             spdlog::drop( loggerName_ );
         
-            if( NULL != spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 ) )
-            {
+            if( NULL != spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 ) ) {
                 status = true;
             }
         }
     }
-    catch( ... )
-    {
+    catch( ... ) {
         status = false;
     }
     
@@ -169,15 +166,13 @@ bool CMLogger::createLogFile()
 
     std::shared_ptr<spdlog::logger> logInstance = NULL;
 
-    try
-    {
+    try {
         if ( !std::filesystem::exists( logFileName_.parent_path() ) ) {
             std::filesystem::create_directories( logFileName_.parent_path() );
         }
         logInstance = spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 );
     }
-    catch( ... )
-    {
+    catch( ... ) {
         throw logger_exception( "Failed to create/open logger : " + logFileName_.string() );
     }
 
