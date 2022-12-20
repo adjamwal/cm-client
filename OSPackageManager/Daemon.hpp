@@ -25,8 +25,6 @@ private:
     std::thread task_;
 
     void mainTask();
-
-    void init();
 };
 
 } // namespace PackageManager

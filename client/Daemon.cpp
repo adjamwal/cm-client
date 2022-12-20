@@ -14,57 +14,50 @@
 #include <chrono>
 #include <iostream>
 
-namespace CloudManagementClient
+namespace CloudManagement
 {
 
 const std::string logFileName = "csc_cms.log";
+//! @todo creation of PM, should also load the process
 Daemon::Daemon()
-    : cmidLoader_ { std::make_unique<ComponentLoader::CMIDLoader>() },
-      config_ { std::make_unique<CloudManagementConfiguration::Config>()}
+    : cmidLoader_ { std::make_unique<CMIDLoader>() },
+      config_ { std::make_unique<Config>()}
 {
     const std::filesystem::path logFilePath = std::filesystem::path(CloudManagementConfiguration::Config::CM_LOG_PATH) / logFileName;
     //initialise Logger before anything else.
     CMLogger::getInstance(logFilePath);
 }
 
-void Daemon::init()
-{
-    config_->load();
-}
-
 void Daemon::start()
 {
     CM_LOG_DEBUG("Starting cloud management");
-    this->isRunning_ = true;
-    this->task_ = std::thread(&Daemon::mainTask, this);
-    this->task_.join();
+    isRunning_ = true;
+
+    task_ = std::thread(&Daemon::mainTask, this);
+    task_.join();
 }
 
 void Daemon::stop()
 {
-    this->isRunning_ = false;
+    isRunning_ = false;
 }
 
 Daemon::~Daemon()
 {
-    this->stop();
 }
 
 void Daemon::mainTask()
 {
-    init();
+    config_->load(); // The config PR should be removing this so we don't need to call load
 
-    cmidLoader_->start();
-    //! @todo Load and start Package Manager
+    umask(0077);
 
     //! TODO: Just busy wait??
     //!
     //! Change as needed...
-    while(this->isRunning_) {
+    while(isRunning_) {
         using namespace std;
         using namespace std::chrono_literals;
-
-        umask(0077);
 
         cout << "Just chillin here..." << endl;
 
@@ -74,8 +67,6 @@ void Daemon::mainTask()
         //auto end = chrono::high_resolution_clock::now();
         (void) chrono::high_resolution_clock::now();
     }
-
-    cmidLoader_->stop();
 }
 
 } // namespace CloudManagementClient
