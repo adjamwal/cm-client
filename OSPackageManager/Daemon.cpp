@@ -17,40 +17,34 @@ Daemon::Daemon()
 {
 }
 
-void Daemon::init()
-{
-}
-
 void Daemon::start()
 {
-    this->isRunning_ = true;
+    isRunning_ = true;
 
-    this->task_ = std::thread(&Daemon::mainTask, this);
-    this->task_.join();
+    task_ = std::thread(&Daemon::mainTask, this);
+    task_.join();
 }
 
 void Daemon::stop()
 {
-    this->isRunning_ = false;
+    isRunning_ = false;
 }
 
 Daemon::~Daemon()
 {
-    this->stop();
+    stop();
 }
 
 void Daemon::mainTask()
 {
-    init();
+    umask(0077);
 
     //! TODO: Just busy wait??
     //!
     //! Change as needed...
-    while(this->isRunning_) {
+    while(isRunning_) {
         using namespace std;
         using namespace std::chrono_literals;
-
-        umask(0077);
 
         cout << "Just chillin here..." << endl;
 
