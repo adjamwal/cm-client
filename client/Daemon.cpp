@@ -23,7 +23,7 @@ Daemon::Daemon()
     : cmidLoader_ { std::make_unique<CMIDLoader>() },
       config_ { std::make_unique<Config>()}
 {
-    const std::filesystem::path logFilePath = std::filesystem::path(CloudManagementConfiguration::Config::CM_LOG_PATH) / logFileName;
+    const std::filesystem::path logFilePath = std::filesystem::path(Config::cmLogPath) / logFileName;
     //initialise Logger before anything else.
     CMLogger::getInstance(logFilePath);
 }
