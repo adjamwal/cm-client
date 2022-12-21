@@ -43,10 +43,10 @@ public:
     CMLogger& operator=(const CMLogger&) = delete;
     CMLogger(CMLogger &&) = delete;
  
-    void logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
-                     const char* funcName, long lineNumber, const char* message, ... );
+    void logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char *fileName,
+                     const char *funcName, long lineNumber, const char *message, ... );
     void setLogLevel( CM_LOG_LVL_T severity );
-    void setLogConfig( uint32_t fileSize, uint32_t logFiles );
+    bool setLogConfig( uint32_t fileSize, uint32_t logFiles );
 private:
     void writeLogLine( const std::string& logLevel, const std::string& logLine );
     bool createLogFile();

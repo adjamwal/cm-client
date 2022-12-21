@@ -78,8 +78,8 @@ void CMLogger::setLogLevel( CM_LOG_LVL_T logLevel )
     }
 }
 
-void CMLogger::logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char* fileName,
-    const char* funcName, long lineNumber, const char* message, ... )
+void CMLogger::logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char *fileName,
+    const char *funcName, long lineNumber, const char *message, ... )
 {
     if( logLevel_ < severity ) {
         return;
@@ -117,17 +117,28 @@ void CMLogger::writeLogLine( const std::string& logLevel, const std::string& log
     spdlog::get( loggerName_ )->flush();
 }
 
-void CMLogger::setLogConfig( uint32_t fileSize, uint32_t logFiles )
+bool CMLogger::setLogConfig( uint32_t fileSize, uint32_t logFiles )
 {
+    bool status = false;
     std::lock_guard<std::mutex> lock(mutex_);
     maxFileSize_ = fileSize;
     maxLogFiles_ = logFiles;
 
-    if ( std::filesystem::exists( logFileName_.parent_path() ) ) {
-        spdlog::get( loggerName_ )->flush();
-        spdlog::drop( loggerName_ );
-        spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 );
+    try {
+        if ( std::filesystem::exists( logFileName_.parent_path() ) ) {
+            spdlog::get( loggerName_ )->flush();
+            spdlog::drop( loggerName_ );
+        
+            if( NULL != spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 ) ) {
+                status = true;
+            }
+        }
     }
+    catch( ... ) {
+        status = false;
+    }
+    
+    return status;
 }
 
 bool CMLogger::createLogFile()
@@ -155,16 +166,14 @@ bool CMLogger::createLogFile()
 
     std::shared_ptr<spdlog::logger> logInstance = NULL;
 
-    try
-    {
+    try {
         if ( !std::filesystem::exists( logFileName_.parent_path() ) ) {
             std::filesystem::create_directories( logFileName_.parent_path() );
         }
         logInstance = spdlog::rotating_logger_mt( loggerName_, logFileName_.string(), maxFileSize_, maxLogFiles_ - 1 );
     }
-    catch( ... )
-    {
-        throw logger_exception("Failed to create/open logger : " + logFileName_.string());
+    catch( ... ) {
+        throw logger_exception( "Failed to create/open logger : " + logFileName_.string() );
     }
 
     return ( NULL != logInstance ) ? true : false;

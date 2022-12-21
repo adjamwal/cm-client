@@ -16,15 +16,14 @@
 
 namespace CloudManagement
 {
-//TODO : finalise log file name
-const std::string logFileName = "csc_cms.log";
 
+const std::string logFileName = "csc_cms.log";
 //! @todo creation of PM, should also load the process
 Daemon::Daemon()
     : cmidLoader_ { std::make_unique<CMIDLoader>() },
       config_ { std::make_unique<Config>()}
 {
-    const auto logFilePath = Config::cmLogPath + logFileName;
+    const std::filesystem::path logFilePath = std::filesystem::path(Config::cmLogPath) / logFileName;
     //initialise Logger before anything else.
     CMLogger::getInstance(logFilePath);
 }
