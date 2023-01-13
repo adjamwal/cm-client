@@ -12,7 +12,7 @@
 #include <thread>
 
 
-namespace ComponentLoader
+namespace CloudManagement
 {
 
 class CMIDLoader {
@@ -24,13 +24,10 @@ public:
     CMIDLoader(CMIDLoader &&other) = delete;
     CMIDLoader &operator=(CMIDLoader &&other) = delete;
 
-    void start();
-    void stop();
     void reloadConfig();
 
 private:
-    std::atomic<bool> is_running_;
     PM_MODULE_CTX_T cmid_module_context_;
 };
 
-} // namespace ComponentLoader
+} // namespace CloudManagement

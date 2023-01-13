@@ -4,3 +4,4 @@
 enable_testing()
 
 add_subdirectory(Config)
+add_subdirectory(Logger)

@@ -13,6 +13,7 @@ set(CM_CLIENT_SRCS
     ComponentLoader/CMIDLoader.cpp
     Configuration/Config.hpp
     Configuration/Config.cpp
+    Logger/CMLogger.cpp
 )
 
 add_executable(csccloudmanagement ${CM_CLIENT_SRCS})
@@ -23,6 +24,7 @@ add_dependencies(csccloudmanagement
     third-party-jsoncpp
     third-party-EndpointIdentity
     third-party-PackageManager
+    third-party-spdlog
 )
 
 target_include_directories(csccloudmanagement

@@ -16,10 +16,10 @@ int main(int argc, char *argv[])
     (void) argc;
     (void) argv;
 
-    auto service = std::make_unique<CloudManagementClient::Daemon>();
+    auto service = CloudManagement::Daemon();
 
     // This blocks till we're stopped
-    service->start();
+    service.start();
 
     return 0;
 }
