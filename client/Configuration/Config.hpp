@@ -12,12 +12,12 @@
 #include <mutex>
 #include <json/json.h>
 
+#include "Logger/CMLogger.hpp"
 
-//TODO : replace these with enum from logger
 #if defined (DEBUG)
-#define DEFAULT_LOG_LEVEL 7
+#define DEFAULT_LOG_LEVEL CM_LOG_LVL_T::CM_LOG_DEBUG
 #else
-#define DEFAULT_LOG_LEVEL 4
+#define DEFAULT_LOG_LEVEL CM_LOG_LVL_T::CM_LOG_WARNING
 #endif
 
 namespace CloudManagement
@@ -32,9 +32,6 @@ public:
     Config(Config &&other) = delete;
     Config &operator=(Config &&other) = delete;
 
-    void load();
-    uint32_t getLogLevel();
-
     static const std::string cmidExePath;
     static const std::string cmConfigPath;
     static const std::string cmLogPath;
@@ -46,15 +43,20 @@ public:
     static const std::string cmidLogPath;
 #endif
 
+    bool load(); // separate function to allow re-load. 
+    CM_LOG_LVL_T getLogLevel() const;
+    
+
 private:
+    
+    bool readCmConfig(const std::filesystem::path&);
 
-    static constexpr const char uc_element[] = "uc";
-    static constexpr const char loglevel_element[] = "loglevel";
+    static constexpr char ucKey[] = "uc";
+    static constexpr char logLevelKey[] = "loglevel";
+    static constexpr char configFileName[] = "cm_config.json";
 
-    std::atomic<bool> is_loaded_;
-    uint32_t logLevel_ = DEFAULT_LOG_LEVEL; //default loglevel
-    std::mutex mutex_;
-    Json::Value readCmConfig(const std::string);
+    mutable std::mutex mutex_;
+    CM_LOG_LVL_T logLevel_ = DEFAULT_LOG_LEVEL;
 };
 
 } // namespace CloudManagement
