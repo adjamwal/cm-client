@@ -52,18 +52,15 @@ PM_STATUS PmAgentController::Stop()
     auto status = PM_STATUS::PM_ERROR;
     {
         std::lock_guard<std::mutex> lock( mutex_ );
-        if( bIsProcessStartedByPlugin_ )
-        {
+        if( bIsProcessStartedByPlugin_ ) {
             bIsProcessStartedByPlugin_ = false;
-            if( PM_STATUS::PM_OK != stopProcess() )
-            {
+            if( PM_STATUS::PM_OK != stopProcess() ) {
                 return PM_STATUS::PM_FAIL;
             }
         }
     }
     //Wait for monitor thread to exit
-    if( threadMonitor_.joinable() )
-    {
+    if( threadMonitor_.joinable() ) {
         threadMonitor_.join();
     }
     return PM_STATUS::PM_OK;
