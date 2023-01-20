@@ -92,4 +92,6 @@ endif()
 
 target_enable_warnings(cmpackagemanager)
 
-install(TARGETS cmpackagemanager DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)
+install(TARGETS cmpackagemanager DESTINATION bin)
+
+add_subdirectory(controlplugin)

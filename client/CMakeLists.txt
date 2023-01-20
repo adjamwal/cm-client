@@ -11,6 +11,8 @@ set(CM_CLIENT_SRCS
     main.cpp
     ComponentLoader/CMIDLoader.hpp
     ComponentLoader/CMIDLoader.cpp
+    ComponentLoader/PMLoader.hpp
+    ComponentLoader/PMLoader.cpp
     Configuration/Config.hpp
     Configuration/Config.cpp
     Logger/CMLogger.cpp
@@ -42,6 +44,7 @@ target_link_libraries(csccloudmanagement
     PUBLIC
     cmidcontrolplugin
     common
+    pmcontrolplugin
     "-framework SystemConfiguration"
     "-framework IOKit"
     "-framework CoreServices"
@@ -52,7 +55,7 @@ target_compile_definitions(csccloudmanagement
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CM_THIRDPARTY_EXPORT}/bin\">"
-    "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/client/config\">"
+    "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/config\">"
     "$<$<CONFIG:DEBUG>:CM_SHARED_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/\">"
 )
 
