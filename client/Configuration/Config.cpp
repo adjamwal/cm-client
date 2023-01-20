@@ -6,10 +6,14 @@
 
 #include "Config.hpp"
 
-#include <filesystem>
 #include <json/json.h>
+
+#include <filesystem>
 #include <iostream>
 #include <fstream>
+
+#define LOG_LEVEL_MIN 1
+#define LOG_LEVEL_MAX 7
 
 namespace CloudManagement
 {
@@ -45,9 +49,11 @@ Config::Config()
     }
 #endif /* !DEBUG */
 
+    reload();
+
 }
 
-bool Config::load()
+bool Config::reload()
 {
     const std::filesystem::path filePath = std::filesystem::path(cmConfigPath) / std::filesystem::path(configFileName);
     return readCmConfig(filePath);
@@ -88,7 +94,7 @@ bool Config::readCmConfig(const std::filesystem::path &filePath)
 
     int logLvl_ = root[ucKey][logLevelKey].asInt();
 
-    if ( logLvl_ < 1 || logLvl_ > 7) {
+    if ( logLvl_ < LOG_LEVEL_MIN || logLvl_ > LOG_LEVEL_MAX ) {
         CM_LOG_INFO("loglevel value does not fall in the valid range.");
         return false;
     }

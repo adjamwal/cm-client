@@ -6,18 +6,19 @@
 
 #pragma once
 
+#include "Logger/CMLogger.hpp"
+
+#include <json/json.h>
+
 #include <atomic>
 #include <thread>
 #include <string>
 #include <mutex>
-#include <json/json.h>
-
-#include "Logger/CMLogger.hpp"
 
 #if defined (DEBUG)
 #define DEFAULT_LOG_LEVEL CM_LOG_LVL_T::CM_LOG_DEBUG
 #else
-#define DEFAULT_LOG_LEVEL CM_LOG_LVL_T::CM_LOG_WARNING
+#define DEFAULT_LOG_LEVEL CM_LOG_LVL_T::CM_LOG_NOTICE
 #endif
 
 namespace CloudManagement
@@ -43,7 +44,7 @@ public:
     static const std::string cmidLogPath;
 #endif
 
-    bool load(); // separate function to allow re-load. 
+    bool reload(); // separate function to allow re-load. 
     CM_LOG_LVL_T getLogLevel() const;
     
 
@@ -51,9 +52,9 @@ private:
     
     bool readCmConfig(const std::filesystem::path&);
 
-    static constexpr char ucKey[] = "uc";
-    static constexpr char logLevelKey[] = "loglevel";
-    static constexpr char configFileName[] = "cm_config.json";
+    const std::string ucKey = "uc";
+    const std::string logLevelKey = "loglevel";
+    const std::string configFileName = "cm_config.json";
 
     mutable std::mutex mutex_;
     CM_LOG_LVL_T logLevel_ = DEFAULT_LOG_LEVEL;
