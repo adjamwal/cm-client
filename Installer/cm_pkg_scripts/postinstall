@@ -1,0 +1,11 @@
+#!/bin/bash
+
+LAUNCHD_DIR="/Library/LaunchDaemons"
+LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
+PREFIX="/opt/cisco/secureclient"
+CM_DIR="${PREFIX}/cloudmanagement"
+BINDIR="${CM_DIR}/bin"
+
+launchctl bootstrap system ${LAUNCHD_DIR}/${LAUNCHD_FILE} || exit 1
+
+exit 0
