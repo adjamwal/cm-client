@@ -1,6 +1,7 @@
 #include <stddef.h> 
-#include "cmid/PackageManagerInternalModuleAPI.h"
+#include "ModuleControlPlugin.hpp"
 #include "PmAgentController.hpp"
+#include "CMLogger.hpp"
 #include <iostream>
 
 namespace { // anonymous namespace
@@ -11,7 +12,7 @@ public:
     // static member functions
 
     static PmControlPlugin&
-    GetInstance( const std::string& basePath = std::string( "" ), const std::string& configPath = std::string( "" ) );
+    GetInstance( const std::string& basePath = std::string(""), const std::string& configPath = std::string("") );
 
     static PM_MODULE_RESULT_T
     StartPmAgent( const TCHAR* pszBasePath, const TCHAR* pszDataPath, const TCHAR* pszConfigPath );
@@ -40,7 +41,7 @@ private:
 PmControlPlugin&
 PmControlPlugin::GetInstance( const std::string& basepath, const std::string& configpath )
 {
-    static PmControlPlugin s_ctrlPluginInstance(basepath, configpath);
+    static PmControlPlugin s_ctrlPluginInstance( basepath, configpath );
     return s_ctrlPluginInstance;
 }
 
@@ -59,6 +60,7 @@ PmControlPlugin::StartPmAgent( const TCHAR* pszBasePath,
                                const TCHAR* pszDataPath,
                                const TCHAR* pszConfigPath )
 {
+    CM_LOG_DEBUG( "Starting PM agent" );
     try {
         PmControlPlugin& rCtrlPlugin = GetInstance( pszBasePath, pszConfigPath );
         std::lock_guard<std::mutex> lck( rCtrlPlugin.mtxAgentCtrl_ );
@@ -72,11 +74,13 @@ PmControlPlugin::StartPmAgent( const TCHAR* pszBasePath,
             return PM_MODULE_SUCCESS;
         }
         else {
+            CM_LOG_ERROR( "Failed to start agent with return code [%d]", retStatus );
             return to_pm_result( retStatus );
         }
     }
     catch ( const std::exception& rExcep ) {
-        // TODO handle exception
+        // handle exception
+        CM_LOG_ERROR( "Exception : [%s] ", rExcep.what() );
     }
 
     return PM_MODULE_GENERAL_ERROR;
@@ -85,22 +89,29 @@ PmControlPlugin::StartPmAgent( const TCHAR* pszBasePath,
 PM_MODULE_RESULT_T
 PmControlPlugin::StopPmAgent()
 {
-    try {
+    try
+    {
         PmControlPlugin& rCtrlPlugin = GetInstance();
         std::lock_guard<std::mutex> lck( rCtrlPlugin.mtxAgentCtrl_ );
-        if ( !rCtrlPlugin.bIsProcessStarted_ ) {
+        if ( !rCtrlPlugin.bIsProcessStarted_ )
+        {
             return PM_MODULE_NOT_STARTED;
         }
 
         PM_STATUS retStatus = rCtrlPlugin.agentCtrlInst_.Stop();
-        if ( PM_STATUS::PM_OK == retStatus ) {
+        if ( PM_STATUS::PM_OK == retStatus )
+        {
             rCtrlPlugin.bIsProcessStarted_ = false;
             return PM_MODULE_SUCCESS;
         }
 
+        CM_LOG_ERROR( "Failed to stop agent with return code [%d]", retStatus );
+
         return to_pm_result( retStatus );
     }
-    catch ( const std::exception& e ) {
+    catch ( const std::exception& e )
+    {
+        CM_LOG_WARNING( "package manager agent not started: %s", e.what() );
         return PM_MODULE_NOT_STARTED;
     }
 }
@@ -108,9 +119,10 @@ PmControlPlugin::StopPmAgent()
 PM_MODULE_RESULT_T 
 PmControlPlugin::SetPmOption( PM_MODULE_OPTION_ID_T nOptionID, void* pOption, size_t nSize )
 {
-    try {
+    try
+    {
         if( nOptionID == PM_MODULE_OPTION_LOG_LEVEL ) {
-           // Integrate logger
+           // TODO set log level
         }
         else {
             throw( "Invalid PM option" );
@@ -118,6 +130,7 @@ PmControlPlugin::SetPmOption( PM_MODULE_OPTION_ID_T nOptionID, void* pOption, si
         }
     }
     catch( const std::exception& e ) {
+        CM_LOG_WARNING( "Invalid option parameter: %s", e.what() );
         return PM_MODULE_INVALID_PARAM;
     }
 
@@ -128,9 +141,9 @@ PmControlPlugin::SetPmOption( PM_MODULE_OPTION_ID_T nOptionID, void* pOption, si
 
 PM_MODULE_API
 PM_MODULE_RESULT_T
-CreateModuleInstance(IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX)
+CreatePMModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX )
 {
-    if (nullptr == pPM_MODULE_CTX) {
+    if ( nullptr == pPM_MODULE_CTX ) {
         return PM_MODULE_INVALID_PARAM;
     }
 
@@ -148,9 +161,9 @@ CreateModuleInstance(IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX)
 
 PM_MODULE_API
 PM_MODULE_RESULT_T
-ReleaseModuleInstance(IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX)
+ReleasePMModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX )
 {
-    if (nullptr == pPM_MODULE_CTX) {
+    if ( nullptr == pPM_MODULE_CTX ) {
         return PM_MODULE_INVALID_PARAM;
     }
 

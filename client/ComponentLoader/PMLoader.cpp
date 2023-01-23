@@ -6,6 +6,7 @@
 
 #include "PMLoader.hpp"
 #include "Configuration/Config.hpp"
+#include "Logger/CMLogger.hpp"
 #include <memory>
 
 namespace CloudManagement
@@ -14,8 +15,7 @@ namespace CloudManagement
 PMLoader::PMLoader() : pm_module_context_{ 0 }
 {
     pm_module_context_.nVersion = PM_MODULE_INTERFACE_VERSION;
-    CreateModuleInstance( &pm_module_context_ );
-
+    CreatePMModuleInstance( &pm_module_context_ );
     pm_module_context_.fpStart( Config::cmidExePath.c_str(),
                                 Config::cmConfigPath.c_str(),
                                 Config::cmConfigPath.c_str() );
@@ -24,7 +24,7 @@ PMLoader::PMLoader() : pm_module_context_{ 0 }
 PMLoader::~PMLoader()
 {
     pm_module_context_.fpStop();
-    ReleaseModuleInstance( &pm_module_context_ );
+    ReleasePMModuleInstance( &pm_module_context_ );
 }
 
 void PMLoader::reloadConfig()

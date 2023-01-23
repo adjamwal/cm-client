@@ -25,7 +25,7 @@ public:
     * Constructor
     * @param[in] path - Path to the child process
     */
-    PmAgentController( const std::string& path, const std::string& configPath);
+    PmAgentController( const std::string& path, const std::string& configPath );
 
     ~PmAgentController();
     /**

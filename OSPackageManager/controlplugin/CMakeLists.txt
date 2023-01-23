@@ -18,6 +18,7 @@ target_include_directories(pmcontrolplugin
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CM_THIRDPARTY_EXPORT}/include
+        ${cm-client_SOURCE_DIR}/client/Logger
 )
 
 target_link_libraries(pmcontrolplugin

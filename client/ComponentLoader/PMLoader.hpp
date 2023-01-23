@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cmid/PackageManagerInternalModuleAPI.h"
+#include "OSPackageManager/controlplugin/ModuleControlPlugin.hpp"
 #include <atomic>
 #include <thread>
 
