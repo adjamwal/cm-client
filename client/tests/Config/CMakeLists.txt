@@ -22,6 +22,13 @@ target_link_libraries(
   ${GTEST_LIBS}
 )
 
+target_compile_definitions(
+    ConfigTest
+    PUBLIC
+    "$<$<CONFIG:DEBUG>:DEBUG>"
+    "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
+)
+
 target_include_directories(
   ConfigTest
   PRIVATE

@@ -4,6 +4,15 @@
 
 using namespace CloudManagement;
 #define TEST_CONFIG_FILEPATH "cm_config.json"
+#define TEST_LOG_FILEPATH "./cm_test.log"
+
+int TestLogGlobalInit()
+{
+    CM_LOG_INIT(TEST_LOG_FILEPATH);
+    return 0;
+}
+// initialise CMLogger as the first thing
+int i = TestLogGlobalInit();
 
 struct ConfigData
 {
@@ -25,7 +34,7 @@ public:
     ConfigTest()
     {
         testdata = GetParam();
-        std::ofstream out_file( TEST_CONFIG_FILEPATH, std::ios::out );
+        std::ofstream out_file( Config::cmConfigPath + "/" + TEST_CONFIG_FILEPATH, std::ios::out );
         out_file << testdata.data;
         out_file.close();
     }
