@@ -137,6 +137,11 @@ PM_STATUS PmAgentController::startProcess()
 {
     PM_STATUS status = PM_STATUS::PM_ERROR;
 
+    // TODO Verify Codesign
+
+    // Will be removed once Codesign verification is implemented.
+    status = PM_STATUS::PM_OK;
+
     if ( INVALID_PID != pid_ ) {
         CM_LOG_DEBUG( "Process is still running, pid = %d", pid_ );
         return PM_STATUS::PM_ERROR;
