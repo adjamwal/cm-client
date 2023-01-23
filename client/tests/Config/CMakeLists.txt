@@ -5,7 +5,7 @@ add_executable(
   ConfigTest
   ${cm-client_SOURCE_DIR}/client/Configuration/Config.hpp
   ${cm-client_SOURCE_DIR}/client/Configuration/Config.cpp
-
+  ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
   # Test files
   ConfigTest.cpp
 )
