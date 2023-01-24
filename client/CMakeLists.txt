@@ -81,6 +81,8 @@ target_enable_warnings(csccloudmanagement)
 
 install(TARGETS csccloudmanagement DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)
 
-#
 # Include tests
-add_subdirectory(tests)
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
+

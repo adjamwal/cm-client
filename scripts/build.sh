@@ -48,7 +48,7 @@ if [ "${usage}" = "true" ]; then
     exit 0
 fi
 
-CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=Debug"
+CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=1"
 CMAKE_BUILD_DIR="debug"
 if [ "${release}" = "true"  ]; then
     CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
