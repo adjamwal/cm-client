@@ -18,7 +18,7 @@
 namespace CloudManagement
 {
 
-#if defined(DEBUG) && defined(CMID_DAEMON_PATH) && defined(CM_CONFIG_PATH) && defined(CM_SHARED_LOG_PATH)
+#if defined(DEBUG) && defined(CMID_DAEMON_PATH) && defined(CM_CONFIG_PATH) && defined(CM_SHARED_LOG_PATH) && defined(CMID_LOG_PATH)
     const std::string Config::cmidExePath  = CMID_DAEMON_PATH;
     const std::string Config::cmConfigPath = CM_CONFIG_PATH;
     const std::string Config::cmLogPath    = CM_SHARED_LOG_PATH;
@@ -26,7 +26,8 @@ namespace CloudManagement
      CMID will try to create a log file here in the call to CreateModuleInstance so we need
      to define this separately and build this directory so it's available prior to loading CMID
      */
-    const std::string Config::cmidLogPath = "/Library/Logs/Cisco/SecureClient/CloudManagement/";
+    //const std::string Config::cmidLogPath = "/Library/Logs/Cisco/SecureClient/CloudManagement/";
+    const std::string Config::cmidLogPath = CMID_LOG_PATH;
 #else
     const std::string Config::cmidExePath   = "/opt/cisco/secureclient/cloudmanagement/bin";
     const std::string Config::cmConfigPath  = "/opt/cisco/secureclient/cloudmanagement/etc";
