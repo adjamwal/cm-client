@@ -13,16 +13,16 @@ public:
     // static member functions
 
     static PmControlPlugin&
-    GetInstance( const std::string& basePath = std::string(""), const std::string& configPath = std::string("") );
+    getInstance( const std::string& basePath = std::string(""), const std::string& configPath = std::string("") );
 
     static PM_MODULE_RESULT_T
-    StartPmAgent( const TCHAR* pszBasePath, const TCHAR* pszDataPath, const TCHAR* pszConfigPath );
+    startPmAgent( const TCHAR* basePath, const TCHAR* dataPath, const TCHAR* configPath );
 
     static PM_MODULE_RESULT_T
-    StopPmAgent();
+    stopPmAgent();
 
     static PM_MODULE_RESULT_T
-    SetPmOption( PM_MODULE_OPTION_ID_T nOptionID, void* pOption, size_t nSize );
+    setPmOption( PM_MODULE_OPTION_ID_T optionID, void* option, size_t opSize );
 private:
     // private member functions
 
@@ -35,12 +35,12 @@ private:
 
     // private data members
     PmAgentController agentCtrlInst_;
-    std::mutex mtxAgentCtrl_; // protect instance returned by GetInstance()
+    std::mutex mtxAgentCtrl_; // protect instance returned by getInstance()
     bool bIsProcessStarted_;  // tracking bool for module Start/Stop
 };
 
 PmControlPlugin&
-PmControlPlugin::GetInstance( const std::string& basepath, const std::string& configpath )
+PmControlPlugin::getInstance( const std::string& basepath, const std::string& configpath )
 {
     static PmControlPlugin s_ctrlPluginInstance( basepath, configpath );
     return s_ctrlPluginInstance;
@@ -57,21 +57,21 @@ to_pm_result( const PM_STATUS eStatus )
 }
 
 PM_MODULE_RESULT_T
-PmControlPlugin::StartPmAgent( const TCHAR* pszBasePath,
-                               const TCHAR* pszDataPath,
-                               const TCHAR* pszConfigPath )
+PmControlPlugin::startPmAgent( const TCHAR* basePath,
+                               const TCHAR* dataPath,
+                               const TCHAR* configPath )
 {
     CM_LOG_DEBUG( "Starting PM agent" );
     try {
-        PmControlPlugin& rCtrlPlugin = GetInstance( pszBasePath, pszConfigPath );
-        std::lock_guard<std::mutex> lck( rCtrlPlugin.mtxAgentCtrl_ );
-        if ( rCtrlPlugin.bIsProcessStarted_ ) {
+        PmControlPlugin& ctrlPlugin = getInstance( basePath, configPath );
+        std::lock_guard<std::mutex> lck( ctrlPlugin.mtxAgentCtrl_ );
+        if ( ctrlPlugin.bIsProcessStarted_ ) {
             return PM_MODULE_ALREADY_STARTED;
         }
 
-        PM_STATUS retStatus = rCtrlPlugin.agentCtrlInst_.Start();
+        PM_STATUS retStatus = ctrlPlugin.agentCtrlInst_.start();
         if ( PM_STATUS::PM_OK == retStatus ) {
-            rCtrlPlugin.bIsProcessStarted_ = true;
+            ctrlPlugin.bIsProcessStarted_ = true;
             return PM_MODULE_SUCCESS;
         }
         else {
@@ -88,21 +88,21 @@ PmControlPlugin::StartPmAgent( const TCHAR* pszBasePath,
 }
 
 PM_MODULE_RESULT_T
-PmControlPlugin::StopPmAgent()
+PmControlPlugin::stopPmAgent()
 {
     try
     {
-        PmControlPlugin& rCtrlPlugin = GetInstance();
-        std::lock_guard<std::mutex> lck( rCtrlPlugin.mtxAgentCtrl_ );
-        if ( !rCtrlPlugin.bIsProcessStarted_ )
+        PmControlPlugin& ctrlPlugin = getInstance();
+        std::lock_guard<std::mutex> lck( ctrlPlugin.mtxAgentCtrl_ );
+        if ( !ctrlPlugin.bIsProcessStarted_ )
         {
             return PM_MODULE_NOT_STARTED;
         }
 
-        PM_STATUS retStatus = rCtrlPlugin.agentCtrlInst_.Stop();
+        PM_STATUS retStatus = ctrlPlugin.agentCtrlInst_.stop();
         if ( PM_STATUS::PM_OK == retStatus )
         {
-            rCtrlPlugin.bIsProcessStarted_ = false;
+            ctrlPlugin.bIsProcessStarted_ = false;
             return PM_MODULE_SUCCESS;
         }
 
@@ -118,11 +118,11 @@ PmControlPlugin::StopPmAgent()
 }
 
 PM_MODULE_RESULT_T 
-PmControlPlugin::SetPmOption( PM_MODULE_OPTION_ID_T nOptionID, void* pOption, size_t nSize )
+PmControlPlugin::setPmOption( PM_MODULE_OPTION_ID_T optionID, void* option, size_t opSize )
 {
     try
     {
-        if( nOptionID == PM_MODULE_OPTION_LOG_LEVEL ) {
+        if( optionID == PM_MODULE_OPTION_LOG_LEVEL ) {
            // TODO set log level
         }
         else {
@@ -153,9 +153,9 @@ CreatePMModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX )
 
     pPM_MODULE_CTX->fpInit   = nullptr;
     pPM_MODULE_CTX->fpDeinit = nullptr;
-    pPM_MODULE_CTX->fpStart  = PmControlPlugin::StartPmAgent;
-    pPM_MODULE_CTX->fpStop   = PmControlPlugin::StopPmAgent;
-    pPM_MODULE_CTX->fpSetOption = PmControlPlugin::SetPmOption;
+    pPM_MODULE_CTX->fpStart  = PmControlPlugin::startPmAgent;
+    pPM_MODULE_CTX->fpStop   = PmControlPlugin::stopPmAgent;
+    pPM_MODULE_CTX->fpSetOption = PmControlPlugin::setPmOption;
     pPM_MODULE_CTX->fpConfigUpdated = nullptr;
     return PM_MODULE_SUCCESS;
 }

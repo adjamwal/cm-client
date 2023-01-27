@@ -33,13 +33,13 @@ public:
     * Starts and monitors the child process
     * @return PM_STATUS
     */
-    PM_STATUS Start();
+    PM_STATUS start();
     /**
     * Sends a Stop signal to the child process
     * Terminates if unresponsive.
     * @return PM_STATUS
     */
-    PM_STATUS Stop();
+    PM_STATUS stop();
 private:
     enum eProcStatus {
         eProcess_Terminated = 0,

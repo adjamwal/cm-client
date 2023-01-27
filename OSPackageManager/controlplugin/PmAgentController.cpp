@@ -24,11 +24,11 @@ PmAgentController::PmAgentController( const std::string& path, const std::string
 
 PmAgentController::~PmAgentController()
 {
-    Stop();
+    stop();
     cleanup();
 }
 
-PM_STATUS PmAgentController::Start()
+PM_STATUS PmAgentController::start()
 {
     //check if previous process is running
     // and kill it.
@@ -53,7 +53,7 @@ PM_STATUS PmAgentController::Start()
     return PM_STATUS::PM_OK;
 }
 
-PM_STATUS PmAgentController::Stop()
+PM_STATUS PmAgentController::stop()
 {
     auto status = PM_STATUS::PM_ERROR;
     {
@@ -103,8 +103,8 @@ void PmAgentController::cleanup()
 
 PmAgentController::eProcStatus PmAgentController::waitForProcess()
 {
-    int iChildStatus = 0;
-    if ( 0 != waitpid( pid_, &iChildStatus, 0 ) ) {
+    int childStatus = 0;
+    if ( 0 != waitpid( pid_, &childStatus, 0 ) ) {
         pid_ = INVALID_PID;
         return eProcess_Terminated;
     }
@@ -113,19 +113,19 @@ PmAgentController::eProcStatus PmAgentController::waitForProcess()
 
 PM_STATUS PmAgentController::killIfRunning()
 {
-    int iProcessCount = proc_listpids( PROC_ALL_PIDS, 0, NULL, 0 );
-    pid_t processIDs[iProcessCount];
+    int processCount = proc_listpids( PROC_ALL_PIDS, 0, NULL, 0 );
+    pid_t processIDs[processCount];
     proc_listpids( PROC_ALL_PIDS, 0, processIDs, sizeof( processIDs ) );
-    for ( int iProc = 0; iProc < iProcessCount; iProc++ )
+    for ( int proc = 0; proc < processCount; proc++ )
     {
-        struct proc_bsdinfo stProcInfo;
-        if ( PROC_PIDTBSDINFO_SIZE == proc_pidinfo( processIDs[iProc], PROC_PIDTBSDINFO, 0, &stProcInfo, PROC_PIDTBSDINFO_SIZE ) ) {
-            if( PM_AGENT_BINARY == std::string(stProcInfo.pbi_name ) ) {
-                if ( 0 == kill( processIDs[iProc], SIGTERM ) ) {
-                    CM_LOG_DEBUG( "Process name = [%s] with pid = [%d] terminated.", PM_AGENT_BINARY, processIDs[iProc] );
+        struct proc_bsdinfo procInfo;
+        if ( PROC_PIDTBSDINFO_SIZE == proc_pidinfo( processIDs[proc], PROC_PIDTBSDINFO, 0, &procInfo, PROC_PIDTBSDINFO_SIZE ) ) {
+            if( PM_AGENT_BINARY == std::string(procInfo.pbi_name ) ) {
+                if ( 0 == kill( processIDs[proc], SIGTERM ) ) {
+                    CM_LOG_DEBUG( "Process name = [%s] with pid = [%d] terminated.", PM_AGENT_BINARY, processIDs[proc] );
                     break;
                 }
-                CM_LOG_ERROR( "Process name = [%s] failed to terminate.", stProcInfo.pbi_name );
+                CM_LOG_ERROR( "Process name = [%s] failed to terminate.", procInfo.pbi_name );
                 return PM_STATUS::PM_ERROR;
             }
         }
@@ -147,7 +147,7 @@ PM_STATUS PmAgentController::startProcess()
         return PM_STATUS::PM_ERROR;
     }
 
-    std::vector<char *> vszProcessArgs = {
+    std::vector<char *> processArgs = {
         strdup(processPath_.c_str()),
         strdup("--bootstrap"),
         strdup(bsConfigPath_.c_str()),
@@ -164,7 +164,7 @@ PM_STATUS PmAgentController::startProcess()
             goto safe_exit;
         case 0:
             // Child
-            if( 0 != execv( vszProcessArgs[0], vszProcessArgs.data() ) ) {
+            if( 0 != execv( processArgs[0], processArgs.data() ) ) {
                 CM_LOG_ERROR( "execv failed, Failed to start Agent" );
                 exit( errno );
             }
