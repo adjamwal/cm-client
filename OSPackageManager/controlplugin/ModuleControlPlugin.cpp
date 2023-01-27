@@ -1,8 +1,9 @@
-#include <stddef.h> 
+
 #include "ModuleControlPlugin.hpp"
 #include "PmAgentController.hpp"
 #include "CMLogger.hpp"
 #include <iostream>
+#include <stddef.h> 
 
 namespace { // anonymous namespace
 
@@ -153,8 +154,8 @@ CreatePMModuleInstance( IN OUT PM_MODULE_CTX_T* pPM_MODULE_CTX )
     pPM_MODULE_CTX->fpInit   = nullptr;
     pPM_MODULE_CTX->fpDeinit = nullptr;
     pPM_MODULE_CTX->fpStart  = PmControlPlugin::StartPmAgent;
-    pPM_MODULE_CTX->fpStop   = PmControlPlugin:: StopPmAgent;
-    pPM_MODULE_CTX->fpSetOption = PmControlPlugin:: SetPmOption;
+    pPM_MODULE_CTX->fpStop   = PmControlPlugin::StopPmAgent;
+    pPM_MODULE_CTX->fpSetOption = PmControlPlugin::SetPmOption;
     pPM_MODULE_CTX->fpConfigUpdated = nullptr;
     return PM_MODULE_SUCCESS;
 }

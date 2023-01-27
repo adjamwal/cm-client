@@ -12,9 +12,9 @@
 using namespace std::chrono_literals;
 
 PmAgentController::PmAgentController( const std::string& path, const std::string& configPath ) :
-      processPath_( path + "/" + PM_AGENT_BINARY ) 
-    , bsConfigPath_( configPath + "/" + BS_CONFIG_FILE )
-    , pmConfigPath_( configPath + "/" + PM_CONFIG_FILE )
+      processPath_( std::filesystem::path( path ) / PM_AGENT_BINARY )
+    , bsConfigPath_( std::filesystem::path( configPath ) / BS_CONFIG_FILE )
+    , pmConfigPath_( std::filesystem::path( configPath ) / PM_CONFIG_FILE )
     , bIsProcessStartedByPlugin_( false )
 {
     if( path.empty() ) {

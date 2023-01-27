@@ -13,6 +13,7 @@
 #include <thread>
 #include <mutex>
 #include <string>
+#include <filesystem>
 
 #define PM_AGENT_BINARY "cmpackagemanager"
 #define BS_CONFIG_FILE "bs.json"
@@ -51,9 +52,9 @@ private:
     PM_STATUS stopProcess();
     eProcStatus waitForProcess();
 
-    std::string processPath_;
-    std::string bsConfigPath_;
-    std::string pmConfigPath_;
+    std::filesystem::path processPath_;
+    std::filesystem::path bsConfigPath_;
+    std::filesystem::path pmConfigPath_;
     std::thread threadMonitor_;
     bool bIsProcessStartedByPlugin_;
     std::mutex mutex_;
