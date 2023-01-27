@@ -6,9 +6,20 @@
 
 #pragma once
 
+#include "Logger/CMLogger.hpp"
+
+#include <json/json.h>
+
 #include <atomic>
 #include <thread>
 #include <string>
+#include <mutex>
+
+#if defined (DEBUG)
+#define DEFAULT_LOG_LEVEL CM_LOG_LVL_T::CM_LOG_DEBUG
+#else
+#define DEFAULT_LOG_LEVEL CM_LOG_LVL_T::CM_LOG_NOTICE
+#endif
 
 namespace CloudManagement
 {
@@ -22,8 +33,6 @@ public:
     Config(Config &&other) = delete;
     Config &operator=(Config &&other) = delete;
 
-    void load();
-
     static const std::string cmidExePath;
     static const std::string cmConfigPath;
     static const std::string cmLogPath;
@@ -35,9 +44,20 @@ public:
     static const std::string cmidLogPath;
 #endif
 
-private:
+    bool reload(); // separate function to allow re-load. 
+    CM_LOG_LVL_T getLogLevel() const;
+    
 
-    std::atomic<bool> is_loaded_;
+private:
+    
+    bool readCmConfig(const std::filesystem::path&);
+
+    const std::string ucKey = "uc";
+    const std::string logLevelKey = "loglevel";
+    const std::string configFileName = "cm_config.json";
+
+    mutable std::mutex mutex_;
+    CM_LOG_LVL_T logLevel_ = DEFAULT_LOG_LEVEL;
 };
 
 } // namespace CloudManagement
