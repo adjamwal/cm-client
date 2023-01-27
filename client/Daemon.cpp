@@ -46,7 +46,6 @@ Daemon::~Daemon()
 
 void Daemon::mainTask()
 {
-    config_->load(); // The config PR should be removing this so we don't need to call load
 
     umask(0077);
 

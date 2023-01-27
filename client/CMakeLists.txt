@@ -45,6 +45,7 @@ target_link_libraries(csccloudmanagement
     cmidcontrolplugin
     common
     pmcontrolplugin
+    jsoncpp
     "-framework SystemConfiguration"
     "-framework IOKit"
     "-framework CoreServices"
@@ -57,6 +58,7 @@ target_compile_definitions(csccloudmanagement
     "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CM_THIRDPARTY_EXPORT}/bin\">"
     "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/config\">"
     "$<$<CONFIG:DEBUG>:CM_SHARED_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/\">"
+    "$<$<CONFIG:DEBUG>:CMID_LOG_PATH=\"/Library/Logs/Cisco/SecureClient/CloudManagement/\">"
 )
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")
@@ -83,6 +85,8 @@ target_enable_warnings(csccloudmanagement)
 
 install(TARGETS csccloudmanagement DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)
 
-#
 # Include tests
-add_subdirectory(tests)
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
+
