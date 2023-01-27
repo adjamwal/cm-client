@@ -12,10 +12,6 @@
      <true/>
      <key>RunAtLoad</key>
      <true/>
-     <key>AbandonProcessGroup</key>
-     <true/>
-     <key>EnableTransactions</key>
-     <false/>
      <key>ExitTimeOut</key>
      <integer>45</integer>
 </dict>

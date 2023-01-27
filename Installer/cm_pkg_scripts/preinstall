@@ -10,7 +10,7 @@ UNINST="${CM_DIR}/bin/cm_uninstall.sh"
 ${UNINST}
 
 if [ "$?" -ne "0" ]; then
-	echo "Error removing previous version!  Continuing..."
+    echo "Error removing previous version!  Continuing..."
 fi
 
 exit 0

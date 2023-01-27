@@ -2,7 +2,7 @@
 <installer-gui-script minSpecVersion="1">
     <options rootVolumeOnly="true" customize="never" hostArchitectures="x86_64,arm64" require-scripts="true" />
     <title>Cisco Secure Client Cloud Management for Mac</title>
-    <product id="com.cisco.secureclient.cloudmanagement" version="1.0.0000" />
+    <product id="com.cisco.secureclient.cloudmanagement"/>
     <organization>com.cisco.secureclient.cloudmanagement</organization>
 
     <ram min-gb="2" />
@@ -22,5 +22,5 @@
     </choice>
 
     <!-- List all component packages -->
-    <pkg-ref id="com.cisco.secureclient.cloudmanagement.service" auth="root">cisco-secure-client-macos-cloudmanagement-1.0.0000.pkg</pkg-ref>
+    <pkg-ref id="com.cisco.secureclient.cloudmanagement.service" auth="root">cisco-secure-client-macos-cloudmanagement.pkg</pkg-ref>
 </installer-gui-script> 
