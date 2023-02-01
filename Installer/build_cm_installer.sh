@@ -53,7 +53,9 @@ for script in ${SCRIPTS_STAGING}/*; do
     chmod 755 "${script}"
 done
 
-pkgbuild --root ${PAYLOAD_STAGING} --scripts ${SCRIPTS_STAGING} --identifier ${CM_PACKAGE_ID} --version ${VER} --install-location "/" ${CM_PKG} --ownership recommended
+pkgbuild --root ${PAYLOAD_STAGING} --analyze cm_components.plist
+
+pkgbuild --component-plist cm_components.plist --root ${PAYLOAD_STAGING} --scripts ${SCRIPTS_STAGING} --identifier ${CM_PACKAGE_ID} --version ${VER} --install-location "/" ${CM_PKG} --ownership recommended
 productbuild --distribution cm_distribution.xml --package-path "./" "unsigned ${CM_PKG}"
 
 rm -rf ${DMG_STAGING}
