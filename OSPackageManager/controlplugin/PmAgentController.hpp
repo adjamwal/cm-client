@@ -55,9 +55,9 @@ private:
     std::filesystem::path processPath_;
     std::filesystem::path bsConfigPath_;
     std::filesystem::path pmConfigPath_;
+    std::thread threadMonitor_;
     bool bIsProcessStartedByPlugin_;
     std::mutex mutex_;
     pid_t pid_ = INVALID_PID;
-    std::thread threadMonitor_;
 
 };
