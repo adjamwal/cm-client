@@ -26,7 +26,6 @@ namespace CloudManagement
      CMID will try to create a log file here in the call to CreateModuleInstance so we need
      to define this separately and build this directory so it's available prior to loading CMID
      */
-    //const std::string Config::cmidLogPath = "/Library/Logs/Cisco/SecureClient/CloudManagement/";
     const std::string Config::cmidLogPath = CMID_LOG_PATH;
 #else
     const std::string Config::cmidExePath   = "/opt/cisco/secureclient/cloudmanagement/bin";

@@ -14,6 +14,7 @@ namespace CloudManagement
 {
 
 class CMIDLoader;
+class PMLoader;
 class Config;
 
 class Daemon {
@@ -25,8 +26,10 @@ public:
     void stop();
 
 private:
-    std::unique_ptr<CMIDLoader> cmidLoader_;
     std::unique_ptr<Config> config_;
+    std::unique_ptr<CMIDLoader> cmidLoader_;
+    std::unique_ptr<PMLoader> pmLoader_;
+    
 
     std::atomic<bool> isRunning_;
     std::thread task_;

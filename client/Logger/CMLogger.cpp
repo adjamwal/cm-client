@@ -44,7 +44,7 @@ std::string LogLevelStr( const CM_LOG_LVL_T level )
 }
 
 CMLogger::CMLogger( const std::string& fileName ) :
-    logLevel_ ( CM_LOG_LVL_T::CM_LOG_ERROR ),
+    logLevel_ ( CM_LOG_LVL_T::CM_LOG_DEBUG ),
     logFileName_ ( fileName ),
     maxFileSize_ ( DEFAULT_MAX_FILE_SIZE ),
     maxLogFiles_ ( DEFAULT_MAX_LOGFILES ),
