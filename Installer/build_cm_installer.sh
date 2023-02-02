@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 set -e
 
 if [ "x$CM_BUILD_VER" = "x" ]; then
@@ -14,8 +13,7 @@ else
     BUILD_TYPE="release"
 fi
 
-PREFIX="/opt/cisco/secureclient"
-CM_DIR="${PREFIX}/cloudmanagement"
+CM_DIR="/opt/cisco/secureclient/cloudmanagement"
 BINDIR="${CM_DIR}/bin"
 LIBDIR="${CM_DIR}/lib"
 CONFIGDIR="${CM_DIR}/etc"
@@ -53,9 +51,7 @@ for script in ${SCRIPTS_STAGING}/*; do
     chmod 755 "${script}"
 done
 
-pkgbuild --root ${PAYLOAD_STAGING} --analyze cm_components.plist
-
-pkgbuild --component-plist cm_components.plist --root ${PAYLOAD_STAGING} --scripts ${SCRIPTS_STAGING} --identifier ${CM_PACKAGE_ID} --version ${VER} --install-location "/" ${CM_PKG} --ownership recommended
+pkgbuild --root ${PAYLOAD_STAGING} --scripts ${SCRIPTS_STAGING} --identifier ${CM_PACKAGE_ID} --version ${VER} --install-location "/" ${CM_PKG} --ownership recommended
 productbuild --distribution cm_distribution.xml --package-path "./" "unsigned ${CM_PKG}"
 
 rm -rf ${DMG_STAGING}

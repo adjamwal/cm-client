@@ -1,7 +1,6 @@
 #!/bin/bash
 
-PREFIX="/opt/cisco/secureclient"
-CM_DIR="${PREFIX}/cloudmanagement"
+CM_DIR="/opt/cisco/secureclient/cloudmanagement"
 UNINST="${CM_DIR}/bin/cm_uninstall.sh"
 
 #TODO : Uninstall and move config files based on versions - on upgrade, disallow downgrades based on versions

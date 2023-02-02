@@ -2,8 +2,7 @@
 
 LAUNCHD_DIR="/Library/LaunchDaemons"
 LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
-PREFIX="/opt/cisco/secureclient"
-CM_DIR="${PREFIX}/cloudmanagement"
+CM_DIR="/opt/cisco/secureclient/cloudmanagement"
 BINDIR="${CM_DIR}/bin"
 ETC_DIR="${CM_DIR}/etc"
 

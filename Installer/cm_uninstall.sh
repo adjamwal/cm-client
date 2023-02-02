@@ -7,8 +7,7 @@ fi
 
 #TODO : preserve config files & logs in case of upgrade
 
-PREFIX="/opt/cisco/secureclient"
-CM_DIR="${PREFIX}/cloudmanagement"
+CM_DIR="/opt/cisco/secureclient/cloudmanagement"
 BINDIR="${CM_DIR}/bin"
 LAUNCHD_DIR="/Library/LaunchDaemons"
 LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
