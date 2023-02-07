@@ -3,11 +3,10 @@
 
 add_executable(
   ControlPluginTest
-  ${cm-client_SOURCE_DIR}/OSPackageManager/controlplugin/ModuleControlPlugin.hpp
-  ${cm-client_SOURCE_DIR}/OSPackageManager/controlplugin/ModuleControlPlugin.cpp
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
   # Test files
   ModuleControlPluginTest.cpp
+  PmAgentControllerTest.cpp
 )
 
 add_dependencies(
@@ -26,7 +25,7 @@ target_compile_definitions(
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
-    "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CM_THIRDPARTY_EXPORT}/bin\">"
+    "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${cm-client_SOURCE_DIR}/OSPackageManager/tests/controlplugin/Resources/mac\">"
     "$<$<CONFIG:DEBUG>:CM_SHARED_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
     "$<$<CONFIG:DEBUG>:CMID_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
 )
