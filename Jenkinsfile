@@ -88,6 +88,9 @@ def run_mac_ci() {
       dir("cm-client/debug/client/tests"){
         sh 'ctest'
       }
+      dir("cm-client/debug/OSPackageManager/tests"){
+        sh 'ctest'
+      }
     }
   }
 }
