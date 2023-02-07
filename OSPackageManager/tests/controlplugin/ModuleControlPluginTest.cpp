@@ -24,6 +24,7 @@ TEST( ModuleControlPlugin, CreateAndRelease )
     EXPECT_EQ( nullptr, modContext.fpConfigUpdated );
 
     EXPECT_EQ( PM_MODULE_NOT_STARTED, modContext.fpStop() );
+    // The start expects to launch a real cmpackagemanager process
     EXPECT_EQ( PM_MODULE_SUCCESS, modContext.fpStart(".", "", "") );
 
     //Test, once start has been called on cmpackagemanager process, a

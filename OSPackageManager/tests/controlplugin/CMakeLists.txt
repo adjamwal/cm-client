@@ -47,12 +47,3 @@ target_link_directories(
 include(GoogleTest)
 gtest_discover_tests(ControlPluginTest)
 
-if(CMAKE_GENERATOR STREQUAL "Xcode")
-    macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
-    set_property (TARGET ${TARGET} PROPERTY XCODE_ATTRIBUTE_${XCODE_PROPERTY}
-        ${XCODE_VALUE})
-    endmacro (set_xcode_property)
-
-    set_xcode_property(example_test CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
-    set_xcode_property(example_test CLANG_CXX_LIBRARY "libc++")
-endif()
