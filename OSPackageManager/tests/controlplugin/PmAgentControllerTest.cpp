@@ -44,7 +44,7 @@ bool checkIfProcessIsRunning( const std::string& procName )
 
 TEST( PmAgentController, StartStop )
 {
-    PmAgentController agentController( CMID_DAEMON_PATH, "" );
+    PmAgentController agentController( ".", "" );
     auto status = agentController.start();
     ASSERT_EQ( PM_STATUS::PM_OK, status );
 
