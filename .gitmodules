@@ -1,6 +1,6 @@
 [submodule "EndpointIdentity"]
 	path = EndpointIdentity
-	url = ../../louilee/EndpointIdentity.git
+	url = ../../UnifiedConnector/EndpointIdentity.git
 [submodule "PackageManager"]
 	path = PackageManager
 	url = ../../UnifiedConnector/PackageManager.git
