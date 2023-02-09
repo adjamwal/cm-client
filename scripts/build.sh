@@ -135,6 +135,22 @@ else
         echo " - build directory:	./${CMAKE_BUILD_DIR}"
         echo " - 3rd party exports:	./${CMAKE_BUILD_DIR}/export/{lib,include}"
         echo
-        echo " Go to build directory, and run 'make' after making changes"
+        
+        echo " running 'make' for ${CMAKE_BUILD_DIR}"
+        pushd ${CMAKE_BUILD_DIR}
+        make || exit 1
+        popd
+        
+        echo " building Installer ..."
+        export BUILD_TYPE=${CMAKE_BUILD_DIR}
+        export CM_BUILD_VER="1.0.0000"
+        DMG_DIR="Installer"
+        DMG_SCRIPT="build_cm_installer.sh"
+        pushd ${DMG_DIR}
+        sh ${DMG_SCRIPT} 
+        echo " Installer built successfully."
+        popd
+        cp "${DMG_DIR}/cisco-secure-client-macos-cloudmanagement-${CM_BUILD_VER}.dmg" "./"
+
     fi
 fi
