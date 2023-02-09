@@ -137,18 +137,18 @@ else
         echo
         
         echo " running 'make' for ${CMAKE_BUILD_DIR}"
-        pushd ${CMAKE_BUILD_DIR}
+        pushd "${CMAKE_BUILD_DIR}"
         make || exit 1
         popd
         
-        echo " building Installer ..."
-        export BUILD_TYPE=${CMAKE_BUILD_DIR}
+        echo " building CM Installer ..."
+        export BUILD_TYPE="${CMAKE_BUILD_DIR}"
         export CM_BUILD_VER="1.0.0000"
         DMG_DIR="Installer"
         DMG_SCRIPT="build_cm_installer.sh"
-        pushd ${DMG_DIR}
-        sh ${DMG_SCRIPT} 
-        echo " Installer built successfully."
+        pushd "${DMG_DIR}"
+        sh "${DMG_SCRIPT}" "${BUILD_TYPE}"
+        echo " CM Installer built successfully."
         popd
         cp "${DMG_DIR}/cisco-secure-client-macos-cloudmanagement-${CM_BUILD_VER}.dmg" "./"
 
