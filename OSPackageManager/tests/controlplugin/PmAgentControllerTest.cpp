@@ -44,7 +44,9 @@ bool checkIfProcessIsRunning( const std::string& procName )
 
 TEST( PmAgentController, StartStop )
 {
-    PmAgentController agentController( ".", "" );
+    const std::string cmpackagemanagerDir = "../../";
+
+    PmAgentController agentController(cmpackagemanagerDir, "" );
     auto status = agentController.start();
     ASSERT_EQ( PM_STATUS::PM_OK, status );
 
