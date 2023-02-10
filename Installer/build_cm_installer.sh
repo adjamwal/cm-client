@@ -31,6 +31,9 @@ SCRIPTS_STAGING="cm_pkg_scripts"
 PAYLOAD_STAGING="cm_pkg_payload"
 DMG_STAGING="cm_dmg"
 
+DSYM_STAGING="cisco-secure-client-macos-cloudmanagement-${VER}-symbols"
+DSYM_TAR="cisco-secure-client-macos-cloudmanagement-${VER}-symbols.tar.gz"
+
 echo "creating CM package Payload Staging Area"
 
 rm -rf "${PAYLOAD_STAGING}"
@@ -53,6 +56,30 @@ for script in ${SCRIPTS_STAGING}/*; do
     chmod 755 "${script}"
 done
 
+if [ "$BUILD_TYPE" = "release" ]; then
+    rm -rf "${DSYM_STAGING}"
+    mkdir -p "${DSYM_STAGING}"
+    rm -f "../${DSYM_TAR}"
+
+    dsymutil "${STAGING}/client/csccloudmanagement" -o "${DSYM_STAGING}/csccloudmanagement.dSYM"
+    dsymutil "${STAGING}/export/bin/csc_cmid" -o "${DSYM_STAGING}/csc_cmid.dSYM"
+    dsymutil "${STAGING}/OSPackageManager/cmpackagemanager" -o "${DSYM_STAGING}/cmpackagemanager.dSYM"
+    dsymutil "${STAGING}/export/lib/libcmidapi.dylib" -o "${DSYM_STAGING}/libcmidapi.dylib.dSYM"
+
+    strip "${STAGING}/client/csccloudmanagement"
+    strip "${STAGING}/export/bin/csc_cmid"
+    strip "${STAGING}/OSPackageManager/cmpackagemanager"
+    strip "${STAGING}/export/lib/libcmidapi.dylib" -x 
+
+    cp "${STAGING}/client/csccloudmanagement" "${STAGING}/export/bin/csc_cmid" "${STAGING}/OSPackageManager/cmpackagemanager" "${STAGING}/export/lib/libcmidapi.dylib" "${DSYM_STAGING}"
+
+    tar czf "../${DSYM_TAR}" "${DSYM_STAGING}"
+fi
+
+
+#TODO : Sign individual libraries and executables
+#TODO : fix links for dependent libs for all binaries to be packaged with install_name_tool
+
 pkgbuild    --root "${PAYLOAD_STAGING}" \
             --scripts "${SCRIPTS_STAGING}" \
             --identifier "${CM_PACKAGE_ID}" \
@@ -69,7 +96,7 @@ rm -rf "${DMG_STAGING}"
 rm -f "${CM_DMG}"
 mkdir -p "${DMG_STAGING}"
 
-#TODO : Signing
+#TODO : Signing the package
 
 mv "${CM_PKG_UNSIGNED}" "${CM_INSTALLER}"
 
@@ -86,6 +113,7 @@ hdiutil create  -ov \
                 "${CM_DMG}" 
 
 rm -rf "${PAYLOAD_STAGING}"
+rm -rf "${DSYM_STAGING}"
 rm -rf "${DMG_STAGING}"
 rm -f "${CM_PKG}"
 rm -f "${CM_INSTALLER}"
