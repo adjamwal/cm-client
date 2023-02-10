@@ -77,13 +77,9 @@ if [ "$BUILD_TYPE" = "skip_release" ]; then
     tar czf "../${DSYM_TAR}" "${DSYM_STAGING}"
 fi
 
-
 install_name_tool -change "@rpath/libcmidapi.dylib" "@executable_path/../lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${BINDIR}/cmpackagemanager"
 
 #TODO : Sign individual libraries and executables
-#TODO : fix links for dependent libs for all binaries to be packaged with install_name_tool
-
-
 
 pkgbuild    --root "${PAYLOAD_STAGING}" \
             --scripts "${SCRIPTS_STAGING}" \
