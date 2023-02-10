@@ -56,7 +56,8 @@ for script in ${SCRIPTS_STAGING}/*; do
     chmod 755 "${script}"
 done
 
-if [ "$BUILD_TYPE" = "release" ]; then
+#TODO : change "skip_release" to "release" when we get to the stage when we don't require debug info about potential crashes
+if [ "$BUILD_TYPE" = "skip_release" ]; then
     rm -rf "${DSYM_STAGING}"
     mkdir -p "${DSYM_STAGING}"
     rm -f "../${DSYM_TAR}"
@@ -77,8 +78,12 @@ if [ "$BUILD_TYPE" = "release" ]; then
 fi
 
 
+install_name_tool -change "@rpath/libcmidapi.dylib" "@executable_path/../lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${BINDIR}/cmpackagemanager"
+
 #TODO : Sign individual libraries and executables
 #TODO : fix links for dependent libs for all binaries to be packaged with install_name_tool
+
+
 
 pkgbuild    --root "${PAYLOAD_STAGING}" \
             --scripts "${SCRIPTS_STAGING}" \
