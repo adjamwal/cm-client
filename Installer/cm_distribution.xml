@@ -13,14 +13,46 @@
 
     <!-- Since this is a regular install we can forgo the huge choice list -->
     <choices-outline>
-        <line choice="choice1"/>
+        <line choice="choice_cm"/>
     </choices-outline>
 
     <!-- Define each choice above -->
-    <choice id="choice1" visible="false" selected="true">
-        <pkg-ref id="com.cisco.secureclient.cloudmanagement.service"/>
+    <choice id="choice_cm" visible="true" title="CM" description="Installs the Cloud Management" selected="true">
+        <pkg-ref id="com.cisco.secureclient.cloudmanagement"/>
     </choice>
 
     <!-- List all component packages -->
-    <pkg-ref id="com.cisco.secureclient.cloudmanagement.service" auth="root">cisco-secure-client-macos-cloudmanagement.pkg</pkg-ref>
+    <pkg-ref id="com.cisco.secureclient.cloudmanagement" auth="root">cisco-secure-client-macos-cloudmanagement.pkg</pkg-ref>
+    <volume-check script='VolumeCheck()'/>
+    <script>
+    function VolumeCheck()
+    {
+        //check if the version being installed is higher than already installed
+
+        var cmReceipt = my.target.receiptForIdentifier("com.cisco.secureclient.cloudmanagement");
+
+        if(cmReceipt)
+        {
+            var comparison = system.compareVersions(cmReceipt.version, choices.choice_cm.packages[0].version);
+
+            if(comparison == 0)
+            {
+                // versions are the same
+                my.result.message = 'Version ' + cmReceipt.version + ' of Cisco Secure Client Cloud Management is already installed.';
+                my.result.type = 'Fatal';
+                return false;
+            }
+            else if (comparison > 0)
+            {
+                // installed version is newer
+                my.result.message = 'Newer version ' + cmReceipt.version + ' of Cisco Secure Client Cloud Management is already installed.';
+                my.result.type = 'Fatal';
+                return false;
+            }
+
+        }
+
+    return true;
+    }
+    </script>
 </installer-gui-script> 

@@ -143,7 +143,6 @@ else
         
         echo " building CM Installer ..."
         export BUILD_TYPE="${CMAKE_BUILD_DIR}"
-        export CM_BUILD_VER="1.0.0000"
         DMG_DIR="Installer"
         DMG_SCRIPT="build_cm_installer.sh"
         pushd "${DMG_DIR}"
