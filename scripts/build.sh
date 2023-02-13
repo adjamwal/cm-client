@@ -143,6 +143,9 @@ else
         
         echo " building CM Installer ..."
         export BUILD_TYPE="${CMAKE_BUILD_DIR}"
+        if [ "x$CM_BUILD_VER" = "x" ]; then
+            CM_BUILD_VER="1.0.0000"
+        fi
         DMG_DIR="Installer"
         DMG_SCRIPT="build_cm_installer.sh"
         pushd "${DMG_DIR}"
