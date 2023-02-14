@@ -2,6 +2,7 @@
 #include "ModuleControlPlugin.hpp"
 #include "CMLogger.hpp"
 #include <stddef.h>
+#include <thread>
 
 #define TEST_LOG_FILEPATH "./ControlPluginTest.log"
 
@@ -24,12 +25,13 @@ TEST( ModuleControlPlugin, CreateAndRelease )
     EXPECT_EQ( nullptr, modContext.fpConfigUpdated );
 
     EXPECT_EQ( PM_MODULE_NOT_STARTED, modContext.fpStop() );
-    // The start expects to launch a real cmpackagemanager process
-    EXPECT_EQ( PM_MODULE_SUCCESS, modContext.fpStart(".", "", "") );
+    // The start expects to launch a dummy cmpackagemanager process
+    EXPECT_EQ( PM_MODULE_SUCCESS, modContext.fpStart(CMID_DAEMON_PATH, "", "") );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 
     //Test, once start has been called on cmpackagemanager process, a
     //further call to it returns 'PM_MODULE_ALREADY_STARTED'
-    EXPECT_EQ( PM_MODULE_ALREADY_STARTED, modContext.fpStart(".", "", "") );
+    EXPECT_EQ( PM_MODULE_ALREADY_STARTED, modContext.fpStart(CMID_DAEMON_PATH, "", "") );
     EXPECT_EQ( PM_MODULE_SUCCESS, modContext.fpStop() );
 
     //Test, once stop has been called on cmpackagemanager process, a
@@ -37,7 +39,8 @@ TEST( ModuleControlPlugin, CreateAndRelease )
     EXPECT_EQ( PM_MODULE_NOT_STARTED, modContext.fpStop() );
 
     //Test to start cmpackagemanager process after stop has been called on it.
-    EXPECT_EQ( PM_MODULE_SUCCESS, modContext.fpStart(".", "", "") );
+    EXPECT_EQ( PM_MODULE_SUCCESS, modContext.fpStart(CMID_DAEMON_PATH, "", "") );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
     EXPECT_EQ( PM_MODULE_SUCCESS, modContext.fpStop() );
 
     EXPECT_EQ( PM_MODULE_SUCCESS, ReleasePMModuleInstance( &modContext ) );
