@@ -25,7 +25,8 @@ TEST( ModuleControlPlugin, CreateAndRelease )
     EXPECT_EQ( nullptr, modContext.fpConfigUpdated );
 
     EXPECT_EQ( PM_MODULE_NOT_STARTED, modContext.fpStop() );
-    // The start expects to launch a dummy cmpackagemanager process
+    // The start expects to simply initiate launch of a  dummy cmpackagemanager process. It may or may not
+    //actually launch the process.
     EXPECT_EQ( PM_MODULE_SUCCESS, modContext.fpStart(CMID_DAEMON_PATH, "", "") );
     std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 
