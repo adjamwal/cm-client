@@ -32,7 +32,7 @@ if [ -e "${LAUNCHD_DIR}/${LAUNCHD_FILE}" ] ; then
     rm -rf "${LAUNCHD_DIR}/${LAUNCHD_FILE}"
 fi
 
-rm -rf ${CM_DIR} || exit
+rm -rf "${CM_DIR}" || exit
 
 pkgutil --forget "${CM_PACKAGE_ID}"
 

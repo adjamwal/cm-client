@@ -3,7 +3,8 @@
 set -e
 
 if [ "x$CM_BUILD_VER" = "x" ]; then
-    CM_BUILD_VER="1.0.0000"
+    echo "CM_BUILD_VER not set. exiting..."
+    exit 1
 fi
 
 VER=${CM_BUILD_VER}
