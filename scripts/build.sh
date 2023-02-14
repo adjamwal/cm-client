@@ -144,8 +144,10 @@ else
         echo " building CM Installer ..."
         export BUILD_TYPE="${CMAKE_BUILD_DIR}"
         if [ "x$CM_BUILD_VER" = "x" ]; then
-            echo "CM_BUILD_VER not set. exiting..."
-            exit 1
+            echo "CM_BUILD_VER not set."
+            #TODO : add CM_BUILD_VER to jenkins env 
+            export CM_BUILD_VER="1.0.0000" 
+            #exit 1
         fi
         DMG_DIR="Installer"
         DMG_SCRIPT="build_cm_installer.sh"
