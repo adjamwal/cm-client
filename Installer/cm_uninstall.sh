@@ -11,6 +11,7 @@ CM_DIR="/opt/cisco/secureclient/cloudmanagement"
 BINDIR="${CM_DIR}/bin"
 LAUNCHD_DIR="/Library/LaunchDaemons"
 LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
+CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
 
 echo "Uninstalling Cisco Secure Client CloudManagement ..."
 
@@ -27,11 +28,13 @@ fi
 echo "Removing files ..."
 
 #Remove launchd file if exists
-if [ -e ${LAUNCHD_DIR}/${LAUNCHD_FILE} ] ; then
-    rm -rf ${LAUNCHD_DIR}/${LAUNCHD_FILE}
+if [ -e "${LAUNCHD_DIR}/${LAUNCHD_FILE}" ] ; then
+    rm -rf "${LAUNCHD_DIR}/${LAUNCHD_FILE}"
 fi
 
 rm -rf ${CM_DIR} || exit
+
+pkgutil --forget "${CM_PACKAGE_ID}"
 
 echo "Successfully uninstalled Cisco Secure Client CloudManagement."
 
