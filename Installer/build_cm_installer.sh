@@ -80,8 +80,6 @@ fi
 
 install_name_tool -change "@rpath/libcmidapi.dylib" "@executable_path/../lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${BINDIR}/cmpackagemanager"
 
-#TODO : Sign individual libraries and executables
-
 pkgbuild    --root "${PAYLOAD_STAGING}" \
             --scripts "${SCRIPTS_STAGING}" \
             --identifier "${CM_PACKAGE_ID}" \
