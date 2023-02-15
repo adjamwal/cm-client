@@ -145,8 +145,7 @@ else
         export BUILD_TYPE="${CMAKE_BUILD_DIR}"
         if [ "x$CM_BUILD_VER" = "x" ]; then
             echo "CM_BUILD_VER not set. exiting..."
-            export CM_BUILD_VER="1.0.0000" 
-            #exit 1
+            exit 1
         fi
         DMG_DIR="Installer"
         DMG_SCRIPT="build_cm_installer.sh"
