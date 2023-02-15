@@ -67,7 +67,7 @@ def run_mac_ci() {
       withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
         withCredentials([string(credentialsId: 'ARTIFACTORY_TOKEN', variable: 'ARTIFACTORY_TOKEN')]) {
           dir("cm-client"){
-            export CM_BUILD_VER="1.0.0000"
+            CM_BUILD_VER = '1.0.0000'
             sh './build'
           }
         }
@@ -78,7 +78,7 @@ def run_mac_ci() {
     if (continueCI()) {
       withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
         dir("cm-client"){
-          export CM_BUILD_VER="1.0.0000"
+          CM_BUILD_VER = '1.0.0000'
           sh './build -r'
         }
       }
