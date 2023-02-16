@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <options rootVolumeOnly="true" customize="never" hostArchitectures="x86_64,arm64" require-scripts="true" />
+    <title>Cisco Secure Client Cloud Management for Mac</title>
+    <product id="com.cisco.secureclient.cloudmanagement"/>
+    <organization>com.cisco.secureclient.cloudmanagement</organization>
+
+    <ram min-gb="2" />
+
+    <!-- Define documents displayed at various steps -->
+    <welcome    file="welcome.rtf"    mime-type="text/rtf" />
+    <license    file="license.rtf"    mime-type="text/rtf" />
+
+    <!-- Since this is a regular install we can forgo the huge choice list -->
+    <choices-outline>
+        <line choice="choice_cm"/>
+    </choices-outline>
+
+    <!-- Define each choice above -->
+    <choice id="choice_cm" visible="true" title="CM" description="Installs the Cloud Management" selected="true">
+        <pkg-ref id="com.cisco.secureclient.cloudmanagement"/>
+    </choice>
+
+    <!-- List all component packages -->
+    <pkg-ref id="com.cisco.secureclient.cloudmanagement" auth="root">cisco-secure-client-macos-cloudmanagement.pkg</pkg-ref>
+    <volume-check script='VolumeCheck()'/>
+    <script>
+    function VolumeCheck()
+    {
+        //check if the version being installed is higher than already installed
+
+        var cmReceipt = my.target.receiptForIdentifier("com.cisco.secureclient.cloudmanagement");
+
+        if(cmReceipt)
+        {
+            var comparison = system.compareVersions(cmReceipt.version, choices.choice_cm.packages[0].version);
+
+            if(comparison == 0)
+            {
+                // versions are the same
+                my.result.message = 'Version ' + cmReceipt.version + ' of Cisco Secure Client Cloud Management is already installed.';
+                my.result.type = 'Fatal';
+                return false;
+            }
+            else if (comparison > 0)
+            {
+                // installed version is newer
+                my.result.message = 'Newer version ' + cmReceipt.version + ' of Cisco Secure Client Cloud Management is already installed.';
+                my.result.type = 'Fatal';
+                return false;
+            }
+
+        }
+
+    return true;
+    }
+    </script>
+</installer-gui-script> 

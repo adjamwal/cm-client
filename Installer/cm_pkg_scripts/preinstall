@@ -1,0 +1,15 @@
+#!/bin/bash
+
+CM_DIR="/opt/cisco/secureclient/cloudmanagement"
+UNINST="${CM_DIR}/bin/cm_uninstall.sh"
+
+#TODO : Uninstall and move config files based on versions - on upgrade, disallow downgrades based on versions
+
+#for now just uninstalling previous installations
+sh ${UNINST}
+
+if [ "$?" -ne "0" ]; then
+    echo "Error removing previous version!  Continuing..."
+fi
+
+exit 0
