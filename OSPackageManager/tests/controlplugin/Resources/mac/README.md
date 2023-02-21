@@ -6,18 +6,11 @@ The `cmpackagemanager` binary is a dummy light weight process to help test out t
 
 # Some info on how the checked-in cmpackagemanager test binary was built
 
-The cmpackagemanager test binary is as of now the actual cmpackagemanager binary but without any of its external dependencies (like libcmidapi.dylib). The libcmidapi.dylib dependency of cmpackagemanager was explicitly removed (via cmake changes) before building the binary to avoid rpath resolution issues like below during the unit test execution.
+The cmpackagemanager test binary is as of now a simple long living process. To rebuild or update the binary please build the test-executable project using the following command :
 
 ```
-dyld: Library not loaded: @rpath/libcmidapi.dylib
-Referenced from: /<some-path>/tests/controlplugin/Resources/mac/cmpackagemanager
-Reason: image not found
-
+$ cd controlplugin/testexecutable/
+$ sh build.sh
 ```
 
-Please note that at the time of checking in this binary the cmpackagemanager was still not fully developed making the checked-in binary pretty simple and light weight.
-The frequent update of any of these resources is not expected and is not intended.
-
-Notes:
-* Execute `$ otool -L cmpackagemanager` to verify if the cmpackagemanager binary has a dependency to libcmidapi.dylib or not.
-* `install_name_tool` may be used if required to set appropriate server paths to resolve any @rpath resolution issues.
+The frequent update of any of these resources is not recommended.
