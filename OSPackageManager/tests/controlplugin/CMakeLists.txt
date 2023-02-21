@@ -25,7 +25,7 @@ target_compile_definitions(
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
-    "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CMAKE_BINARY_DIR}/OSPackageManager\">"
+    "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${cm-client_SOURCE_DIR}/OSPackageManager/tests/controlplugin/Resources/mac\">"
     "$<$<CONFIG:DEBUG>:CM_SHARED_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
     "$<$<CONFIG:DEBUG>:CMID_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
 )
