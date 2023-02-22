@@ -31,6 +31,7 @@ STAGING="../${BUILD_TYPE}"
 SCRIPTS_STAGING="cm_pkg_scripts"
 PAYLOAD_STAGING="cm_pkg_payload"
 DMG_STAGING="cm_dmg"
+BUILD_STAGING_DIR="Staging"
 
 DSYM_STAGING="cisco-secure-client-macos-cloudmanagement-${VER}-symbols"
 DSYM_TAR="cisco-secure-client-macos-cloudmanagement-${VER}-symbols.tar.gz"
@@ -76,6 +77,7 @@ if [ "$BUILD_TYPE" = "skip_release" ]; then
     cp "${STAGING}/client/csccloudmanagement" "${STAGING}/export/bin/csc_cmid" "${STAGING}/OSPackageManager/cmpackagemanager" "${STAGING}/export/lib/libcmidapi.dylib" "${DSYM_STAGING}"
 
     tar czf "../${DSYM_TAR}" "${DSYM_STAGING}"
+    cp "${DSYM_STAGING}/${DSYM_TAR}" "../${BUILD_STAGING_DIR}"
 fi
 
 install_name_tool -change "@rpath/libcmidapi.dylib" "@executable_path/../lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${BINDIR}/cmpackagemanager"
@@ -117,3 +119,6 @@ rm -rf "${DSYM_STAGING}"
 rm -rf "${DMG_STAGING}"
 rm -f "${CM_PKG}"
 rm -f "${CM_INSTALLER}"
+
+echo "Copying CM Installer to Staging"
+cp "${CM_DMG}" "../${BUILD_STAGING_DIR}"
