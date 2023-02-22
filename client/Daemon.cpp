@@ -23,7 +23,7 @@ Daemon::Daemon()
       cmidLoader_ { std::make_unique<CMIDLoader>() },
       pmLoader_ { std::make_unique<PMLoader>() }
 {
-
+    CMLogger::getInstance().setLogLevel(config_->getLogLevel());
 }
 
 void Daemon::start()
