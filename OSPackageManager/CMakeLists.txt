@@ -95,3 +95,8 @@ target_enable_warnings(cmpackagemanager)
 install(TARGETS cmpackagemanager DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)
 
 add_subdirectory(controlplugin)
+
+# Include tests
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()

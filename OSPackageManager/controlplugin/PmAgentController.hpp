@@ -24,7 +24,7 @@ class PmAgentController {
 public:
     /**
     * Constructor
-    * @param[in] path - Path to the child process
+    * @param[in] path - Path to the directory containing the package manager agent binary (cmpackagemanager)
     */
     PmAgentController( const std::string& path, const std::string& configPath );
 

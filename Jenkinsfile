@@ -88,7 +88,10 @@ def run_mac_ci() {
     if (continueCI()) {
       // Do this for each individual test suite, i.e. add PackageManager when available
       dir("cm-client/debug/client/tests"){
-        sh 'ctest'
+        sh 'ctest --output-on-failure'
+      }
+      dir("cm-client/debug/OSPackageManager/tests"){
+        sh 'ctest --output-on-failure'
       }
     }
   }
