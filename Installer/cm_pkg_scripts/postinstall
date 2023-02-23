@@ -5,57 +5,80 @@ LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
 CM_DIR="/opt/cisco/secureclient/cloudmanagement"
 BINDIR="${CM_DIR}/bin"
 ETC_DIR="${CM_DIR}/etc"
+TMP_DIR="/opt/cisco/secureclient/tmp"
 
-PKG_FILE=$1
-PKG_FILE_DIR=$(dirname "${PKG_FILE}")
-VOL_ROOT_DIR=""
-DMG_FILE_DIR=""
+if [[ -d "${TMP_DIR}"  &&  ( -f "${TMP_DIR}/bs.json" || -f "${TMP_DIR}/cm_config.json" ) ]]; then
+    
+    echo "copying existing config files."
+    
+    if [ -f "${TMP_DIR}/bs.json" ]; then
+        cp -f "${TMP_DIR}/bs.json" "${ETC_DIR}"
+    else
+        echo "bs.json not found."
+    fi
+    
+    if [ -f "${TMP_DIR}/cm_config.json" ]; then
+        cp -f "${TMP_DIR}/cm_config.json" "${ETC_DIR}"
+    else
+        echo "cm_config.json not found."
+    fi
 
-SAVEIFS=$IFS
-IFS=$'\n'
+    rm -rf "${TMP_DIR}"
 
-MOUNTED_VOLS=($(hdiutil info -plist | egrep -A 1 "mount-point" | grep "<string>" | sed 's:.*<string>::' | sed 's:</string>::'))
-DMG_PATHS=($(hdiutil info -plist | egrep -A 1 "image-path" | grep "<string>" | sed 's:.*<string>::' | sed 's:</string>::'))
+else
 
-# To be safe, we only want to process the hdiutil information if we have an equal number of Volume paths and DMG directories
-if [ ${#MOUNTED_VOLS[@]} -eq ${#DMG_PATHS[@]} ] ; then
-  # If we find a mounted volume that matches our known mounted volume, get the path to the associated DMG
-  INDEX=0
-  while [ $INDEX -lt ${#MOUNTED_VOLS[@]} ] ; do
-    # This check should ensure that there is only a single matching directory to import from.
-    MOUNTED_VOLS_PATH=${MOUNTED_VOLS[${INDEX}]}
+    PKG_FILE=$1
+    PKG_FILE_DIR=$(dirname "${PKG_FILE}")
+    VOL_ROOT_DIR=""
+    DMG_FILE_DIR=""
 
-    case ${PKG_FILE_DIR} in
-        ${MOUNTED_VOLS_PATH})
-            # pkg is located at the root of the mounted volume
-            DMG_FILE_DIR=$(dirname "${DMG_PATHS[${INDEX}]}")
-        ;;
+    SAVEIFS=$IFS
+    IFS=$'\n'
 
-        ${MOUNTED_VOLS_PATH}*)
-            # pkg is located on the mounted volume but not at root
-            VOL_ROOT_DIR=${MOUNTED_VOLS_PATH}
-            DMG_FILE_DIR=$(dirname "${DMG_PATHS[${INDEX}]}")
-        ;;
-    esac
+    MOUNTED_VOLS=($(hdiutil info -plist | egrep -A 1 "mount-point" | grep "<string>" | sed 's:.*<string>::' | sed 's:</string>::'))
+    DMG_PATHS=($(hdiutil info -plist | egrep -A 1 "image-path" | grep "<string>" | sed 's:.*<string>::' | sed 's:</string>::'))
 
-    let "INDEX = $INDEX + 1"
-  done
-fi
+    # To be safe, we only want to process the hdiutil information if we have an equal number of Volume paths and DMG directories
+    if [ ${#MOUNTED_VOLS[@]} -eq ${#DMG_PATHS[@]} ] ; then
+      # If we find a mounted volume that matches our known mounted volume, get the path to the associated DMG
+      INDEX=0
+      while [ $INDEX -lt ${#MOUNTED_VOLS[@]} ] ; do
+        # This check should ensure that there is only a single matching directory to import from.
+        MOUNTED_VOLS_PATH=${MOUNTED_VOLS[${INDEX}]}
 
-IFS=$SAVEIFS
+        case ${PKG_FILE_DIR} in
+            ${MOUNTED_VOLS_PATH})
+                # pkg is located at the root of the mounted volume
+                DMG_FILE_DIR=$(dirname "${DMG_PATHS[${INDEX}]}")
+            ;;
 
-if [ -d "${PKG_FILE_DIR}" ] && [ -f "${PKG_FILE_DIR}/.bs.json" ] ; then
-    echo "Importing Cisco Secure Client CloudManagement bootstrap & config profile from ${PKG_FILE_DIR}"
-    cp -f "${PKG_FILE_DIR}/.bs.json" ${ETC_DIR}/bs.json
-    cp -f "${PKG_FILE_DIR}/.cm_config.json" ${ETC_DIR}/cm_config.json
-elif [ -d "${VOL_ROOT_DIR}" ] && [ -f "${VOL_ROOT_DIR}/.bs.json" ] ; then
-    echo "Importing Cisco Secure Client CloudManagement bootstrap & config profile from ${VOL_ROOT_DIR}"
-    cp -f "${VOL_ROOT_DIR}/.bs.json" ${ETC_DIR}/bs.json
-    cp -f "${VOL_ROOT_DIR}/.cm_config.json" ${ETC_DIR}/cm_config.json
-elif [ -d "${DMG_FILE_DIR}" ] && [ -f "${DMG_FILE_DIR}/.bs.json" ] ; then
-    echo "Importing Cisco Secure Client CloudManagement bootstrap & config profile from ${DMG_FILE_DIR}"
-    cp -f "${DMG_FILE_DIR}/.bs.json" ${ETC_DIR}/bs.json
-    cp -f "${DMG_FILE_DIR}/.cm_config.json" ${ETC_DIR}/cm_config.json
+            ${MOUNTED_VOLS_PATH}*)
+                # pkg is located on the mounted volume but not at root
+                VOL_ROOT_DIR=${MOUNTED_VOLS_PATH}
+                DMG_FILE_DIR=$(dirname "${DMG_PATHS[${INDEX}]}")
+            ;;
+        esac
+
+        let "INDEX = $INDEX + 1"
+      done
+    fi
+
+    IFS=$SAVEIFS
+
+    if [ -d "${PKG_FILE_DIR}" ] && [ -f "${PKG_FILE_DIR}/.bs.json" ] ; then
+        echo "Importing Cisco Secure Client CloudManagement bootstrap & config profile from ${PKG_FILE_DIR}"
+        cp -f "${PKG_FILE_DIR}/.bs.json" ${ETC_DIR}/bs.json
+        cp -f "${PKG_FILE_DIR}/.cm_config.json" ${ETC_DIR}/cm_config.json
+    elif [ -d "${VOL_ROOT_DIR}" ] && [ -f "${VOL_ROOT_DIR}/.bs.json" ] ; then
+        echo "Importing Cisco Secure Client CloudManagement bootstrap & config profile from ${VOL_ROOT_DIR}"
+        cp -f "${VOL_ROOT_DIR}/.bs.json" ${ETC_DIR}/bs.json
+        cp -f "${VOL_ROOT_DIR}/.cm_config.json" ${ETC_DIR}/cm_config.json
+    elif [ -d "${DMG_FILE_DIR}" ] && [ -f "${DMG_FILE_DIR}/.bs.json" ] ; then
+        echo "Importing Cisco Secure Client CloudManagement bootstrap & config profile from ${DMG_FILE_DIR}"
+        cp -f "${DMG_FILE_DIR}/.bs.json" ${ETC_DIR}/bs.json
+        cp -f "${DMG_FILE_DIR}/.cm_config.json" ${ETC_DIR}/cm_config.json
+    fi
+
 fi
 
 launchctl bootstrap system ${LAUNCHD_DIR}/${LAUNCHD_FILE} || exit 1

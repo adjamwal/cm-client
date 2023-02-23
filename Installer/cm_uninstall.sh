@@ -5,8 +5,6 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-#TODO : preserve config files & logs in case of upgrade
-
 CM_DIR="/opt/cisco/secureclient/cloudmanagement"
 BINDIR="${CM_DIR}/bin"
 LAUNCHD_DIR="/Library/LaunchDaemons"
