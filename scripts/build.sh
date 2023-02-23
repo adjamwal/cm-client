@@ -149,6 +149,7 @@ else
         export BUILD_TYPE="${CMAKE_BUILD_DIR}"
         DMG_DIR="Installer"
         DMG_SCRIPT="build_cm_installer.sh"
+        rm -rf "${BUILD_STAGING_DIR}"
         mkdir -p "${BUILD_STAGING_DIR}"
         pushd "${DMG_DIR}"
         sh "${DMG_SCRIPT}" "${BUILD_TYPE}"

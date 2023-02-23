@@ -76,8 +76,7 @@ if [ "$BUILD_TYPE" = "skip_release" ]; then
 
     cp "${STAGING}/client/csccloudmanagement" "${STAGING}/export/bin/csc_cmid" "${STAGING}/OSPackageManager/cmpackagemanager" "${STAGING}/export/lib/libcmidapi.dylib" "${DSYM_STAGING}"
 
-    tar czf "../${DSYM_TAR}" "${DSYM_STAGING}"
-    cp "${DSYM_STAGING}/${DSYM_TAR}" "../${BUILD_STAGING_DIR}"
+    tar czf "../${BUILD_STAGING_DIR}/${DSYM_TAR}" "${DSYM_STAGING}"
 fi
 
 install_name_tool -change "@rpath/libcmidapi.dylib" "@executable_path/../lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${BINDIR}/cmpackagemanager"
