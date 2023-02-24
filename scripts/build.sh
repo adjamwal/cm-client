@@ -2,7 +2,10 @@
 # Copyright 2022 Cisco Systems, Inc.
 
 SYSTEM="$(uname -s)"
-
+if [ "x$CM_BUILD_VER" = "x" ]; then
+    echo "CM_BUILD_VER not set. exiting..."
+    exit 1
+fi
 clean=false
 usage=false
 if [ $# -ge 1 ] && [ "$1" = "clean" ]; then
@@ -50,6 +53,7 @@ fi
 
 CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=1"
 CMAKE_BUILD_DIR="debug"
+BUILD_STAGING_DIR="Staging"
 if [ "${release}" = "true"  ]; then
     CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
     CMAKE_BUILD_DIR="release"
@@ -143,17 +147,13 @@ else
         
         echo " building CM Installer ..."
         export BUILD_TYPE="${CMAKE_BUILD_DIR}"
-        if [ "x$CM_BUILD_VER" = "x" ]; then
-            echo "CM_BUILD_VER not set. exiting..."
-            exit 1
-        fi
         DMG_DIR="Installer"
         DMG_SCRIPT="build_cm_installer.sh"
+        rm -rf "${BUILD_STAGING_DIR}"
+        mkdir -p "${BUILD_STAGING_DIR}"
         pushd "${DMG_DIR}"
         sh "${DMG_SCRIPT}" "${BUILD_TYPE}"
-        echo " CM Installer built successfully."
+        echo "CM Installer built successfully."
         popd
-        cp "${DMG_DIR}/cisco-secure-client-macos-cloudmanagement-${CM_BUILD_VER}.dmg" "./"
-
     fi
 fi
