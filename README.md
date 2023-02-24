@@ -66,9 +66,11 @@ To be able to build cm-client, the following software packages are required:
 
 # Build
 
-To build cm-client, use the `build` symlink on the root of the repository.  Usage for this script is as follows:
+To build cm-client, set the CM_BUILD_VER environment variable and run the `build` symlink on the root of the repository.  Usage for this script is as follows:
 
 ~~~
+export CM_BUILD_VER=1.0.0
+
 Usage: build [-c|-h]
  -c    clean build
  -h    help (this usage)
