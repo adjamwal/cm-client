@@ -15,9 +15,9 @@ else
 fi
 
 CM_DIR="/opt/cisco/secureclient/cloudmanagement"
-BINDIR="${CM_DIR}/bin"
-LIBDIR="${CM_DIR}/lib"
-CONFIGDIR="${CM_DIR}/etc"
+BIN_DIR="${CM_DIR}/bin"
+LIB_DIR="${CM_DIR}/lib"
+CONFIG_DIR="${CM_DIR}/etc"
 LAUNCHD_DIR="/Library/LaunchDaemons"
 
 CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
@@ -39,18 +39,18 @@ DSYM_TAR="cisco-secure-client-macos-cloudmanagement-${VER}-symbols.tar.gz"
 echo "creating CM package Payload Staging Area"
 
 rm -rf "${PAYLOAD_STAGING}"
-mkdir -p "${PAYLOAD_STAGING}${LIBDIR}"
-mkdir -p "${PAYLOAD_STAGING}${BINDIR}"
-mkdir -p "${PAYLOAD_STAGING}${CONFIGDIR}"
+mkdir -p "${PAYLOAD_STAGING}${LIB_DIR}"
+mkdir -p "${PAYLOAD_STAGING}${BIN_DIR}"
+mkdir -p "${PAYLOAD_STAGING}${CONFIG_DIR}"
 mkdir -p "${PAYLOAD_STAGING}${LAUNCHD_DIR}"
 
-cp -f "${STAGING}/client/csccloudmanagement" "${PAYLOAD_STAGING}${BINDIR}"
-cp -f "${STAGING}/export/bin/csc_cmid" "${PAYLOAD_STAGING}${BINDIR}"
-cp -f "${STAGING}/OSPackageManager/cmpackagemanager" "${PAYLOAD_STAGING}${BINDIR}"
+cp -f "${STAGING}/client/csccloudmanagement" "${PAYLOAD_STAGING}${BIN_DIR}"
+cp -f "${STAGING}/export/bin/csc_cmid" "${PAYLOAD_STAGING}${BIN_DIR}"
+cp -f "${STAGING}/OSPackageManager/cmpackagemanager" "${PAYLOAD_STAGING}${BIN_DIR}"
 
-cp -f "${STAGING}/export/lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${LIBDIR}"
+cp -f "${STAGING}/export/lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${LIB_DIR}"
 
-cp -f "cm_uninstall.sh" "${PAYLOAD_STAGING}${BINDIR}"
+cp -f "cm_uninstall.sh" "${PAYLOAD_STAGING}${BIN_DIR}"
 
 cp -f "com.cisco.secureclient.cloudmanagement.plist" "${PAYLOAD_STAGING}${LAUNCHD_DIR}"
 
@@ -79,7 +79,7 @@ if [ "$BUILD_TYPE" = "skip_release" ]; then
     tar czf "../${BUILD_STAGING_DIR}/${DSYM_TAR}" "${DSYM_STAGING}"
 fi
 
-install_name_tool -change "@rpath/libcmidapi.dylib" "@executable_path/../lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${BINDIR}/cmpackagemanager"
+install_name_tool -change "@rpath/libcmidapi.dylib" "@executable_path/../lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${BIN_DIR}/cmpackagemanager"
 
 pkgbuild    --root "${PAYLOAD_STAGING}" \
             --scripts "${SCRIPTS_STAGING}" \

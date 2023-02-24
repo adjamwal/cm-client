@@ -2,25 +2,27 @@
 
 LAUNCHD_DIR="/Library/LaunchDaemons"
 LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
-CM_DIR="/opt/cisco/secureclient/cloudmanagement"
-BINDIR="${CM_DIR}/bin"
+PREFIX="/opt/cisco/secureclient"
+CM_DIR="${PREFIX}/cloudmanagement"
 ETC_DIR="${CM_DIR}/etc"
-TMP_DIR="/opt/cisco/secureclient/tmp"
+TMP_DIR="${PREFIX}/tmp"
+BOOTSTRAP_FILE="bs.json"
+CONFIG_FILE="cm_config.json"
 
-if [[ -d "${TMP_DIR}"  &&  ( -f "${TMP_DIR}/bs.json" || -f "${TMP_DIR}/cm_config.json" ) ]]; then
+if [[ -d "${TMP_DIR}"  &&  ( -f "${TMP_DIR}/${BOOTSTRAP_FILE}" || -f "${TMP_DIR}/${CONFIG_FILE}" ) ]]; then
     
     echo "copying existing config files."
     
-    if [ -f "${TMP_DIR}/bs.json" ]; then
-        cp -f "${TMP_DIR}/bs.json" "${ETC_DIR}"
+    if [ -f "${TMP_DIR}/${BOOTSTRAP_FILE}" ]; then
+        cp -f "${TMP_DIR}/${BOOTSTRAP_FILE}" "${ETC_DIR}"
     else
-        echo "bs.json not found."
+        echo "${BOOTSTRAP_FILE} not found."
     fi
     
-    if [ -f "${TMP_DIR}/cm_config.json" ]; then
-        cp -f "${TMP_DIR}/cm_config.json" "${ETC_DIR}"
+    if [ -f "${TMP_DIR}/${CONFIG_FILE}" ]; then
+        cp -f "${TMP_DIR}/${CONFIG_FILE}" "${ETC_DIR}"
     else
-        echo "cm_config.json not found."
+        echo "${CONFIG_FILE} not found."
     fi
 
     rm -rf "${TMP_DIR}"

@@ -6,7 +6,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 CM_DIR="/opt/cisco/secureclient/cloudmanagement"
-BINDIR="${CM_DIR}/bin"
+BIN_DIR="${CM_DIR}/bin"
 LAUNCHD_DIR="/Library/LaunchDaemons"
 LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
 CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
@@ -17,7 +17,7 @@ echo "Stopping csccloudmanagement ... "
 launchctl bootout system ${LAUNCHD_DIR}/${LAUNCHD_FILE}
 
 # ensure that CM is not running
-CMPROC=`ps -A -o pid,command | grep '(${BINDIR}/csccloudmanagement)' | egrep -v 'grep|cm_uninstall' | awk '{print $1}'`
+CMPROC=`ps -A -o pid,command | grep '(${BIN_DIR}/csccloudmanagement)' | egrep -v 'grep|cm_uninstall' | awk '{print $1}'`
 if [ ! "x${CMPROC}" = "x" ] ; then
     echo Killing `ps -A -o pid,command -p ${CMPROC} | grep ${CMPROC} | egrep -v 'ps|grep'`
     kill -KILL ${CMPROC}

@@ -1,12 +1,14 @@
 #!/bin/bash
 
-CM_DIR="/opt/cisco/secureclient/cloudmanagement"
+PREFIX="/opt/cisco/secureclient"
+CM_DIR="${PREFIX}/cloudmanagement"
+ETC_DIR="${CM_DIR}/etc"
 UNINST="${CM_DIR}/bin/cm_uninstall.sh"
 CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
-TMP_DIR="/opt/cisco/secureclient/tmp"
+TMP_DIR="${PREFIX}/tmp"
 
-BOOTSTRAP_FILE="${CM_DIR}/etc/bs.json"
-CM_CONFIG_FILE="${CM_DIR}/etc/cm_config.json"
+BOOTSTRAP_FILE="bs.json"
+CM_CONFIG_FILE="cm_config.json"
 
 INSTALLED=$( pkgutil --pkgs | grep "${CM_PACKAGE_ID}" )
 
@@ -17,13 +19,13 @@ if [ ! -z "${INSTALLED}" ]; then
     rm -rf "${TMP_DIR}"
     mkdir -p "${TMP_DIR}"
 
-    if [ -f "${BOOTSTRAP_FILE}" ]; then
-        cp -f "${BOOTSTRAP_FILE}" "${TMP_DIR}"
+    if [ -f "${ETC_DIR}/${BOOTSTRAP_FILE}" ]; then
+        cp -f "${ETC_DIR}/${BOOTSTRAP_FILE}" "${TMP_DIR}"
     else
         echo "${BOOTSTRAP_FILE} not found."
     fi
-    if [ -f "${CM_CONFIG_FILE}" ]; then
-        cp -f "${CM_CONFIG_FILE}" "${TMP_DIR}" 
+    if [ -f "${ETC_DIR}/${CM_CONFIG_FILE}" ]; then
+        cp -f "${ETC_DIR}/${CM_CONFIG_FILE}" "${TMP_DIR}" 
     else
         echo "${CM_CONFIG_FILE} not found."
     fi
