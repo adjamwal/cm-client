@@ -67,18 +67,18 @@ else
 
     IFS=$SAVEIFS
 
-    if [ -d "${PKG_FILE_DIR}" ] && [ -f "${PKG_FILE_DIR}/.bs.json" ] ; then
+    if [ -d "${PKG_FILE_DIR}" ] && [ -f "${PKG_FILE_DIR}/.${BOOTSTRAP_FILE}" ] ; then
         echo "Importing Cisco Secure Client CloudManagement bootstrap & config profile from ${PKG_FILE_DIR}"
-        cp -f "${PKG_FILE_DIR}/.bs.json" ${ETC_DIR}/bs.json
-        cp -f "${PKG_FILE_DIR}/.cm_config.json" ${ETC_DIR}/cm_config.json
-    elif [ -d "${VOL_ROOT_DIR}" ] && [ -f "${VOL_ROOT_DIR}/.bs.json" ] ; then
+        cp -f "${PKG_FILE_DIR}/.${BOOTSTRAP_FILE}" "${ETC_DIR}/${BOOTSTRAP_FILE}"
+        cp -f "${PKG_FILE_DIR}/.${CONFIG_FILE}" "${ETC_DIR}/${CONFIG_FILE}"
+    elif [ -d "${VOL_ROOT_DIR}" ] && [ -f "${VOL_ROOT_DIR}/.${BOOTSTRAP_FILE}" ] ; then
         echo "Importing Cisco Secure Client CloudManagement bootstrap & config profile from ${VOL_ROOT_DIR}"
-        cp -f "${VOL_ROOT_DIR}/.bs.json" ${ETC_DIR}/bs.json
-        cp -f "${VOL_ROOT_DIR}/.cm_config.json" ${ETC_DIR}/cm_config.json
-    elif [ -d "${DMG_FILE_DIR}" ] && [ -f "${DMG_FILE_DIR}/.bs.json" ] ; then
+        cp -f "${VOL_ROOT_DIR}/.${BOOTSTRAP_FILE}" "${ETC_DIR}/${BOOTSTRAP_FILE}"
+        cp -f "${VOL_ROOT_DIR}/.${CONFIG_FILE}" "${ETC_DIR}/${CONFIG_FILE}"
+    elif [ -d "${DMG_FILE_DIR}" ] && [ -f "${DMG_FILE_DIR}/.${BOOTSTRAP_FILE}" ] ; then
         echo "Importing Cisco Secure Client CloudManagement bootstrap & config profile from ${DMG_FILE_DIR}"
-        cp -f "${DMG_FILE_DIR}/.bs.json" ${ETC_DIR}/bs.json
-        cp -f "${DMG_FILE_DIR}/.cm_config.json" ${ETC_DIR}/cm_config.json
+        cp -f "${DMG_FILE_DIR}/.${BOOTSTRAP_FILE}" "${ETC_DIR}/${BOOTSTRAP_FILE}"
+        cp -f "${DMG_FILE_DIR}/.${CONFIG_FILE}" "${ETC_DIR}/${CONFIG_FILE}"
     fi
 
 fi
