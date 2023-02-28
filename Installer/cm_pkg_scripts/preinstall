@@ -5,6 +5,7 @@ CM_DIR="${PREFIX}/cloudmanagement"
 ETC_DIR="${CM_DIR}/etc"
 UNINST="${CM_DIR}/bin/cm_uninstall.sh"
 CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
+#TODO : temp dir path needs to be re-evaluated
 TMP_DIR="${PREFIX}/tmp"
 
 BOOTSTRAP_FILE="bs.json"

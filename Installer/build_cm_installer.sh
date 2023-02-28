@@ -30,12 +30,13 @@ CM_DISTRIBUTION="cm_distribution.xml"
 BOOTSTRAP_FILE="bs.json"
 CONFIG_FILE="cm_config.json"
 
+CM_PREFIX="cisco-secure-client-macos-cloudmanagement"
 CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
 CM_VOLUME="Cisco Secure Client - Cloud Management ${VER}"
-CM_PKG="cisco-secure-client-macos-cloudmanagement.pkg"
+CM_PKG="${CM_PREFIX}.pkg"
 CM_PKG_UNSIGNED="unsigned-${CM_PKG}"
-CM_INSTALLER="cisco-secure-client-macos-cloudmanagement-${VER}.pkg"
-CM_DMG="cisco-secure-client-macos-cloudmanagement-${VER}.dmg"
+CM_INSTALLER="${CM_PREFIX}-${VER}.pkg"
+CM_DMG="${CM_PREFIX}-${VER}.dmg"
 
 STAGING="../${BUILD_TYPE}"
 SCRIPTS_STAGING="cm_pkg_scripts"
@@ -43,8 +44,8 @@ PAYLOAD_STAGING="cm_pkg_payload"
 DMG_STAGING="cm_dmg"
 BUILD_STAGING_DIR="Staging"
 
-DSYM_STAGING="cisco-secure-client-macos-cloudmanagement-${VER}-symbols"
-DSYM_TAR="cisco-secure-client-macos-cloudmanagement-${VER}-symbols.tar.gz"
+DSYM_STAGING="${CM_PREFIX}-${VER}-symbols"
+DSYM_TAR="${CM_PREFIX}-${VER}-symbols.tar.gz"
 
 echo "creating CM package Payload Staging Area"
 
