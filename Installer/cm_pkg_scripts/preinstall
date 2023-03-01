@@ -1,11 +1,37 @@
 #!/bin/bash
 
-CM_DIR="/opt/cisco/secureclient/cloudmanagement"
+PREFIX="/opt/cisco/secureclient"
+CM_DIR="${PREFIX}/cloudmanagement"
+ETC_DIR="${CM_DIR}/etc"
 UNINST="${CM_DIR}/bin/cm_uninstall.sh"
+CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
+#TODO : temp dir path needs to be re-evaluated
+TMP_DIR="${PREFIX}/tmp"
 
-#TODO : Uninstall and move config files based on versions - on upgrade, disallow downgrades based on versions
+BOOTSTRAP_FILE="bs.json"
+CM_CONFIG_FILE="cm_config.json"
 
-#for now just uninstalling previous installations
+INSTALLED=$( pkgutil --pkgs | grep "${CM_PACKAGE_ID}" )
+
+if [ ! -z "${INSTALLED}" ]; then
+    echo "previous installation found."
+    echo "saving config files to a temporary location"
+
+    rm -rf "${TMP_DIR}"
+    mkdir -p "${TMP_DIR}"
+
+    if [ -f "${ETC_DIR}/${BOOTSTRAP_FILE}" ]; then
+        cp -f "${ETC_DIR}/${BOOTSTRAP_FILE}" "${TMP_DIR}"
+    else
+        echo "${BOOTSTRAP_FILE} not found."
+    fi
+    if [ -f "${ETC_DIR}/${CM_CONFIG_FILE}" ]; then
+        cp -f "${ETC_DIR}/${CM_CONFIG_FILE}" "${TMP_DIR}" 
+    else
+        echo "${CM_CONFIG_FILE} not found."
+    fi
+fi
+
 sh ${UNINST}
 
 if [ "$?" -ne "0" ]; then

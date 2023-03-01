@@ -15,17 +15,28 @@ else
 fi
 
 CM_DIR="/opt/cisco/secureclient/cloudmanagement"
-BINDIR="${CM_DIR}/bin"
-LIBDIR="${CM_DIR}/lib"
-CONFIGDIR="${CM_DIR}/etc"
+BIN_DIR="${CM_DIR}/bin"
+LIB_DIR="${CM_DIR}/lib"
+CONFIG_DIR="${CM_DIR}/etc"
 LAUNCHD_DIR="/Library/LaunchDaemons"
 
+CM_BINARY="csccloudmanagement"
+CMID_BINARY="csc_cmid"
+CMID_LIBRARY="libcmidapi.dylib"
+PM_BINARY="cmpackagemanager"
+UNINSTALL_SCRIPT="cm_uninstall.sh"
+CM_PLIST="com.cisco.secureclient.cloudmanagement.plist"
+CM_DISTRIBUTION="cm_distribution.xml"
+BOOTSTRAP_FILE="bs.json"
+CONFIG_FILE="cm_config.json"
+
+CM_PREFIX="cisco-secure-client-macos-cloudmanagement"
 CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
 CM_VOLUME="Cisco Secure Client - Cloud Management ${VER}"
-CM_PKG="cisco-secure-client-macos-cloudmanagement.pkg"
+CM_PKG="${CM_PREFIX}.pkg"
 CM_PKG_UNSIGNED="unsigned-${CM_PKG}"
-CM_INSTALLER="cisco-secure-client-macos-cloudmanagement-${VER}.pkg"
-CM_DMG="cisco-secure-client-macos-cloudmanagement-${VER}.dmg"
+CM_INSTALLER="${CM_PREFIX}-${VER}.pkg"
+CM_DMG="${CM_PREFIX}-${VER}.dmg"
 
 STAGING="../${BUILD_TYPE}"
 SCRIPTS_STAGING="cm_pkg_scripts"
@@ -33,26 +44,26 @@ PAYLOAD_STAGING="cm_pkg_payload"
 DMG_STAGING="cm_dmg"
 BUILD_STAGING_DIR="Staging"
 
-DSYM_STAGING="cisco-secure-client-macos-cloudmanagement-${VER}-symbols"
-DSYM_TAR="cisco-secure-client-macos-cloudmanagement-${VER}-symbols.tar.gz"
+DSYM_STAGING="${CM_PREFIX}-${VER}-symbols"
+DSYM_TAR="${CM_PREFIX}-${VER}-symbols.tar.gz"
 
 echo "creating CM package Payload Staging Area"
 
 rm -rf "${PAYLOAD_STAGING}"
-mkdir -p "${PAYLOAD_STAGING}${LIBDIR}"
-mkdir -p "${PAYLOAD_STAGING}${BINDIR}"
-mkdir -p "${PAYLOAD_STAGING}${CONFIGDIR}"
+mkdir -p "${PAYLOAD_STAGING}${LIB_DIR}"
+mkdir -p "${PAYLOAD_STAGING}${BIN_DIR}"
+mkdir -p "${PAYLOAD_STAGING}${CONFIG_DIR}"
 mkdir -p "${PAYLOAD_STAGING}${LAUNCHD_DIR}"
 
-cp -f "${STAGING}/client/csccloudmanagement" "${PAYLOAD_STAGING}${BINDIR}"
-cp -f "${STAGING}/export/bin/csc_cmid" "${PAYLOAD_STAGING}${BINDIR}"
-cp -f "${STAGING}/OSPackageManager/cmpackagemanager" "${PAYLOAD_STAGING}${BINDIR}"
+cp -f "${STAGING}/client/${CM_BINARY}" "${PAYLOAD_STAGING}${BIN_DIR}"
+cp -f "${STAGING}/export/bin/${CMID_BINARY}" "${PAYLOAD_STAGING}${BIN_DIR}"
+cp -f "${STAGING}/OSPackageManager/${PM_BINARY}" "${PAYLOAD_STAGING}${BIN_DIR}"
 
-cp -f "${STAGING}/export/lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${LIBDIR}"
+cp -f "${STAGING}/export/lib/${CMID_LIBRARY}" "${PAYLOAD_STAGING}${LIB_DIR}"
 
-cp -f "cm_uninstall.sh" "${PAYLOAD_STAGING}${BINDIR}"
+cp -f "${UNINSTALL_SCRIPT}" "${PAYLOAD_STAGING}${BIN_DIR}"
 
-cp -f "com.cisco.secureclient.cloudmanagement.plist" "${PAYLOAD_STAGING}${LAUNCHD_DIR}"
+cp -f "${CM_PLIST}" "${PAYLOAD_STAGING}${LAUNCHD_DIR}"
 
 for script in ${SCRIPTS_STAGING}/*; do
     chmod 755 "${script}"
@@ -64,22 +75,22 @@ if [ "$BUILD_TYPE" = "skip_release" ]; then
     mkdir -p "${DSYM_STAGING}"
     rm -f "../${DSYM_TAR}"
 
-    dsymutil "${STAGING}/client/csccloudmanagement" -o "${DSYM_STAGING}/csccloudmanagement.dSYM"
-    dsymutil "${STAGING}/export/bin/csc_cmid" -o "${DSYM_STAGING}/csc_cmid.dSYM"
-    dsymutil "${STAGING}/OSPackageManager/cmpackagemanager" -o "${DSYM_STAGING}/cmpackagemanager.dSYM"
-    dsymutil "${STAGING}/export/lib/libcmidapi.dylib" -o "${DSYM_STAGING}/libcmidapi.dylib.dSYM"
+    dsymutil "${STAGING}/client/${CM_BINARY}" -o "${DSYM_STAGING}/${CM_BINARY}.dSYM"
+    dsymutil "${STAGING}/export/bin/${CMID_BINARY}" -o "${DSYM_STAGING}/${CM_BINARY}.dSYM"
+    dsymutil "${STAGING}/OSPackageManager/${PM_BINARY}" -o "${DSYM_STAGING}/${PM_BINARY}.dSYM"
+    dsymutil "${STAGING}/export/lib/${CMID_LIBRARY}" -o "${DSYM_STAGING}/${CMID_LIBRARY}.dSYM"
 
-    strip "${STAGING}/client/csccloudmanagement"
-    strip "${STAGING}/export/bin/csc_cmid"
-    strip "${STAGING}/OSPackageManager/cmpackagemanager"
-    strip "${STAGING}/export/lib/libcmidapi.dylib" -x 
+    strip "${STAGING}/client/${CM_BINARY}"
+    strip "${STAGING}/export/bin/${CMID_BINARY}"
+    strip "${STAGING}/OSPackageManager/${PM_BINARY}"
+    strip "${STAGING}/export/lib/${CMID_LIBRARY}" -x 
 
-    cp "${STAGING}/client/csccloudmanagement" "${STAGING}/export/bin/csc_cmid" "${STAGING}/OSPackageManager/cmpackagemanager" "${STAGING}/export/lib/libcmidapi.dylib" "${DSYM_STAGING}"
+    cp "${STAGING}/client/${CM_BINARY}" "${STAGING}/export/bin/${CMID_BINARY}" "${STAGING}/OSPackageManager/${PM_BINARY}" "${STAGING}/export/lib/${CMID_LIBRARY}" "${DSYM_STAGING}"
 
     tar czf "../${BUILD_STAGING_DIR}/${DSYM_TAR}" "${DSYM_STAGING}"
 fi
 
-install_name_tool -change "@rpath/libcmidapi.dylib" "@executable_path/../lib/libcmidapi.dylib" "${PAYLOAD_STAGING}${BINDIR}/cmpackagemanager"
+install_name_tool -change "@rpath/${CMID_LIBRARY}" "@executable_path/../lib/${CMID_LIBRARY}" "${PAYLOAD_STAGING}${BIN_DIR}/${PM_BINARY}"
 
 pkgbuild    --root "${PAYLOAD_STAGING}" \
             --scripts "${SCRIPTS_STAGING}" \
@@ -89,7 +100,7 @@ pkgbuild    --root "${PAYLOAD_STAGING}" \
             --ownership recommended \
             "${CM_PKG}"
 
-productbuild    --distribution "cm_distribution.xml" \
+productbuild    --distribution "${CM_DISTRIBUTION}" \
                 --package-path "./" \
                 "${CM_PKG_UNSIGNED}"
 
@@ -101,8 +112,8 @@ mkdir -p "${DMG_STAGING}"
 
 mv "${CM_PKG_UNSIGNED}" "${CM_INSTALLER}"
 
-cp -f "../client/config/bs.json" "${DMG_STAGING}/.bs.json"
-cp -f "../client/config/cm_config.json" "${DMG_STAGING}/.cm_config.json"
+cp -f "../client/config/${BOOTSTRAP_FILE}" "${DMG_STAGING}/.${BOOTSTRAP_FILE}"
+cp -f "../client/config/${CONFIG_FILE}" "${DMG_STAGING}/.${CONFIG_FILE}"
 
 cp -f "${CM_INSTALLER}" "${DMG_STAGING}"
 hdiutil create  -ov \
