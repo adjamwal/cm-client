@@ -54,6 +54,6 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
         ${XCODE_VALUE})
     endmacro (set_xcode_property)
 
-    set_xcode_property(example_test CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
-    set_xcode_property(example_test CLANG_CXX_LIBRARY "libc++")
+    set_xcode_property(ConfigTest CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
+    set_xcode_property(ConfigTest CLANG_CXX_LIBRARY "libc++")
 endif()

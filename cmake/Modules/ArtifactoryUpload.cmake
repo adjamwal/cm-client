@@ -7,18 +7,17 @@ function(upload_component component_name output)
             third-party-${component_name}
             artifactory_upload
             COMMAND ARTIFACTORY_TOKEN=$ENV{ARTIFACTORY_TOKEN} ${CM_SCRIPTS_DIR}/upload_artifact_to_artifactory.sh ${component_name}
-            COMMAND ${COMMAND} cp -aR "${component_install_prefix}/." "${CM_THIRDPARTY_EXPORT}"
             DEPENDEES install
         )
         set(${output} artifactory_upload PARENT_SCOPE)
-    else()
-        ExternalProject_Add_Step(
-            third-party-${component_name}
-            copy_exports
-            COMMENT "-- Artifactory upload skipped for ${component_name}, no ARTIFACTORY_TOKEN available"
-            COMMAND ${COMMAND} cp -aR "${component_install_prefix}/." "${CM_THIRDPARTY_EXPORT}"
-            DEPENDEES install
-        )
-        set(${output} copy_exports PARENT_SCOPE)
     endif()
+
+    ExternalProject_Add_Step(
+        third-party-${component_name}
+        copy_exports
+        COMMENT "-- Copying exports for ${component_name} to common export directory"
+        COMMAND ${COMMAND} cp -aR "${component_install_prefix}/." "${CM_THIRDPARTY_EXPORT}"
+        DEPENDEES install
+    )
+    set(${output} copy_exports PARENT_SCOPE)
 endfunction()

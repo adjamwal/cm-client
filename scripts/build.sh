@@ -2,10 +2,6 @@
 # Copyright 2022 Cisco Systems, Inc.
 
 SYSTEM="$(uname -s)"
-if [ "x$CM_BUILD_VER" = "x" ]; then
-    echo "CM_BUILD_VER not set. exiting..."
-    exit 1
-fi
 clean=false
 usage=false
 if [ $# -ge 1 ] && [ "$1" = "clean" ]; then
@@ -31,7 +27,12 @@ else
 done
 fi
 
-if [ "${usage}" = "true" ]; then
+if [ "${usage}" = "true" ] || [ "x$CM_BUILD_VER" = "x" ]; then
+    if [ "x$CM_BUILD_VER" = "x" ]; then
+        echo "***"
+        echo "*** ERROR: CM_BUILD_VER is not set"
+        echo
+    fi
     echo "Usage: build [-c|-h]"
     echo " -c		clean build"
     echo " -h		help (this usage)"
@@ -41,22 +42,36 @@ if [ "${usage}" = "true" ]; then
     echo
     echo " * Run without any arguments to build cm-client"
     echo
+    echo "Required Environment Variables:"
+    echo
+    echo " CM_BUILD_VER                     Build version number (i.e. 1.0.0.0)"
+    echo
+    echo "Influential Environment Variables:"
+    echo
+    echo " BUILD_SUBMODULES_FROM_SRC        Builds all third-party, and submodules from source"
+    echo " RETAIN_SYMBOLS                   Set to "yes" to retain symbols when building a release build"
+    echo " DEV_ID_APP_CERT                  Developer ID Application Certificate"
+    echo " DEV_ID_INSTALL_CERT              Developer ID Installer Certificate"
+    echo
     echo "Examples:"
     echo
     echo " # Use Xcode, and find *developer* signing certificate in Keychain"
-    echo " % ./build -x -s -"
+    echo " % CM_BUILD_VER=1.0.0 ./build -x -s -"
     echo
     echo " # Create a Makefile build signing using specified certificate in Keychain"
-    echo " % ./build -s \"Apple Development: John Smith (F34ACD4F4E)\""
+    echo " % CM_BUILD_VER=1.0.0 ./build -s \"Apple Development: John Smith (F34ACD4F4E)\""
     exit 0
 fi
 
 CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=1"
 CMAKE_BUILD_DIR="debug"
-BUILD_STAGING_DIR="Staging"
+BUILD_STAGING_DIR="$(pwd)/Staging"
 if [ "${release}" = "true"  ]; then
     CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
     CMAKE_BUILD_DIR="release"
+fi
+if [ "${BUILD_SUBMODULES_FROM_SRC}" = "YES" ]; then
+    CMAKE_EXTRA_ARGS="-DBUILD_ALL_THIRD_PARTY:BOOL=ON ${CMAKE_EXTRA_ARGS}"
 fi
 
 if [ "${sign}" = "true" ]; then
@@ -96,9 +111,9 @@ else
         CMAKE_EXTRA_ARGS="-G Xcode ${CMAKE_EXTRA_ARGS}"
         pushd "${CMAKE_BUILD_DIR}"
             if [ "${sign}" = "true" ]; then
-                cmake ${CMAKE_EXTRA_ARGS} -DSIGNING_CERT="${SIGNING_CERT}" ../ .
+                cmake ${CMAKE_EXTRA_ARGS} -DSIGNING_CERT="${SIGNING_CERT}" ../
             else
-                cmake ${CMAKE_EXTRA_ARGS} ../ .
+                cmake ${CMAKE_EXTRA_ARGS} ../
             fi
         popd
 
@@ -126,9 +141,9 @@ else
     else
         pushd "${CMAKE_BUILD_DIR}"
             if [ "${sign}" = "true" ]; then
-                cmake ${CMAKE_EXTRA_ARGS} -DSIGNING_CERT="${SIGNING_CERT}" ../ .
+                cmake ${CMAKE_EXTRA_ARGS} -DSIGNING_CERT="${SIGNING_CERT}" ../
             else
-                cmake ${CMAKE_EXTRA_ARGS} ../ .
+                cmake ${CMAKE_EXTRA_ARGS} ../
             fi
             cmake --build .
         popd
@@ -140,20 +155,20 @@ else
         echo " - 3rd party exports:	./${CMAKE_BUILD_DIR}/export/{lib,include}"
         echo
         
-        echo " running 'make' for ${CMAKE_BUILD_DIR}"
+        echo "** Running 'make' in ${CMAKE_BUILD_DIR} to build CM"
         pushd "${CMAKE_BUILD_DIR}"
-        make || exit 1
+            make
+            # Copy files to debug/export/{bin,lib,...} directory for use by installer
+            make install
         popd
         
-        echo " building CM Installer ..."
-        export BUILD_TYPE="${CMAKE_BUILD_DIR}"
-        DMG_DIR="Installer"
-        DMG_SCRIPT="build_cm_installer.sh"
-        rm -rf "${BUILD_STAGING_DIR}"
-        mkdir -p "${BUILD_STAGING_DIR}"
-        pushd "${DMG_DIR}"
-        sh "${DMG_SCRIPT}" "${BUILD_TYPE}"
-        echo "CM Installer built successfully."
+        echo "** Building CM Installer **"
+        BUILD_TYPE="${CMAKE_BUILD_DIR}"
+        DMG_INSTALLER_DIR="Installer"
+        DMG_BUILDER_SCRIPT="build_cm_installer.sh"
+        pushd "${DMG_INSTALLER_DIR}"
+            "./${DMG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
+            echo "** CM Installer built successfully **"
         popd
     fi
 fi

@@ -104,6 +104,7 @@ build_ciscossl_forarch()
     # Build CiscoSSL shared libaries.  Enable debug symbols.
     pushd "${WORKSPACE_ROOT}/third-party/ciscossl/src"
         \rm -rf "${EXPORT_DIR}"
+        echo "Configuring CiscoSSL with options ${CONFIGURE_FLAGS}"
         ./Configure ${CONFIGURE_FLAGS}
         make clean # Need to do this to ensure we don't link against the wrong architecture
         make depend

@@ -20,8 +20,14 @@ if(NOT TARGET "third-party-${component_name}")
         BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND echo "No configuration necessary."
         BUILD_COMMAND
-            ${CMAKE_COMMAND} -E env CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            sh "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ciscossl.sh"
+            COMMAND
+                #
+                # Passing argument -c to do a clean prior to build
+                CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                sh "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ciscossl.sh" -c
+            COMMAND
+                CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                sh "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ciscossl.sh"
         INSTALL_COMMAND echo "Auto-installed by build"
     )
 

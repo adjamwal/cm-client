@@ -38,8 +38,11 @@ endif()
 # remove ZERO_CHECK target from xcode
 set(CMAKE_SUPPRESS_REGENERATION true)
 
-# TODO - Make this configurable
-set(BUILD_ALL_THIRD_PARTY false)
+if(DEFINED BUILD_ALL_THIRD_PARTY AND BUILD_ALL_THIRD_PARTY)
+    set(BUILD_ALL_THIRD_PARTY true)
+else()
+    set(BUILD_ALL_THIRD_PARTY false)
+endif()
 # Change manually to force an individual library to be built instead
 set(BUILD_PACKAGE_MANAGER_THIRD_PARTY false)
 set(BUILD_ENDPOINT_IDENTITY_THIRD_PARTY false)
