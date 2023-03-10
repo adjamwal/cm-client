@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <installer-gui-script minSpecVersion="1">
-    <options rootVolumeOnly="true" customize="never" hostArchitectures="x86_64,arm64" require-scripts="true" />
+    <options customize="never" hostArchitectures="x86_64,arm64" require-scripts="true" />
+    <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true"/>
     <title>Cisco Secure Client Cloud Management for Mac</title>
     <product id="com.cisco.secureclient.cloudmanagement"/>
     <organization>com.cisco.secureclient.cloudmanagement</organization>
