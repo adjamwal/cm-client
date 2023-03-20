@@ -7,7 +7,10 @@ function(get_artifactory_url component output)
         OUTPUT_VARIABLE get_artifactory_url_output
     )
 
-    string(REGEX MATCH "https:\/\/.+\.tar\.gz" artifactory_url "${get_artifactory_url_output}")
+    string(
+        REGEX MATCH "https:\/\/engci-maven-master.cisco.com\/artifactory\/ampcx-generic-thirdparty\/.+\.tar\.gz"
+        artifactory_url "${get_artifactory_url_output}"
+    )
 
     if(artifactory_url STREQUAL "")
         set(${output} "" PARENT_SCOPE)
@@ -16,6 +19,7 @@ function(get_artifactory_url component output)
         # TODO also clean the third-party component to ensure the build
         #      is pristine prior to building and uploading to Artifactory
     else()
+        string(STRIP ${artifactory_url} artifactory_url)
         set(${output} ${artifactory_url} PARENT_SCOPE)
         message("-- Have download URL for ${component}: ${artifactory_url}.")
     endif()
@@ -27,7 +31,7 @@ function(download_component component_name component_dst_dir)
 
         ExternalProject_Add(
             third-party-${component_name}
-            URL ${artifactory_url}
+            URL "${artifactory_url}"
             CONFIGURE_COMMAND echo "Configuration not necessary."
             BUILD_COMMAND echo "Build not necessary."
             INSTALL_COMMAND ${COMMAND} cp -aR "${component_dst_dir}/." "${CM_THIRDPARTY_EXPORT}"
