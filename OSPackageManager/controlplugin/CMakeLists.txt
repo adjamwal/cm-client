@@ -21,6 +21,11 @@ target_include_directories(pmcontrolplugin
         ${cm-client_SOURCE_DIR}/client/Logger
 )
 
+add_dependencies(pmcontrolplugin 
+        third-party-EndpointIdentity
+        third-party-spdlog
+)
+
 target_link_libraries(pmcontrolplugin
     PRIVATE
         ${SystemConfiguration_framework}

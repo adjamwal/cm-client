@@ -103,6 +103,10 @@ if [ "${clean}" = "true" ]; then
     if [ -d release ]; then
         rm -fr release
     fi
+
+    # Recursively find all files named CMakeCache.txt and delete them
+    find . -type f -name "CMakeCache.txt" -exec rm {} \; -print
+
     echo
     echo "** Build clean completed **"
 else

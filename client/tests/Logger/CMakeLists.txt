@@ -12,6 +12,7 @@ add_executable(
 
 add_dependencies(
     LoggerTest
+    third-party-spdlog
     third-party-gtest
 )
 

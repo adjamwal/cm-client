@@ -12,6 +12,7 @@ add_executable(
 
 add_dependencies(
     ConfigTest
+    third-party-spdlog
     third-party-jsoncpp
     third-party-gtest
 )
