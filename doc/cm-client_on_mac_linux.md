@@ -397,7 +397,7 @@ This is a good opportunity to adopt this as a common logger across connector tea
 These are the proposed log paths:
 
 * On macOS
-    - /Library/Logs/Cisco/Cisco Secure Client/Cloud Management/
+    - /Library/Logs/Cisco/SecureClient/CloudManagement/
 * On Linux
     - /var/logs/cisco/secureclient/cloudmanagement/
 
