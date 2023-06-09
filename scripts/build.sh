@@ -27,7 +27,7 @@ else
 done
 fi
 
-if [ "${usage}" = "true" ] || [ "x$CM_BUILD_VER" = "x" ]; then
+if [ "${usage}" = "true" ] || [ "x${CM_BUILD_VER}" = "x" -a "${clean}" = "false" ]; then
     if [ "x$CM_BUILD_VER" = "x" ]; then
         echo "***"
         echo "*** ERROR: CM_BUILD_VER is not set"
@@ -103,6 +103,7 @@ if [ "${clean}" = "true" ]; then
     if [ -d release ]; then
         rm -fr release
     fi
+    rm -fr Staging
 
     # Recursively find all files named CMakeCache.txt and delete them
     find . -type f -name "CMakeCache.txt" -exec rm {} \; -print
@@ -159,11 +160,11 @@ else
         echo " - 3rd party exports:	./${CMAKE_BUILD_DIR}/export/{lib,include}"
         echo
         
-        echo "** Running 'make' in ${CMAKE_BUILD_DIR} to build CM"
+        echo "** Building, Installing, and creating the CM Installer **"
         pushd "${CMAKE_BUILD_DIR}"
-            make
+            cmake --build .
             # Copy files to debug/export/{bin,lib,...} directory for use by installer
-            make install
+            cmake --install .
         popd
         
         echo "** Building CM Installer **"

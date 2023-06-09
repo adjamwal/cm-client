@@ -45,5 +45,5 @@ target_link_directories(
 )
 
 include(GoogleTest)
-gtest_discover_tests(ControlPluginTest)
+gtest_discover_tests(ControlPluginTest DISCOVERY_MODE PRE_TEST)
 

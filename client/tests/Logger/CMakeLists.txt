@@ -35,7 +35,7 @@ target_link_directories(
 )
 
 include(GoogleTest)
-gtest_discover_tests(LoggerTest)
+gtest_discover_tests(LoggerTest DISCOVERY_MODE PRE_TEST)
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")
     macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
