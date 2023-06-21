@@ -94,8 +94,10 @@ void PmLogger::writeLog(Severity severity, const char* msgFormatter, va_list arg
     int nBufSize = vsnprintf(nullptr, 0, msgFormatter, args);
     if (nBufSize <= 0)
         return;
+    
+    nBufSize += 1;
 
-    std::vector<char> strBuf(static_cast<size_t>(nBufSize+1), '\0');
+    std::vector<char> strBuf(static_cast<size_t>(nBufSize), '\0');
 
     vsnprintf(strBuf.data(), nBufSize, msgFormatter, args);
 
