@@ -78,7 +78,11 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
 
     set_xcode_property(cmpackagemanager CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
     set_xcode_property(cmpackagemanager CLANG_CXX_LIBRARY "libc++")
-
+    
+    set_xcode_property(cmpackagemanager DEPLOYMENT_LOCATION "YES")
+    set_xcode_property(cmpackagemanager INSTALL_PATH "/")
+    set_xcode_property(cmpackagemanager DSTROOT "${CM_THIRDPARTY_EXPORT}/bin")
+    
     # For code signing
     if(DEFINED SIGNING_CERT)
         set_xcode_property(cmpackagemanager CODE_SIGN_IDENTITY "${SIGNING_CERT}")
