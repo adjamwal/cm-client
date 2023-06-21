@@ -10,6 +10,8 @@ set(component_install_prefix "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${componen
 set(GTEST_LIBS
     gtest_maind
     gtestd
+    gmock_maind
+    gmockd
 )
 
 if(NOT BUILD_ALL_THIRD_PARTY)
@@ -36,6 +38,8 @@ if(NOT TARGET "third-party-${component_name}")
         set(GTEST_LIBS
             gtest_main
             gtest
+            gmock_maind
+            gmockd
         )
     endif()
 endif()

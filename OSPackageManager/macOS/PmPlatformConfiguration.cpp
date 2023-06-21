@@ -4,83 +4,160 @@
  * @copyright (c) 2022 Cisco Systems, Inc. All rights reserved
  */
 
+#include <string>
 #include "PmPlatformConfiguration.hpp"
 
-bool GetIdentityToken(std::string& token)
+bool PmPlatformConfiguration::GetIdentityToken(std::string& token)
 {
-    (void) token;
-    return false;
+    assert(cmidapi_);
+    
+    int buflen = 0;
+    cmid_result_t result = cmidapi_->get_token(nullptr, &buflen);
+    if (result != CMID_RES_INSUFFICIENT_LEN) {
+        return false;
+    }
+
+    std::string cmid(buflen-1, '\0');
+    result = cmidapi_->get_token(cmid.data(), &buflen);
+    if (result != CMID_RES_SUCCESS) {
+        return false;
+    }
+
+    token = cmid;
+    return true;
 }
 
-bool GetUcIdentity(std::string& identity)
+bool PmPlatformConfiguration::GetUcIdentity(std::string& identity)
 {
-    (void) identity;
-    return false;
+    assert(cmidapi_);
+
+    int buflen = 0;
+    cmid_result_t result = cmidapi_->get_id(nullptr, &buflen);
+    if (result != CMID_RES_INSUFFICIENT_LEN) {
+        return false;
+    }
+    
+    std::string cmid(buflen-1, '\0');
+    result = cmidapi_->get_id(cmid.data(), &buflen);
+    if (result != CMID_RES_SUCCESS) {
+        return false;
+    }
+    
+    identity = cmid;
+    return true;
 }
 
-bool RefreshIdentity()
+bool PmPlatformConfiguration::RefreshIdentity()
 {
-    return false;
+    assert(cmidapi_);
+
+    cmid_result_t result = cmidapi_->refresh_token();
+    if (result != CMID_RES_SUCCESS) {
+        return false;
+    }
+    return true;
 }
 
-int32_t ReloadSslCertificates()
+int32_t PmPlatformConfiguration::ReloadSslCertificates()
 {
     return -1;
 }
 
-int32_t GetSslCertificates(X509 ***certificates, size_t &count)
+int32_t PmPlatformConfiguration::GetSslCertificates(X509 ***certificates, size_t &count)
 {
     (void) certificates;
     (void) count;
     return -1;
 }
 
-void ReleaseSslCertificates(X509 **certificates, size_t count)
+void PmPlatformConfiguration::ReleaseSslCertificates(X509 **certificates, size_t count)
 {
     (void) certificates;
     (void) count;
 }
 
-std::string GetHttpUserAgent()
+std::string PmPlatformConfiguration::GetHttpUserAgent()
 {
      return "";
 }
 
-std::string GetInstallDirectory()
+std::string PmPlatformConfiguration::GetInstallDirectory()
 {
      return "";
 }
 
-std::string GetDataDirectory()
+std::string PmPlatformConfiguration::GetDataDirectory()
 {
      return "";
 }
 
-std::string GetPmVersion()
+std::string PmPlatformConfiguration::GetPmVersion()
 {
      return "";
 }
 
-bool GetPmUrls(PmUrlList& urls)
+cmid_result_t PmPlatformConfiguration::GetUrl( cmid_url_type_t urlType, std::string& url )
 {
-     (void) urls;
-     return false;
+    cmid_result_t result = CMID_RES_GENERAL_ERROR;
+    int urlSize = 0;
+    result = cmidapi_->get_url( urlType, nullptr, &urlSize );
+    if( result == CMID_RES_INSUFFICIENT_LEN ) {
+        std::string tmpUrl(urlSize-1, '\0');
+        result = cmidapi_->get_url( urlType, tmpUrl.data(), &urlSize );
+        if( result == CMID_RES_SUCCESS ) {
+            url = tmpUrl;
+        }
+    }
+    
+    return result;
 }
 
-bool UpdateCertStoreForUrl(const std::string &url)
+bool PmPlatformConfiguration::GetPmUrls(PmUrlList& urls)
+{
+    cmid_result_t rtn = CMID_RES_SUCCESS;
+    cmid_result_t tmpRtn = CMID_RES_SUCCESS;
+    
+    tmpRtn = GetUrl( CMID_EVENT_URL, urls.eventUrl );
+    if( tmpRtn != CMID_RES_SUCCESS ) {
+//  TODO: oskryp, add error logging
+//        LOG_ERROR( "Failed to fetch event url %d", tmpRtn );
+        rtn = CMID_RES_GENERAL_ERROR;
+    }
+    
+    tmpRtn = GetUrl( CMID_CHECKIN_URL, urls.checkinUrl );
+    if( tmpRtn != CMID_RES_SUCCESS ) {
+//  TODO: oskryp, add error logging
+//        LOG_ERROR( "Failed to fetch checking url %d", tmpRtn );
+        rtn = CMID_RES_GENERAL_ERROR;
+    }
+    
+    tmpRtn = GetUrl( CMID_CATALOG_URL, urls.catalogUrl );
+    if( tmpRtn != CMID_RES_SUCCESS ) {
+//  TODO: oskryp, add error logging
+//        LOG_ERROR( "Failed to fetch catalog url %d", tmpRtn );
+        rtn = CMID_RES_GENERAL_ERROR;
+    }
+    
+//  TODO: oskryp, add error logging
+//    LOG_DEBUG( "Event Url %s Checkin Url %s Catalog Url %s", urls.eventUrl.c_str(), urls.checkinUrl.c_str(), urls.catalogUrl.c_str() );
+    
+    return rtn == CMID_RES_SUCCESS;
+}
+
+bool PmPlatformConfiguration::UpdateCertStoreForUrl(const std::string &url)
 {
     (void) url;
     return false;
 }
 
-std::list<PmProxy> StartProxyDiscovery(const std::string &testUrl, const std::string &pacUrl)
+std::list<PmProxy> PmPlatformConfiguration::StartProxyDiscovery(const std::string &testUrl, const std::string &pacUrl)
 {
     (void) testUrl;
     (void) pacUrl;
     return std::list<PmProxy>();
 }
 
-bool StartProxyDiscoveryAsync(const std::string &testUrl, const std::string &pacUrl, AsyncProxyDiscoveryCb cb, void *context)
+bool PmPlatformConfiguration::StartProxyDiscoveryAsync(const std::string &testUrl, const std::string &pacUrl, AsyncProxyDiscoveryCb cb, void *context)
 {
     (void) testUrl;
     (void) pacUrl;

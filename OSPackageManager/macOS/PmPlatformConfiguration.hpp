@@ -5,11 +5,12 @@
  */
 
 #include "PackageManager/IPmPlatformConfiguration.h"
+#include "../proxy/CMIDAPIProxyAbstract.hpp"
 
 class PmPlatformConfiguration : public IPmPlatformConfiguration
 {
 public:
-    PmPlatformConfiguration() {}
+    explicit PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi) : cmidapi_(cmidapi) {}
 
     /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
@@ -105,4 +106,10 @@ public:
      * @return true if the discovery process was started
      */
     bool StartProxyDiscoveryAsync(const std::string &testUrl, const std::string &pacUrl, AsyncProxyDiscoveryCb cb, void *context);
+    
+protected:
+    cmid_result_t GetUrl( cmid_url_type_t urlType, std::string& url );
+
+private:
+    std::shared_ptr<CMIDAPIProxyAbstract> cmidapi_;
 };

@@ -3,4 +3,5 @@
 
 enable_testing()
 
+add_subdirectory(cmpackagemanager)
 add_subdirectory(controlplugin)
