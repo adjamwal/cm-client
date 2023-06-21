@@ -5,34 +5,126 @@
  */
 
 #include "PmLogger.hpp"
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include <iostream>
+
+namespace
+{
+    std::string severityToString(const IPMLogger::Severity s)
+    {
+        switch(s)
+        {
+        case IPMLogger::LOG_ALERT:
+            return "Alert";
+        case IPMLogger::LOG_CRITICAL:
+            return "Cretical";
+        case IPMLogger::LOG_ERROR:
+            return "Error";
+        case IPMLogger::LOG_WARNING:
+            return "Warning";
+        case IPMLogger::LOG_NOTICE:
+            return "Notice";
+        case IPMLogger::LOG_INFO:
+            return "Info";
+        case IPMLogger::LOG_DEBUG:
+        default:
+            return "Debug:";
+        }
+        return "Debug";
+    }
+}
+
+
+PmLogger::PmLogger()
+{
+    spdlog::stdout_color_mt("console");
+}
 
 void PmLogger::Log(Severity severity, const char* msgFormatter, ...)
 {
-    (void) severity;
-    (void) msgFormatter;
+    if (severity > m_curSeverity)
+        return;
+
+    va_list va_args;
+    va_start(va_args, msgFormatter);
+    writeLog(severity, msgFormatter, va_args);
+
+    va_end(va_args);
 }
 
 void PmLogger::Log(Severity severity, const wchar_t* msgFormatter, ...)
 {
-    (void) severity;
-    (void) msgFormatter;
+    if (severity > m_curSeverity)
+        return;
+
+    va_list va_args;
+    va_start(va_args, msgFormatter);
+    writeLog(severity, msgFormatter, va_args);
+
+    va_end(va_args);
 }
 
 void PmLogger::Log(Severity severity, const char* msgFormatter, va_list args)
 {
-    (void) severity;
-    (void) msgFormatter;
-    (void) args;
+    if (severity > m_curSeverity)
+        return;
+
+    writeLog(severity, msgFormatter, args);
 }
 
 void PmLogger::Log(Severity severity, const wchar_t* msgFormatter, va_list args)
 {
-    (void) severity;
-    (void) msgFormatter;
-    (void) args;
+    if (severity > m_curSeverity)
+        return;
+
+    writeLog(severity, msgFormatter, args);
 }
 
 void PmLogger::SetLogLevel(Severity severity)
 {
-    (void) severity;
+    m_curSeverity = severity;
+}
+
+void PmLogger::writeLog(Severity severity, const char* msgFormatter, va_list args)
+{
+    std::string strLog = severityToString(severity);
+    strLog += ": ";
+
+    int nBufSize = vsnprintf(nullptr, 0, msgFormatter, args);
+    if (nBufSize <= 0)
+        return;
+
+    std::vector<char> strBuf(static_cast<size_t>(nBufSize+1), '\0');
+
+    vsnprintf(strBuf.data(), nBufSize, msgFormatter, args);
+
+    strLog += strBuf.data();
+
+    spdlog::get("console")->info("{}", strLog);
+}
+
+void PmLogger::writeLog(Severity severity, const wchar_t* msgFormatter, va_list args)
+{
+    std::string strSeverinity = severityToString(severity);
+    std::wstring strLog(strSeverinity.begin(), strSeverinity.end());
+    strLog += L": ";
+    size_t nBufSize = 2048;
+
+    std::vector<wchar_t> strBuf;
+    int nRet = -1;
+    int nIter = 0;
+
+    do
+    {
+        strBuf.resize(0);
+        strBuf.resize(nBufSize + 1, L'\0');
+        nRet = vswprintf(strBuf.data(), nBufSize, msgFormatter, args);
+        nBufSize *= 2;
+        ++nIter;
+    } while (nRet < 0 && nIter < 4);
+    strLog += strBuf.data();
+
+    //spdlog::get("console")->info(L"{}", strLog);
+    std::wcout << strLog << std::endl;
 }
