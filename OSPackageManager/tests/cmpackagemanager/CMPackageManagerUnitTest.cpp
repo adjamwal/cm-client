@@ -7,6 +7,8 @@
 #include "../../macOS/PmPlatformConfiguration.hpp"
 #include "CMLogger.hpp"
 #include "MockCMIDAPIProxy.hpp"
+#include "MockPmCertManager/MockPmCertRetriever.h"
+#include "MockPmCertManager/MockPmCertManager.h"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -14,13 +16,19 @@ using ::testing::SetArgPointee;
 using ::testing::SaveArg;
 using ::testing::Return;
 using ::testing::NiceMock;
+using ::testing::AnyNumber;
 
 class PmPlatformConfigurationTestWithUninitialisedCMIDAPI : public ::testing::Test {
 protected:
     void SetUp() override {
         // Set up the test fixture
         mockCMIDApi = std::make_shared<NiceMock<MockCMIDAPIProxy>>(false);
-        platformConfiguration = std::make_unique<PmPlatformConfiguration>(mockCMIDApi);
+        //TODO: vzakharc - get rid of cert mgr mock in pkg mgr tests
+        auto retrieverMock = std::make_shared<NiceMock<MockPmCertRetriever>>();
+        auto certMgrMock = std::make_shared<NiceMock<MockPmCertManager>>(retrieverMock);
+        EXPECT_CALL(*retrieverMock, LoadSystemSslCertificates()).Times(AnyNumber());
+        EXPECT_CALL(*retrieverMock, FreeSystemSslCertificates()).Times(AnyNumber());
+        platformConfiguration = std::make_unique<PmPlatformConfiguration>(mockCMIDApi, certMgrMock);
     }
     
     void TearDown() override {
@@ -68,7 +76,13 @@ protected:
         // Set up the test fixture
         mockCMIDApi = std::make_shared<NiceMock<MockCMIDAPIProxy>>(true);
         mockCMIDApi->DelegateToFake();
-        platformConfiguration = std::make_unique<PmPlatformConfiguration>(mockCMIDApi);
+        //TODO: vzakharc - get rid of cert mgr mock in pkg mgr tests
+        auto retrieverMock = std::make_shared<NiceMock<MockPmCertRetriever>>();
+        auto certMgrMock = std::make_shared<NiceMock<MockPmCertManager>>(retrieverMock);
+        EXPECT_CALL(*retrieverMock, LoadSystemSslCertificates()).Times(AnyNumber());
+        EXPECT_CALL(*retrieverMock, FreeSystemSslCertificates()).Times(AnyNumber());
+
+        platformConfiguration = std::make_unique<PmPlatformConfiguration>(mockCMIDApi, certMgrMock);
     }
     
     void TearDown() override {

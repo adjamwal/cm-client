@@ -2,7 +2,10 @@
 
 list(APPEND CONTROL_PLUGIN_SOURCES
     ModuleControlPlugin.cpp
+    ModuleControlPlugin.hpp
     PmAgentController.cpp
+    PmAgentController.hpp
+    PmStatusTypes.hpp
 )
 
 add_library(pmcontrolplugin STATIC

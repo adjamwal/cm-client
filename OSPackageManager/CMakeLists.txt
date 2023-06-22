@@ -11,6 +11,11 @@ set(OS_PACKAGE_MANAGER_SRCS
     main.cpp
     agent/PackageManagerAgent.cpp
     agent/PackageManagerAgent.hpp
+    macOS/IPmCertRetriever.hpp
+    macOS/PmCertManager.cpp
+    macOS/PmCertManager.hpp
+    macOS/PmCertRetrieverImpl.cpp
+    macOS/PmCertRetrieverImpl.hpp
     macOS/PmLogger.cpp
     macOS/PmLogger.hpp
     macOS/PmPlatformComponentManager.cpp
@@ -79,7 +84,6 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
 
     set_xcode_property(cmpackagemanager CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
     set_xcode_property(cmpackagemanager CLANG_CXX_LIBRARY "libc++")
-    
     set_xcode_property(cmpackagemanager DEPLOYMENT_LOCATION "YES")
     set_xcode_property(cmpackagemanager INSTALL_PATH "/")
     set_xcode_property(cmpackagemanager DSTROOT "${CM_THIRDPARTY_EXPORT}/bin")

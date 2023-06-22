@@ -7,9 +7,19 @@ get_filename_component(TESTEE_DIR "${TESTS_DIR}" DIRECTORY)
 add_executable(
   PackageManagerUnitTest
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
+
   # Test files
   CMPackageManagerUnitTest.cpp
+  TestPmCertMgr.cpp
   ${TESTEE_DIR}/macOS/PmPlatformConfiguration.cpp
+  ${TESTEE_DIR}/macOS/PmCertManager.cpp
+  
+  # Mocks
+  ${TESTEE_DIR}/proxy/CMIDAPIProxy.hpp
+  ${TESTEE_DIR}/proxy/CMIDAPIProxyAbstract.hpp
+  ${TESTEE_DIR}/Mocks/MockPmCertManager/MockPmCertManager.h
+  ${TESTEE_DIR}/Mocks/MockPmCertManager/MockPmCertRetriever.cpp
+  ${TESTEE_DIR}/Mocks/MockPmCertManager/MockPmCertRetriever.h
 )
 
 add_dependencies(
@@ -23,6 +33,8 @@ add_dependencies(
 target_link_libraries(
   PackageManagerUnitTest
   cmidapi
+  crypto
+  ssl
   ${GTEST_LIBS}
 )
 
@@ -39,6 +51,7 @@ target_include_directories(
       ${CM_THIRDPARTY_EXPORT}/include
       ${cm-client_SOURCE_DIR}/client/Logger
       ${cm-client_SOURCE_DIR}/OSPackageManager/macOS
+      ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
 )
 
 target_link_directories(

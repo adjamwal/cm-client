@@ -5,6 +5,16 @@
  */
 
 #include "PmPlatformDependencies.hpp"
+#include "PmCertManager.hpp"
+#include "PmCertRetrieverImpl.hpp"
+
+using namespace PackageManager;
+
+PmPlatformDependencies::PmPlatformDependencies()
+    : pmConfiguration_ { PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract>(new CMIDAPIProxy()),
+                                                 std::make_shared<PmCertManager>(std::shared_ptr<IPmCertRetriever>(new PmCertRetrieverImpl))) },
+      pmComponentManager_ { PmPlatformComponentManager() }
+{ }
 
 IPmPlatformConfiguration &PmPlatformDependencies::Configuration()
 {

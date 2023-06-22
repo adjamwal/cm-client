@@ -6,7 +6,7 @@
 
 #include "PmPlatformComponentManager.hpp"
 
-int32_t GetInstalledPackages(const std::vector<PmProductDiscoveryRules> &catalogRules, PackageInventory &packagesDiscovered)
+int32_t PmPlatformComponentManager::GetInstalledPackages(const std::vector<PmProductDiscoveryRules> &catalogRules, PackageInventory &packagesDiscovered)
 {
     (void) catalogRules;
     (void) packagesDiscovered;
@@ -17,19 +17,19 @@ int32_t GetInstalledPackages(const std::vector<PmProductDiscoveryRules> &catalog
     return -1;
 }
 
-int32_t GetCachedInventory(PackageInventory &cachedInventory)
+int32_t PmPlatformComponentManager::GetCachedInventory(PackageInventory &cachedInventory)
 {
     (void) cachedInventory;
     return -1;
 }
 
-int32_t InstallComponent(const PmComponent &package)
+int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
 {
     (void) package;
     return -1;
 }
 
-IPmPlatformComponentManager::PmInstallResult UpdateComponent(const PmComponent &package, std::string &error)
+IPmPlatformComponentManager::PmInstallResult PmPlatformComponentManager::UpdateComponent(const PmComponent &package, std::string &error)
 {
     IPmPlatformComponentManager::PmInstallResult result = {
         .pmResult = IPmPlatformComponentManager::PM_INSTALL_FAILURE,
@@ -41,41 +41,41 @@ IPmPlatformComponentManager::PmInstallResult UpdateComponent(const PmComponent &
     return result;
 }
 
-int32_t UninstallComponent(const PmComponent &package)
+int32_t PmPlatformComponentManager::UninstallComponent(const PmComponent &package)
 {
     (void) package;
     return -1;
 }
 
-int32_t DeployConfiguration(const PackageConfigInfo &config)
+int32_t PmPlatformComponentManager::DeployConfiguration(const PackageConfigInfo &config)
 {
     (void) config;
     return -1;
 }
 
-std::string ResolvePath(const std::string &basePath)
+std::string PmPlatformComponentManager::ResolvePath(const std::string &basePath)
 {
     return basePath;
 }
 
-int32_t FileSearchWithWildCard(const std::filesystem::path &searchPath, std::vector<std::filesystem::path> &results)
+int32_t PmPlatformComponentManager::FileSearchWithWildCard(const std::filesystem::path &searchPath, std::vector<std::filesystem::path> &results)
 {
     (void) searchPath;
     (void) results;
     return -1;
 }
 
-void NotifySystemRestart()
+void PmPlatformComponentManager::NotifySystemRestart()
 {
 }
 
-int32_t ApplyBultinUsersReadPermissions(const std::filesystem::path &filePath)
+int32_t PmPlatformComponentManager::ApplyBultinUsersReadPermissions(const std::filesystem::path &filePath)
 {
     (void) filePath;
     return -1;
 }
 
-int32_t RestrictPathPermissionsToAdmins(const std::filesystem::path &filePath)
+int32_t PmPlatformComponentManager::RestrictPathPermissionsToAdmins(const std::filesystem::path &filePath)
 {
     (void) filePath;
     return -1;

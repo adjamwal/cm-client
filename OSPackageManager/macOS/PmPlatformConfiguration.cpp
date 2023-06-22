@@ -4,8 +4,16 @@
  * @copyright (c) 2022 Cisco Systems, Inc. All rights reserved
  */
 
-#include <string>
 #include "PmPlatformConfiguration.hpp"
+#include <string>
+
+PmPlatformConfiguration::PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
+                                                 std::shared_ptr<PackageManager::PmCertManager> certmgr)
+    :   cmidapi_(cmidapi),
+        certmgr_(certmgr)
+{
+    certmgr_->LoadSystemSslCertificates();
+}
 
 bool PmPlatformConfiguration::GetIdentityToken(std::string& token)
 {
@@ -60,20 +68,30 @@ bool PmPlatformConfiguration::RefreshIdentity()
 
 int32_t PmPlatformConfiguration::ReloadSslCertificates()
 {
-    return -1;
+    int32_t result = certmgr_->FreeSystemSslCertificates() ? 0 : -1;
+    if (0 != result) {
+        //TODO: LOG_ERROR
+        return false;
+    }
+    
+    result = certmgr_->LoadSystemSslCertificates() ? 0 : -1;
+    if (0 != result) {
+        //TODO: LOG_ERROR
+        return false;
+    }
+
+    return result;
 }
 
 int32_t PmPlatformConfiguration::GetSslCertificates(X509 ***certificates, size_t &count)
 {
-    (void) certificates;
-    (void) count;
-    return -1;
+    int32_t result = certmgr_->GetSslCertificates(certificates, count);
+    return result;
 }
 
 void PmPlatformConfiguration::ReleaseSslCertificates(X509 **certificates, size_t count)
 {
-    (void) certificates;
-    (void) count;
+    certmgr_->ReleaseSslCertificates(certificates, count);
 }
 
 std::string PmPlatformConfiguration::GetHttpUserAgent()

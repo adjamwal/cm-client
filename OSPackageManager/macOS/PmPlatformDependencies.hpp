@@ -13,10 +13,7 @@
 class PmPlatformDependencies : public IPmPlatformDependencies
 {
 public:
-    PmPlatformDependencies()
-        : pmConfiguration_ { PmPlatformConfiguration( std::shared_ptr<CMIDAPIProxyAbstract>(new CMIDAPIProxy())) },
-          pmComponentManager_ { PmPlatformComponentManager() }
-    { }
+    PmPlatformDependencies();
 
     IPmPlatformConfiguration &Configuration();
     IPmPlatformComponentManager &ComponentManager();
