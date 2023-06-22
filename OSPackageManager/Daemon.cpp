@@ -9,9 +9,6 @@
 
 #include <chrono>
 #include <iostream>
-#include "PmPlatformDependencies.hpp"
-#include "agent/PackageManagerAgent.hpp"
-#include "PmLogger.hpp"
 
 namespace PackageManager
 {
@@ -41,13 +38,6 @@ Daemon::~Daemon()
 void Daemon::mainTask()
 {
     umask(0077);
-    
-    PmPlatformDependencies deps;
-    PmLogger logger;
-        Agent::PackageManagerAgent agent("/Users/alex/cisco/fork/cm-client/client/config/bs.json", "/Users/alex/cisco/fork/cm-client/client/config/cm_config.json",
-                                         deps, logger);
-    agent.start();
-    GetPMLogger()->Log( IPMLogger::LOG_INFO, "Test output" );
 
     //! TODO: Just busy wait??
     //!
