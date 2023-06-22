@@ -6,8 +6,11 @@
 
 #pragma once
 
+#include "PackageManager/IPmLogger.h"
+
 #include <atomic>
 #include <thread>
+#include <string>
 
 namespace PackageManager
 {
@@ -19,10 +22,15 @@ public:
 
     void start();
     void stop();
+    
+    void setBooststrapPath(const std::string& strPath);
+    void setConfigPath(const std::string& strPath);
 
 private:
     std::atomic<bool> isRunning_;
     std::thread task_;
+    std::string bootstrap_;
+    std::string configFile_;
 
     void mainTask();
 };

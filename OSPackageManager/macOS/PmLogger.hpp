@@ -17,6 +17,8 @@ public:
     void Log(Severity severity, const wchar_t* msgFormatter, va_list args);
 
     void SetLogLevel(Severity severity);
+    
+    static IPMLogger& GetCurrentLogger();
 
 private:
     Severity m_curSeverity = LOG_ERROR;

@@ -5,16 +5,26 @@
 
 #include "Daemon.hpp"
 
-#include <sys/stat.h>
+#include "PmPlatformDependencies.hpp"
+#include "agent/PackageManagerAgent.hpp"
+#include "PmLogger.hpp"
 
+#include <sys/stat.h>
 #include <chrono>
 #include <iostream>
+#include <filesystem>
 
 namespace PackageManager
 {
 
 Daemon::Daemon()
 {
+#ifdef CM_CONFIG_PATH
+    bootstrap_ = (std::filesystem::path(CM_CONFIG_PATH) /
+        std::filesystem::path("bs.json")).native();
+    configFile_ = (std::filesystem::path(CM_CONFIG_PATH) /
+        std::filesystem::path("cm_config.json")).native();
+#endif
 }
 
 void Daemon::start()
@@ -35,9 +45,40 @@ Daemon::~Daemon()
     stop();
 }
 
+void Daemon::setBooststrapPath(const std::string& strPath)
+{
+    std::filesystem::path p = std::filesystem::path(strPath);
+    if(std::filesystem::exists(p))
+    {
+        bootstrap_ = p;
+    }
+    else
+    {
+        //LOG_ERROR("Non existing path to the bootsrap: %s", strPath);
+    }
+}
+
+void Daemon::setConfigPath(const std::string& strPath)
+{
+    std::filesystem::path p = std::filesystem::path(strPath);
+    if(std::filesystem::exists(p))
+    {
+        configFile_ = p;
+    }
+    else
+    {
+        //LOG_ERROR("Non existing path to the log file: %s", strPath);
+    }
+}
+
 void Daemon::mainTask()
 {
     umask(0077);
+    
+    assert(GetPMLogger() != nullptr);
+    PmPlatformDependencies deps;
+    Agent::PackageManagerAgent agent(bootstrap_, configFile_, deps, PmLogger::GetCurrentLogger());
+    agent.start();
 
     //! TODO: Just busy wait??
     //!
@@ -54,6 +95,7 @@ void Daemon::mainTask()
         //auto end = chrono::high_resolution_clock::now();
         (void) chrono::high_resolution_clock::now();
     }
+    agent.stop();
 }
 
 } // namespace PackageManager

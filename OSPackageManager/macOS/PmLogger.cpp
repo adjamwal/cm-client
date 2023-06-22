@@ -33,6 +33,8 @@ namespace
         }
         return "Debug";
     }
+
+    static PmLogger g_logger;
 }
 
 
@@ -90,8 +92,11 @@ void PmLogger::writeLog(Severity severity, const char* msgFormatter, va_list arg
 {
     std::string strLog = severityToString(severity);
     strLog += ": ";
-
-    int nBufSize = vsnprintf(nullptr, 0, msgFormatter, args);
+    
+    va_list copy_args;
+    va_copy(copy_args, args);
+    int nBufSize = vsnprintf(nullptr, 0, msgFormatter, copy_args);
+    va_end(copy_args);
     if (nBufSize <= 0)
         return;
     
@@ -121,7 +126,10 @@ void PmLogger::writeLog(Severity severity, const wchar_t* msgFormatter, va_list 
     {
         strBuf.resize(0);
         strBuf.resize(nBufSize + 1, L'\0');
-        nRet = vswprintf(strBuf.data(), nBufSize, msgFormatter, args);
+        va_list copy_args;
+        va_copy(copy_args, args);
+        nRet = vswprintf(strBuf.data(), nBufSize, msgFormatter, copy_args);
+        va_end(copy_args);
         nBufSize *= 2;
         ++nIter;
     } while (nRet < 0 && nIter < 4);
@@ -129,4 +137,9 @@ void PmLogger::writeLog(Severity severity, const wchar_t* msgFormatter, va_list 
 
     //spdlog::get("console")->info(L"{}", strLog);
     std::wcout << strLog << std::endl;
+}
+
+IPMLogger& PmLogger::GetCurrentLogger()
+{
+    return g_logger;
 }
