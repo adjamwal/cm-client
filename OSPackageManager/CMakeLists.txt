@@ -30,6 +30,7 @@ add_dependencies(cmpackagemanager
     third-party-jsoncpp
     third-party-EndpointIdentity
     third-party-PackageManager
+    third-party-spdlog
 )
 
 target_include_directories(cmpackagemanager
