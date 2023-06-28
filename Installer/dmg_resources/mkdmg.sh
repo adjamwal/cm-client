@@ -56,8 +56,8 @@ SCRIPT_DIR=$(dirname "$0")
 
 DMG_NAME="${1}"
 BOOTSTRAP="${2}"
-CONFIG="${2}"
-PKG="${3}"
+CONFIG="${3}"
+PKG="${4}"
 
 # Create temporary working directory to stage source files. Clean up on exit.
 TMPDIR=$(mktemp -d -t "${SCRIPT_NAME}"_XXXXX)
