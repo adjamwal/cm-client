@@ -74,6 +74,8 @@ target_compile_definitions(cmpackagemanager
     "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CM_THIRDPARTY_EXPORT}/bin\">"
     "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/client/config\">"
     "$<$<CONFIG:DEBUG>:CM_SHARED_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/\">"
+    "$<$<CONFIG:DEBUG>:PackageManager_VERSION_MAJOR=\"1\">"
+    "$<$<CONFIG:DEBUG>:PackageManager_VERSION_MINOR=\"0\">"
 )
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")

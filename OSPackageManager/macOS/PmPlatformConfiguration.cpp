@@ -7,6 +7,32 @@
 #include "PmPlatformConfiguration.hpp"
 #include <string>
 
+#if defined(PackageManager_VERSION_MAJOR) && defined(PackageManager_VERSION_MINOR)
+const std::string kPmVersion = std::string(PackageManager_VERSION_MAJOR) + std::string(".") + std::string(PackageManager_VERSION_MINOR);
+#else
+constexpr std::string_view kPmVersion{"0.0"};
+#endif
+
+#ifdef CM_CONFIG_PATH
+constexpr std::string_view kCmConfigPath{CM_CONFIG_PATH};
+#else
+constexpr std::string_view kCmConfigPath{"/opt/cisco/secureclient/cloudmanagement/etc"};
+#endif
+
+#ifdef CMID_DAEMON_PATH
+constexpr std::string_view kCmidDaemonPath{CMID_DAEMON_PATH};
+#else
+constexpr std::string_view kCmidDaemonPath{"/opt/cisco/secureclient/cloudmanagement/bin"};
+#endif
+
+#ifdef CM_SHARED_LOG_PATH
+constexpr std::string_view kCmSharedLogPath{CM_SHARED_LOG_PATH};
+#elif __APPLE__
+constexpr std::string_view kCmSharedLogPath{"/Library/Logs/Cisco/SecureClient/CloudManagement/"};
+#else
+constexpr std::string_view kCmSharedLogPath{"/var/logs/cisco/secureclient/cloudmanagement/"};
+#endif
+
 PmPlatformConfiguration::PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
                                                  std::shared_ptr<PackageManager::PmCertManager> certmgr)
     :   cmidapi_(cmidapi),
@@ -96,22 +122,27 @@ void PmPlatformConfiguration::ReleaseSslCertificates(X509 **certificates, size_t
 
 std::string PmPlatformConfiguration::GetHttpUserAgent()
 {
-     return "";
+    return std::string("PackageManager/" + GetPmVersion());
 }
 
 std::string PmPlatformConfiguration::GetInstallDirectory()
 {
-     return "";
+    return static_cast<std::string>(kCmidDaemonPath);
+}
+
+std::string PmPlatformConfiguration::GetLogDirectory()
+{
+    return static_cast<std::string>(kCmSharedLogPath);
 }
 
 std::string PmPlatformConfiguration::GetDataDirectory()
 {
-     return "";
+    return  static_cast<std::string>(kCmConfigPath);
 }
 
 std::string PmPlatformConfiguration::GetPmVersion()
 {
-     return "";
+    return static_cast<std::string>(kPmVersion);
 }
 
 cmid_result_t PmPlatformConfiguration::GetUrl( cmid_url_type_t urlType, std::string& url )
