@@ -7,6 +7,8 @@
 #include "PmPlatformConfiguration.hpp"
 #include <string>
 
+namespace
+{
 #if defined(PackageManager_VERSION_MAJOR) && defined(PackageManager_VERSION_MINOR)
 const std::string kPmVersion = std::string(PackageManager_VERSION_MAJOR) + std::string(".") + std::string(PackageManager_VERSION_MINOR);
 #else
@@ -32,6 +34,9 @@ constexpr std::string_view kCmSharedLogPath{"/Library/Logs/Cisco/SecureClient/Cl
 #else
 constexpr std::string_view kCmSharedLogPath{"/var/logs/cisco/secureclient/cloudmanagement/"};
 #endif
+
+constexpr std::string_view kHttpUserAgentPrefix{"PackageManager/"};
+}
 
 PmPlatformConfiguration::PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
                                                  std::shared_ptr<PackageManager::PmCertManager> certmgr)
@@ -122,7 +127,8 @@ void PmPlatformConfiguration::ReleaseSslCertificates(X509 **certificates, size_t
 
 std::string PmPlatformConfiguration::GetHttpUserAgent()
 {
-    return std::string("PackageManager/" + GetPmVersion());
+    static std::string httpUserAgent = static_cast<std::string>(kHttpUserAgentPrefix) + static_cast<std::string>(GetPmVersion());
+    return httpUserAgent;
 }
 
 std::string PmPlatformConfiguration::GetInstallDirectory()
