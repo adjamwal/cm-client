@@ -11,8 +11,11 @@ add_executable(
   # Test files
   CMPackageManagerUnitTest.cpp
   TestPmCertMgr.cpp
+  TestPmLogger.cpp
   ${TESTEE_DIR}/macOS/PmPlatformConfiguration.cpp
   ${TESTEE_DIR}/macOS/PmCertManager.cpp
+  ${TESTEE_DIR}/macOS/PmLogger.cpp
+  ${TESTEE_DIR}/macOS/PmLogger.hpp
   
   # Mocks
   ${TESTEE_DIR}/proxy/CMIDAPIProxy.hpp
@@ -28,6 +31,7 @@ add_dependencies(
     third-party-EndpointIdentity
     third-party-gtest
     third-party-PackageManager
+    third-party-spdlog
 )
 
 target_link_libraries(

@@ -13,6 +13,17 @@
 #include <chrono>
 #include <iostream>
 #include <filesystem>
+#include <string_view>
+
+namespace
+{
+    constexpr std::string_view kLogFileName = "cmpackagemanager.log";
+#ifndef CM_SHARED_LOG_PATH
+    constexpr std::string_view kLogDir = "/Library/Logs/Cisco/SecureClient/CloudManagement";
+#endif
+    constexpr size_t kMaxSize = 1048576 * 15;
+    constexpr size_t kMaxFiles = 5;
+}
 
 namespace PackageManager
 {
@@ -25,11 +36,21 @@ Daemon::Daemon()
     configFile_ = (std::filesystem::path(CM_CONFIG_PATH) /
         std::filesystem::path("cm_config.json")).native();
 #endif
+
+#ifdef CM_SHARED_LOG_PATH
+    setLoggerDir(CM_SHARED_LOG_PATH);
+#else
+#ifdef __APPLE__
+    setLoggerDir(static_cast<std::string>(kLogDir));
+#endif
+#endif
 }
 
 void Daemon::start()
 {
     isRunning_ = true;
+    PmLogger::getLogger().initFileLogging(loggerDir_, static_cast<std::string>(kLogFileName),
+        kMaxSize, kMaxFiles);
 
     task_ = std::thread(&Daemon::mainTask, this);
     task_.join();
@@ -54,7 +75,7 @@ void Daemon::setBooststrapPath(const std::string& strPath)
     }
     else
     {
-        //LOG_ERROR("Non existing path to the bootsrap: %s", strPath);
+        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Non existing path to the bootsrap: %s", strPath.c_str());
     }
 }
 
@@ -67,7 +88,25 @@ void Daemon::setConfigPath(const std::string& strPath)
     }
     else
     {
-        //LOG_ERROR("Non existing path to the log file: %s", strPath);
+        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Non existing path to the config file: %s", strPath.c_str());
+    }
+}
+
+void Daemon::setLoggerDir(const std::string& strLoggerDir)
+{
+    try
+    {
+        std::filesystem::path p = std::filesystem::path(strLoggerDir);
+        if (!std::filesystem::exists(p))
+        {
+            std::filesystem::create_directories(p);
+            loggerDir_ = p;
+        }
+        loggerDir_ = p;
+    }
+    catch(std::exception& ex)
+    {
+        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Filed to create non existing logger directory: %s. Exception occured: %s", strLoggerDir.c_str(), ex.what());
     }
 }
 
@@ -77,7 +116,7 @@ void Daemon::mainTask()
     
     assert(GetPMLogger() != nullptr);
     PmPlatformDependencies deps;
-    Agent::PackageManagerAgent agent(bootstrap_, configFile_, deps, PmLogger::GetCurrentLogger());
+    Agent::PackageManagerAgent agent(bootstrap_, configFile_, deps, PmLogger::getLogger());
     agent.start();
 
     //! TODO: Just busy wait??

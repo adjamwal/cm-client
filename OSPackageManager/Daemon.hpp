@@ -25,12 +25,14 @@ public:
     
     void setBooststrapPath(const std::string& strPath);
     void setConfigPath(const std::string& strPath);
+    void setLoggerDir(const std::string& strLoggerDir);
 
 private:
     std::atomic<bool> isRunning_;
     std::thread task_;
     std::string bootstrap_;
     std::string configFile_;
+    std::string loggerDir_;
 
     void mainTask();
 };

@@ -4,6 +4,8 @@
  */
 
 #include "Daemon.hpp"
+#include "PmLogger.hpp"
+#include <clocale>
 
 int main(int argc, char *argv[])
 {
@@ -11,9 +13,10 @@ int main(int argc, char *argv[])
     //
     // - Signal handlers
     // - atExit() handler
-    // - initialize logger
     //
-    
+
+    std::setlocale(LC_CTYPE, "UTF-8");
+    PmLogger::initLogger();
     if(argc < 5)
     {
         //LOG_ERROR("Error: not enough arguments.\n"
@@ -41,6 +44,14 @@ int main(int argc, char *argv[])
             }
             ++i;
         }
+        else if (std::string("--log-dir") == argv[i])
+        {
+            if(++i < argc)
+            {
+                service.setLoggerDir(argv[i]);
+            }
+            ++i;
+        }
         else
         {
             ++i;
@@ -51,5 +62,6 @@ int main(int argc, char *argv[])
     // This blocks till we're stopped
     service.start();
 
+    PmLogger::releaseLogger();
     return 0;
 }
