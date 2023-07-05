@@ -67,6 +67,11 @@ public:
     std::string GetInstallDirectory();
 
     /**
+     * @brief Gets the log directory
+     */
+    std::string GetLogDirectory();
+
+    /**
      * @brief Gets the data directory
      */
     std::string GetDataDirectory();
