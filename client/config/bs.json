@@ -1,6 +1,7 @@
 {
-    "business_id": "f8911c82-3083-4bc7-9cff-3857c41206e0",
-    "installer_key": "11111111-2222-3333-4444-555541c2c956",
-    "identify_url": "https://identify.qa.uc.amp.cisco.com/identify",
-    "event_url": "https://identify.qa.uc.amp.cisco.com/event"
+"business_id":"40f60118-a793-5f47-93bf-2f93f4140404",
+"event_url":"https://identify.qa.uc.amp.cisco.com/event",
+"identify_url":"https://identify.qa.uc.amp.cisco.com/identify",
+"installer_key":"58c0be0d-4ab4-40ae-9ff5-0d1a4f19a57a"
 }
+

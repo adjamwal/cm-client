@@ -187,11 +187,14 @@ copy_and_prepare_staging()
         echo "codesigning ${CMID_LIBRARY} with ${DEV_ID_APP_CERT}"
         codesign --timestamp --verbose --force --deep --options runtime --sign "${DEV_ID_APP_CERT}" "${PAYLOAD_STAGING}/${LIB_DIR}/${CMID_LIBRARY}"
     fi
-    cp -f "${UNINSTALL_SCRIPT}" "${PAYLOAD_STAGING}${BIN_DIR}"
+    cp -f "${UNINSTALL_SCRIPT}" "${PAYLOAD_STAGING}/${BIN_DIR}"
 
-    cp -f "${CM_PLIST}" "${PAYLOAD_STAGING}${LAUNCHD_DIR}"
+    cp -f "${CM_PLIST}" "${PAYLOAD_STAGING}/${LAUNCHD_DIR}"
 
     chmod 755 "${SCRIPTS_STAGING}"/{pre,post}install
+    
+    #only superuser can execute uninstall script
+    chmod 744 "${PAYLOAD_STAGING}/${BIN_DIR}/${UNINSTALL_SCRIPT}"
 }
 
 create_pkg_from_staging()
