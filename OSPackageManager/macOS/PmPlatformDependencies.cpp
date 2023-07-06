@@ -7,13 +7,16 @@
 #include "PmPlatformDependencies.hpp"
 #include "PmCertManager.hpp"
 #include "PmCertRetrieverImpl.hpp"
+#include "PmPkgUtilWrapper.hpp"
 
 using namespace PackageManager;
 
 PmPlatformDependencies::PmPlatformDependencies()
-    : pmConfiguration_ { PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract>(new CMIDAPIProxy()),
-                                                 std::make_shared<PmCertManager>(std::shared_ptr<IPmCertRetriever>(new PmCertRetrieverImpl))) },
-      pmComponentManager_ { PmPlatformComponentManager() }
+    : pmConfiguration_ { PmPlatformConfiguration(
+        std::make_shared<CMIDAPIProxy>(),
+        std::make_shared<PmCertManager>(std::make_shared<PmCertRetrieverImpl>())
+      )},
+      pmComponentManager_ { PmPlatformComponentManager( std::make_shared<PmPkgUtilWrapper>() ) }
 { }
 
 IPmPlatformConfiguration &PmPlatformDependencies::Configuration()

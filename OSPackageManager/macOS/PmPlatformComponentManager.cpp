@@ -5,16 +5,20 @@
  */
 
 #include "PmPlatformComponentManager.hpp"
+#include "PackageManager/PmTypes.h"
+#include "PmLogger.hpp"
+
+PmPlatformComponentManager::PmPlatformComponentManager(std::shared_ptr<IPmPkgUtil> pkgUtil) : discovery_(pkgUtil) {}
 
 int32_t PmPlatformComponentManager::GetInstalledPackages(const std::vector<PmProductDiscoveryRules> &catalogRules, PackageInventory &packagesDiscovered)
 {
-    (void) catalogRules;
-    (void) packagesDiscovered;
-    /** @todo how to determine installed packages? */
-    /* pkg installers have a package receipt, but what if the package receipt is not
-     * removed by an uninstaller?  Then an uninstalled package may be identified as installed.
-     */
-    return -1;
+    try {
+        packagesDiscovered = discovery_.DiscoverInstalledPackages(catalogRules);
+    } catch (PkgUtilException& e) {
+        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Exception: [%s]", e.what());
+        return -1;
+    }
+    return 0;
 }
 
 int32_t PmPlatformComponentManager::GetCachedInventory(PackageInventory &cachedInventory)

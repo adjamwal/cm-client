@@ -70,8 +70,11 @@ PmLogger::~PmLogger()
         logger->flush();
         spdlog::drop(loggerName_);
     }
-    spdlog::get(kConsoleLogName)->flush();
-    spdlog::drop(kConsoleLogName);
+    
+    if (loggerName_ != kConsoleLogName) {
+        spdlog::get(kConsoleLogName)->flush();
+        spdlog::drop(kConsoleLogName);
+    }
     fclose(printDummyFile_);
 }
 

@@ -9,6 +9,7 @@
 #include "MockCMIDAPIProxy.hpp"
 #include "MockPmCertManager/MockPmCertRetriever.h"
 #include "MockPmCertManager/MockPmCertManager.h"
+#include "PmLogger.hpp"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -21,6 +22,7 @@ using ::testing::AnyNumber;
 class PmPlatformConfigurationTestWithUninitialisedCMIDAPI : public ::testing::Test {
 protected:
     void SetUp() override {
+        PmLogger::initLogger();
         // Set up the test fixture
         mockCMIDApi = std::make_shared<NiceMock<MockCMIDAPIProxy>>(false);
         //TODO: vzakharc - get rid of cert mgr mock in pkg mgr tests
@@ -34,6 +36,7 @@ protected:
     void TearDown() override {
         // Verify and clear expectations after each test
         testing::Mock::VerifyAndClearExpectations(mockCMIDApi.get());
+        PmLogger::releaseLogger();
     }
     
     // Define member variables used in the test
@@ -73,6 +76,7 @@ TEST_F(PmPlatformConfigurationTestWithUninitialisedCMIDAPI, GetUrls) {
 class PmPlatformConfigurationTestWithInitialisedCMIDAPI : public ::testing::Test {
 protected:
     void SetUp() override {
+        PmLogger::initLogger();
         // Set up the test fixture
         mockCMIDApi = std::make_shared<NiceMock<MockCMIDAPIProxy>>(true);
         mockCMIDApi->DelegateToFake();
@@ -88,6 +92,7 @@ protected:
     void TearDown() override {
         // Verify and clear expectations after each test
         testing::Mock::VerifyAndClearExpectations(mockCMIDApi.get());
+        PmLogger::releaseLogger();
     }
     
     // Define member variables used in the test

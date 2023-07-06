@@ -4,8 +4,9 @@
  * @copyright (c) 2022 Cisco Systems, Inc. All rights reserved
  */
 
-#include "PmPlatformConfiguration.hpp"
 #include <string>
+#include "PmPlatformConfiguration.hpp"
+#include "PmLogger.hpp"
 
 namespace
 {
@@ -174,28 +175,24 @@ bool PmPlatformConfiguration::GetPmUrls(PmUrlList& urls)
     
     tmpRtn = GetUrl( CMID_EVENT_URL, urls.eventUrl );
     if( tmpRtn != CMID_RES_SUCCESS ) {
-//  TODO: oskryp, add error logging
-//        LOG_ERROR( "Failed to fetch event url %d", tmpRtn );
+        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Failed to fetch event url %d", tmpRtn);
         rtn = CMID_RES_GENERAL_ERROR;
     }
     
     tmpRtn = GetUrl( CMID_CHECKIN_URL, urls.checkinUrl );
     if( tmpRtn != CMID_RES_SUCCESS ) {
-//  TODO: oskryp, add error logging
-//        LOG_ERROR( "Failed to fetch checking url %d", tmpRtn );
+        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Failed to fetch checking url %d", tmpRtn);
         rtn = CMID_RES_GENERAL_ERROR;
     }
     
     tmpRtn = GetUrl( CMID_CATALOG_URL, urls.catalogUrl );
     if( tmpRtn != CMID_RES_SUCCESS ) {
-//  TODO: oskryp, add error logging
-//        LOG_ERROR( "Failed to fetch catalog url %d", tmpRtn );
+        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Failed to fetch catalog url %d", tmpRtn);
         rtn = CMID_RES_GENERAL_ERROR;
     }
     
-//  TODO: oskryp, add error logging
-//    LOG_DEBUG( "Event Url %s Checkin Url %s Catalog Url %s", urls.eventUrl.c_str(), urls.checkinUrl.c_str(), urls.catalogUrl.c_str() );
-    
+    PmLogger::getLogger().Log(IPMLogger::LOG_DEBUG, "Event Url %s Checkin Url %s Catalog Url %s", urls.eventUrl.c_str(), urls.checkinUrl.c_str(), urls.catalogUrl.c_str());
+
     return rtn == CMID_RES_SUCCESS;
 }
 

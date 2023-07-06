@@ -4,16 +4,21 @@
 get_filename_component(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
 get_filename_component(TESTEE_DIR "${TESTS_DIR}" DIRECTORY)
 
+file(GLOB_RECURSE TEST_SRCS Test*.cpp)
+
 add_executable(
   PackageManagerUnitTest
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
 
   # Test files
-  CMPackageManagerUnitTest.cpp
-  TestPmCertMgr.cpp
-  TestPmLogger.cpp
+  ${TEST_SRCS}
+
+  # Dependencies
+  ${TESTEE_DIR}/macOS/PmPkgUtilWrapper.cpp
   ${TESTEE_DIR}/macOS/PmPlatformConfiguration.cpp
   ${TESTEE_DIR}/macOS/PmCertManager.cpp
+  ${TESTEE_DIR}/macOS/PmPlatformComponentManager.cpp
+  ${TESTEE_DIR}/macOS/PmPlatformDiscovery.cpp
   ${TESTEE_DIR}/macOS/PmLogger.cpp
   ${TESTEE_DIR}/macOS/PmLogger.hpp
   

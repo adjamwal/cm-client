@@ -24,6 +24,10 @@ set(OS_PACKAGE_MANAGER_SRCS
     macOS/PmPlatformConfiguration.hpp
     macOS/PmPlatformDependencies.cpp
     macOS/PmPlatformDependencies.hpp
+    macOS/PmPkgUtilWrapper.cpp
+    macOS/PmPkgUtilWrapper.hpp
+    macOS/PmPlatformDiscovery.hpp
+    macOS/PmPlatformDiscovery.cpp
 )
 
 add_executable(cmpackagemanager ${OS_PACKAGE_MANAGER_SRCS})
