@@ -6,6 +6,12 @@ list(APPEND CONTROL_PLUGIN_SOURCES
     PmAgentController.cpp
     PmAgentController.hpp
     PmStatusTypes.hpp
+    IProcessWrapper.hpp
+    ProcessWrapper.cpp
+    ProcessWrapper.hpp
+    ExecutionError.hpp
+    ExecutionError.cpp
+    ../util/ScopedGuard.hpp
 )
 
 add_library(pmcontrolplugin STATIC
@@ -20,6 +26,7 @@ target_compile_definitions(pmcontrolplugin
 target_include_directories(pmcontrolplugin
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CM_THIRDPARTY_EXPORT}/include
         ${cm-client_SOURCE_DIR}/client/Logger
 )

@@ -1,6 +1,7 @@
 
 #include "ModuleControlPlugin.hpp"
 #include "PmAgentController.hpp"
+#include "ProcessWrapper.hpp"
 #include "CMLogger.hpp"
 #include <iostream>
 #include <stddef.h> 
@@ -26,7 +27,8 @@ public:
 private:
     // private member functions
 
-    PmControlPlugin( const std::string& basePath, const std::string& configPath ) : agentCtrlInst_( basePath, configPath ), bIsProcessStarted_( false )
+    PmControlPlugin( const std::string& basePath, const std::string& configPath ) : agentCtrlInst_( basePath, configPath, std::make_shared<ProcessWrapper>() ),
+        bIsProcessStarted_( false )
     {
     }
 

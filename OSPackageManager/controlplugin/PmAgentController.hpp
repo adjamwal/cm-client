@@ -12,13 +12,18 @@
 #include "PmStatusTypes.hpp"
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <string>
 #include <filesystem>
+#include <atomic>
+
+#include "IProcessWrapper.hpp"
 
 #define PM_AGENT_BINARY "cmpackagemanager"
 #define BS_CONFIG_FILE "bs.json"
 #define PM_CONFIG_FILE "cm_config.json"
 #define INVALID_PID -1
+#define RESTART_DELAY_CHRONO 30000
 
 class PmAgentController {
 public:
@@ -26,7 +31,7 @@ public:
     * Constructor
     * @param[in] path - Path to the directory containing the package manager agent binary (cmpackagemanager)
     */
-    PmAgentController( const std::string& path, const std::string& configPath );
+    PmAgentController( const std::string& path, const std::string& configPath, std::shared_ptr<IProcessWrapper> pProcessWrapper,  std::chrono::milliseconds restartDelay = std::chrono::milliseconds(RESTART_DELAY_CHRONO) );
 
     ~PmAgentController();
     /**
@@ -40,17 +45,20 @@ public:
     * @return PM_STATUS
     */
     PM_STATUS stop();
+    
+    //helper methods used in unit tests
+    bool waitMonitorThreadInitialized();
+    bool waitForMonitorIteration(size_t nIteration);
+    void waitMonitorThreadStopped();
+    bool isProcessStartedByPlugin() const;
+    void setProcessStartedByPlugin(bool bVal);
 private:
-    enum eProcStatus {
-        eProcess_Terminated = 0,
-        eProcess_Active
-    };
     void cleanup();
     void monitorProcess();
     PM_STATUS killIfRunning();
     PM_STATUS startProcess();
     PM_STATUS stopProcess();
-    eProcStatus waitForProcess();
+    std::chrono::milliseconds getRestartDelay() const;
 
     std::filesystem::path processPath_;
     std::filesystem::path bsConfigPath_;
@@ -59,5 +67,12 @@ private:
     std::mutex mutex_;
     pid_t pid_ = INVALID_PID;
     std::thread threadMonitor_;
-
+    std::shared_ptr<IProcessWrapper> pProcessWrapper_;
+    std::condition_variable monitorCondition_;
+    std::mutex monitorMtx_;
+    mutable std::mutex memberProtectionMtx_;
+    std::chrono::milliseconds restartDelay_;
+    std::atomic<bool> monitorThreadStarted_ = false;
+    std::atomic<size_t> monitorIteration_ = 0;
+    std::condition_variable monitorIterationCondition_;
 };

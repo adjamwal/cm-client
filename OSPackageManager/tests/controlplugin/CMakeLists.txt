@@ -7,6 +7,8 @@ add_executable(
   # Test files
   ModuleControlPluginTest.cpp
   PmAgentControllerTest.cpp
+  FakeProcessWrapper.cpp
+  FakeProcessWrapper.hpp
 )
 
 add_dependencies(
