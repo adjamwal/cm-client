@@ -23,8 +23,8 @@ int32_t PmPlatformComponentManager::GetInstalledPackages(const std::vector<PmPro
 
 int32_t PmPlatformComponentManager::GetCachedInventory(PackageInventory &cachedInventory)
 {
-    (void) cachedInventory;
-    return -1;
+    cachedInventory = discovery_.CachedInventory();
+    return 0;
 }
 
 int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)

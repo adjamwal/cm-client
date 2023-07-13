@@ -20,5 +20,11 @@ PackageInventory PmPlatformDiscovery::DiscoverInstalledPackages( const std::vect
         }
     }
     
+    lastDetectedPackages_ = packagesDiscovered;
+    
     return packagesDiscovered;
+}
+
+PackageInventory PmPlatformDiscovery::CachedInventory() const {
+    return lastDetectedPackages_;
 }

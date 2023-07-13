@@ -22,7 +22,14 @@ public:
      */
     PackageInventory DiscoverInstalledPackages(const std::vector<PmProductDiscoveryRules>& catalogRules) override;
     
+    /**
+     * @brief Returns installed packages inventory from a cache
+     * @return The inventory of discovered packages.
+     */
+    PackageInventory CachedInventory() const override;
+
 private:
     std::shared_ptr<IPmPkgUtil> pkgUtilManager_; /**< The IPmPkgUtil instance for package management operations. */
+    PackageInventory lastDetectedPackages_;
 };
 
