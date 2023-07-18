@@ -175,23 +175,23 @@ bool PmPlatformConfiguration::GetPmUrls(PmUrlList& urls)
     
     tmpRtn = GetUrl( CMID_EVENT_URL, urls.eventUrl );
     if( tmpRtn != CMID_RES_SUCCESS ) {
-        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Failed to fetch event url %d", tmpRtn);
+        PM_LOG_ERROR("Failed to fetch event url %d", tmpRtn);
         rtn = CMID_RES_GENERAL_ERROR;
     }
     
     tmpRtn = GetUrl( CMID_CHECKIN_URL, urls.checkinUrl );
     if( tmpRtn != CMID_RES_SUCCESS ) {
-        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Failed to fetch checking url %d", tmpRtn);
+        PM_LOG_ERROR("Failed to fetch checking url %d", tmpRtn);
         rtn = CMID_RES_GENERAL_ERROR;
     }
     
     tmpRtn = GetUrl( CMID_CATALOG_URL, urls.catalogUrl );
     if( tmpRtn != CMID_RES_SUCCESS ) {
-        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Failed to fetch catalog url %d", tmpRtn);
+        PM_LOG_ERROR("Failed to fetch catalog url %d", tmpRtn);
         rtn = CMID_RES_GENERAL_ERROR;
     }
     
-    PmLogger::getLogger().Log(IPMLogger::LOG_DEBUG, "Event Url %s Checkin Url %s Catalog Url %s", urls.eventUrl.c_str(), urls.checkinUrl.c_str(), urls.catalogUrl.c_str());
+    PM_LOG_DEBUG("Event Url %s Checkin Url %s Catalog Url %s", urls.eventUrl.c_str(), urls.checkinUrl.c_str(), urls.catalogUrl.c_str());
 
     return rtn == CMID_RES_SUCCESS;
 }

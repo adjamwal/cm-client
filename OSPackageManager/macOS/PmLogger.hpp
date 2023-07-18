@@ -50,3 +50,23 @@ private:
     void initMessagePattern();
     void initDevNullDummyFile();
 };
+
+#define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
+
+#ifndef __FUNCTION__
+#   define __FUNCTION__ __func__
+#endif
+
+#define PM_LOG_ALERT( fmt, ... ) PmLogger::getLogger().Log( IPMLogger::LOG_ALERT, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__ )
+
+#define PM_LOG_CRITICAL( fmt, ... ) PmLogger::getLogger().Log( IPMLogger::LOG_CRITICAL, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__ )
+
+#define PM_LOG_ERROR( fmt, ... ) PmLogger::getLogger().Log( IPMLogger::LOG_ERROR, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__ )
+
+#define PM_LOG_WARNING( fmt, ... ) PmLogger::getLogger().Log( IPMLogger::LOG_WARNING, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__ )
+
+#define PM_LOG_NOTICE( fmt, ... ) PmLogger::getLogger().Log( IPMLogger::LOG_NOTICE, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__ )
+
+#define PM_LOG_INFO( fmt, ... ) PmLogger::getLogger().Log( IPMLogger::LOG_INFO, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__ )
+
+#define PM_LOG_DEBUG( fmt, ... ) PmLogger::getLogger().Log( IPMLogger::LOG_DEBUG, "%s:%s:%d: " fmt, __FILENAME__, __FUNCTION__, __LINE__, ##__VA_ARGS__ )

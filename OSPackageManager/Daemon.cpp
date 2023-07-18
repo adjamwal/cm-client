@@ -75,7 +75,7 @@ void Daemon::setBooststrapPath(const std::string& strPath)
     }
     else
     {
-        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Non existing path to the bootsrap: %s", strPath.c_str());
+        PM_LOG_ERROR("Non existing path to the bootsrap: %s", strPath.c_str());
     }
 }
 
@@ -88,7 +88,7 @@ void Daemon::setConfigPath(const std::string& strPath)
     }
     else
     {
-        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Non existing path to the config file: %s", strPath.c_str());
+        PM_LOG_ERROR("Non existing path to the config file: %s", strPath.c_str());
     }
 }
 
@@ -106,7 +106,7 @@ void Daemon::setLoggerDir(const std::string& strLoggerDir)
     }
     catch(std::exception& ex)
     {
-        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Filed to create non existing logger directory: %s. Exception occured: %s", strLoggerDir.c_str(), ex.what());
+        PM_LOG_ERROR("Filed to create non existing logger directory: %s. Exception occured: %s", strLoggerDir.c_str(), ex.what());
     }
 }
 

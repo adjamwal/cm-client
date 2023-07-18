@@ -15,7 +15,7 @@ int32_t PmPlatformComponentManager::GetInstalledPackages(const std::vector<PmPro
     try {
         packagesDiscovered = discovery_.DiscoverInstalledPackages(catalogRules);
     } catch (PkgUtilException& e) {
-        PmLogger::getLogger().Log(IPMLogger::LOG_ERROR, "Exception: [%s]", e.what());
+        PM_LOG_ERROR("Exception: [%s]", e.what());
         return -1;
     }
     return 0;
