@@ -58,6 +58,7 @@ get_prereq_dir(){
     "gtest:third-party/gtest"
     "jsoncpp:third-party/jsoncpp"
     "spdlog:third-party/spdlog"
+    "crashpad:third-party/crashpad/crashpad"
   )
   for prereq_dir in "${prereq_dirs[@]}" ; do
     local component="${prereq_dir%%:*}"
@@ -136,6 +137,7 @@ get_dependency_string(){
   dependency_relations=(
     "curl:ciscossl"
     "PackageManager:ciscossl curl jsoncpp gtest"
+    "crashpad:ciscossl curl"
   )
 
   dependency_string=""
@@ -175,6 +177,7 @@ get_exclude_patterns(){
     "spdlog:*.la"
     "PackageManager:*.la"
     "EndpointIdentity:*.la"
+    "crashpad:"
   )
   for exclude_pattern_relation in "${exclude_pattern_relations[@]}" ; do
     local component="${exclude_pattern_relation%%:*}"
@@ -309,6 +312,11 @@ artifactory_upload(){
   pushd "${prereq_dir}" || exit 1
     if [ -d "export" ]; then
       eval tar "${exclude_pattern[@]}" -czvf "${file_name}" "export*"
+    elif [ -d "../export" ]; then
+        # For convenience, let's move it in and then out
+        mv ../export .
+        eval tar "${exclude_pattern[@]}" -czvf "${file_name}" "export*"
+        mv export ../
     else
       echoerr "export for ${prereq} not found at ${prereq_dir}"
       exit 1

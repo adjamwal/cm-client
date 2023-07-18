@@ -63,16 +63,20 @@ To be able to build cm-client, the following software packages are required:
 - CMake - which can be acquired from [here](https://cmake.org/download/)
 - Xcode - 12.2 and higher (Minimum for Universal binaries)
 - Xcode Command Line Tools - running `clang`, `gcc` or similar commands will trigger a prompt, or just run `xcode-select --install` to begin the install process.
+- Ninja - acquire [ninja-mac.zip](https://github.com/ninja-build/ninja/releases) and copy `ninja` to `/usr/local/bin` for building crashpad (or non-Xcode builds as it's far faster than `Makefile` builds)
+
+> **NOTE** You may need to run `ninja` once and then allow it to run through `System Settings` -> `Privacy & Security`
 
 # Build
 
-To build cm-client, set the CM_BUILD_VER environment variable and run the `build` symlink on the root of the repository.  Usage for this script is as follows:
+To build cm-client, run the `build` symlink on the root of the repository.  If building for development only, pass `-d`, otherwise, set `CM_BUILD_VER` prior to running the `build` command.  Usage for this script is as follows:
 
 ~~~
 export CM_BUILD_VER=1.0.0
 
 Usage: build [-c|-h]
  -c    clean build
+ -d    development only (skip installer on non-Xcode projects)
  -h    help (this usage)
  -r    release (default: debug)
  -x    Xcode project generator (macOS only)

@@ -3,14 +3,16 @@
 
 SYSTEM="$(uname -s)"
 clean=false
+development_only=false
 usage=false
 if [ $# -ge 1 ] && [ "$1" = "clean" ]; then
     clean=true
 else
-    while getopts chrxs: flag
+    while getopts cdhrxs: flag
     do
       case "${flag}" in
         c) clean=true;;
+        d) development_only=true;;
         x) xcode=true;; # Only applicable to macOS
         r) release=true;;
         s) sign=true
@@ -27,6 +29,11 @@ else
 done
 fi
 
+if [ "x${CM_BUILD_VER}" = "x" ] && [ "${development_only}" = "true" ]; then
+    echo "**Development only, setting version to 999.0.0 to satisfy build"
+    CM_BUILD_VER=999.0.0
+fi
+
 if [ "${usage}" = "true" ] || [ "x${CM_BUILD_VER}" = "x" -a "${clean}" = "false" ]; then
     if [ "x$CM_BUILD_VER" = "x" ]; then
         echo "***"
@@ -35,6 +42,7 @@ if [ "${usage}" = "true" ] || [ "x${CM_BUILD_VER}" = "x" -a "${clean}" = "false"
     fi
     echo "Usage: build [-c|-h]"
     echo " -c		clean build"
+    echo " -d		development only (skip installer on non-Xcode projects)"
     echo " -h		help (this usage)"
     echo " -r		release (default: debug)"
     echo " -x		Xcode project generator (macOS only)"
@@ -60,6 +68,9 @@ if [ "${usage}" = "true" ] || [ "x${CM_BUILD_VER}" = "x" -a "${clean}" = "false"
     echo
     echo " # Create a Makefile build signing using specified certificate in Keychain"
     echo " % CM_BUILD_VER=1.0.0 ./build -s \"Apple Development: John Smith (F34ACD4F4E)\""
+    echo
+    echo " # To build for development without the required build version pass the -d option"
+    echo " % ./build -d -s -"
     exit 0
 fi
 
@@ -144,6 +155,10 @@ else
         echo " NOTE: CMake install targets may sometimes be unreliable and a manual run on the command"
         echo "       line may be necessary for some third-party components"
     else
+        if command -v ninja > /dev/null 2> /dev/null; then
+            echo "****Build using Ninja"
+            CMAKE_EXTRA_ARGS="-G Ninja ${CMAKE_EXTRA_ARGS}"
+        fi
         pushd "${CMAKE_BUILD_DIR}"
             if [ "${sign}" = "true" ]; then
                 cmake ${CMAKE_EXTRA_ARGS} -DSIGNING_CERT="${SIGNING_CERT}" ../
@@ -159,21 +174,23 @@ else
         echo " - build directory:	./${CMAKE_BUILD_DIR}"
         echo " - 3rd party exports:	./${CMAKE_BUILD_DIR}/export/{lib,include}"
         echo
+
+        if [ "${development_only}" = "false" ]; then
+            echo "** Building, Installing, and creating the CM Installer **"
+            pushd "${CMAKE_BUILD_DIR}"
+                cmake --build .
+                # Copy files to debug/export/{bin,lib,...} directory for use by installer
+                cmake --install .
+            popd
         
-        echo "** Building, Installing, and creating the CM Installer **"
-        pushd "${CMAKE_BUILD_DIR}"
-            cmake --build .
-            # Copy files to debug/export/{bin,lib,...} directory for use by installer
-            cmake --install .
-        popd
-        
-        echo "** Building CM Installer **"
-        BUILD_TYPE="${CMAKE_BUILD_DIR}"
-        DMG_INSTALLER_DIR="Installer"
-        DMG_BUILDER_SCRIPT="build_cm_installer.sh"
-        pushd "${DMG_INSTALLER_DIR}"
-            "./${DMG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
-            echo "** CM Installer built successfully **"
-        popd
+            echo "** Building CM Installer **"
+            BUILD_TYPE="${CMAKE_BUILD_DIR}"
+            DMG_INSTALLER_DIR="Installer"
+            DMG_BUILDER_SCRIPT="build_cm_installer.sh"
+            pushd "${DMG_INSTALLER_DIR}"
+                "./${DMG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
+                echo "** CM Installer built successfully **"
+            popd
+        fi
     fi
 fi

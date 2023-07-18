@@ -27,6 +27,7 @@ add_dependencies(csccloudmanagement
     third-party-EndpointIdentity
     third-party-PackageManager
     third-party-spdlog
+    third-party-crashpad
 )
 
 target_include_directories(csccloudmanagement

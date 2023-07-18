@@ -22,3 +22,7 @@
 [submodule "third-party/spdlog"]
 	path = third-party/spdlog
 	url = ../../UnifiedConnector/spdlog-rel.git
+[submodule "third-party/crashpad/crashpad"]
+	path = third-party/crashpad/crashpad
+	url = ../../Cloud/crashpad.git
+	shallow = true
