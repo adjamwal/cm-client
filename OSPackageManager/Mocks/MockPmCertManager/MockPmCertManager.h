@@ -1,3 +1,9 @@
+/**
+ * @file
+ *
+ * @copyright (c) 2023 Cisco Systems, Inc. All rights reserved
+ */
+
 #pragma once
 
 #include "gmock/gmock.h"
@@ -5,7 +11,8 @@
 #include "IPmCertRetriever.hpp"
 #include "PmCertManager.hpp"
 
-class MockPmCertManager: public PackageManager::PmCertManager{
+class MockPmCertManager: public PackageManager::PmCertManager
+{
 public:
     explicit MockPmCertManager(std::shared_ptr<PackageManager::IPmCertRetriever> certRetriever)
         :PackageManager::PmCertManager(certRetriever){}

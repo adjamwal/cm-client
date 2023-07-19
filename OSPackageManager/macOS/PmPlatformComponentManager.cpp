@@ -7,14 +7,15 @@
 #include "PmPlatformComponentManager.hpp"
 #include "PackageManager/PmTypes.h"
 #include "PmLogger.hpp"
-//#include "PmPkgUtilWrapper.hpp"
+#include "FileUtilities.hpp"
 #include "IPmCodesignVerifier.hpp"
 #include "IPmPkgUtil.hpp"
 
 PmPlatformComponentManager::PmPlatformComponentManager(
-   std::shared_ptr<IPmPkgUtil> pkgUtil,
-   std::shared_ptr<IPmCodesignVerifier> codesignVerifier)
-: pkgUtil_(pkgUtil), codesignVerifier_(codesignVerifier), discovery_(pkgUtil)
+    std::shared_ptr<IPmPkgUtil> pkgUtil,
+    std::shared_ptr<IPmCodesignVerifier> codesignVerifier,
+    std::shared_ptr<PackageManager::IFileUtilities> fileUtils)
+: pkgUtil_(pkgUtil), codesignVerifier_(codesignVerifier), discovery_(pkgUtil), fileUtils_(fileUtils)
 {}
 
 int32_t PmPlatformComponentManager::GetInstalledPackages(const std::vector<PmProductDiscoveryRules> &catalogRules, PackageInventory &packagesDiscovered)
@@ -130,6 +131,16 @@ int32_t PmPlatformComponentManager::ApplyBultinUsersReadPermissions(const std::f
 
 int32_t PmPlatformComponentManager::RestrictPathPermissionsToAdmins(const std::filesystem::path &filePath)
 {
-    (void) filePath;
-    return -1;
+    int32_t nRet = -1;
+    if ( !fileUtils_ || !fileUtils_->PathIsValid(filePath))
+        return  nRet;
+
+    //0 refers to ERROR_SUCCESS 0 (0x0) in WINAPI
+    if ( !fileUtils_->HasAdminRestrictionsApplied(filePath) ){
+        nRet = fileUtils_->ApplyAdminRestrictions(filePath) ? 0 : -1;
+    }
+    else
+        nRet = 0;
+
+    return nRet;
 }

@@ -8,6 +8,7 @@
 #include "PmCertManager.hpp"
 #include "PmCertRetrieverImpl.hpp"
 #include "PmPkgUtilWrapper.hpp"
+#include "FileUtilities.hpp"
 #include "PmCodesignVerifier.hpp"
 
 using namespace PackageManager;
@@ -19,7 +20,8 @@ PmPlatformDependencies::PmPlatformDependencies()
       )},
       pmComponentManager_ { PmPlatformComponentManager(
         std::make_shared<PmPkgUtilWrapper>(),
-        std::make_shared<CodesignVerifier>() ) }
+        std::make_shared<CodesignVerifier>(),
+        std::make_shared<PackageManager::FileUtilities>()) }
 { }
 
 IPmPlatformConfiguration &PmPlatformDependencies::Configuration()

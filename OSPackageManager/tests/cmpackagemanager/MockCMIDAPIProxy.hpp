@@ -1,3 +1,7 @@
+
+#pragma once
+#include "gmock/gmock.h"
+
 class FakeCMIDAPIProxy : public CMIDAPIProxyAbstract {
 public:
     cmid_result_t get_token(char* p_token, int* p_buflen) {

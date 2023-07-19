@@ -1,35 +1,28 @@
-#include <gtest/gtest.h>
 #include "IPmPkgUtil.hpp"
-#include "MockPmPlatformComponentManager/MockPmPkgUtil.hpp"
 #include "MockPmPlatformComponentManager/MockCodesignVerifier.hpp"
 #include "PmPlatformComponentManager.hpp"
 #include "PmLogger.hpp"
+#include "UnitTestBase.h"
 
 using namespace testing;
 
 // Test fixture for PmPlatformComponentManager tests
-class PmPlatformComponentManagerTest : public Test {
-protected:
-    void SetUp() override {
-        PmLogger::initLogger();
-        // Create a mock object for IPmPkgUtil
-        mockPkgUtil_ = std::make_shared<StrictMock<MockPmPkgUtil>>();
-        mockCodesignVerifier_ = std::make_shared<StrictMock<MockCodesignVerifier>>();
-        
+class PmPlatformComponentManagerTest : public TestEnv::UnitTestBase {
+public:
+    PmPlatformComponentManagerTest() {
         // Initialize PmPlatformComponentManager with the mock object
-        manager_ = std::make_shared<PmPlatformComponentManager>(mockPkgUtil_, mockCodesignVerifier_);
+        mockCodesignVerifier_ = std::make_shared<StrictMock<MockCodesignVerifier>>();
+        manager_ = std::make_shared<PmPlatformComponentManager>( mockEnv_.pkgUtil_, mockCodesignVerifier_, mockEnv_.fileUtils_);
     }
     
-    void TearDown() override {
+    ~PmPlatformComponentManagerTest(){
         // Reset the mock object
-        mockPkgUtil_.reset();
         mockCodesignVerifier_.reset();
         manager_.reset();
-        PmLogger::releaseLogger();
     }
     
+protected:
     // Mocked IPmPkgUtil object
-    std::shared_ptr<MockPmPkgUtil> mockPkgUtil_;
     std::shared_ptr<MockCodesignVerifier> mockCodesignVerifier_;
     
     // Instance of PmPlatformComponentManager to be tested
@@ -51,11 +44,11 @@ TEST_F(PmPlatformComponentManagerTest, GetInstalledPackages) {
         { "com.test.Package2", "2.0", "/path/to/package"},
     };
     // Set up expectations on the mock object
-    EXPECT_CALL(*mockPkgUtil_, listPackages(_))
+    EXPECT_CALL(*mockEnv_.pkgUtil_, listPackages(_))
         .WillOnce(Return(expectedPackageList));
-    EXPECT_CALL(*mockPkgUtil_, getPackageInfo("com.test.Package1", _))
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package1", _))
         .WillOnce(Return(expectedPackageInfo[0]));
-    EXPECT_CALL(*mockPkgUtil_, getPackageInfo("com.test.Package2", _))
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package2", _))
         .WillOnce(Return(expectedPackageInfo[1]));
 
     // Invoke the function under test
@@ -86,11 +79,11 @@ TEST_F(PmPlatformComponentManagerTest, FilledCachedInventory) {
         { "com.test.Package2", "2.0", "/path/to/package"},
     };
         // Set up expectations on the mock object
-    EXPECT_CALL(*mockPkgUtil_, listPackages(_))
+    EXPECT_CALL(*mockEnv_.pkgUtil_, listPackages(_))
         .WillOnce(Return(expectedPackageList));
-    EXPECT_CALL(*mockPkgUtil_, getPackageInfo("com.test.Package1", _))
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package1", _))
         .WillOnce(Return(expectedPackageInfo[0]));
-    EXPECT_CALL(*mockPkgUtil_, getPackageInfo("com.test.Package2", _))
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package2", _))
         .WillOnce(Return(expectedPackageInfo[1]));
     
         // Invoke the function under test
@@ -129,7 +122,7 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_Positive) {
     package.installerType = "pkg";
     
     // Set up expectations on the mock object
-    EXPECT_CALL(*mockPkgUtil_,
+    EXPECT_CALL(*mockEnv_.pkgUtil_,
                 installPackage(
                    package.downloadedInstallerPath.filename().u8string(),
                    _
@@ -207,7 +200,7 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_InstallFailed_Negative) 
     package.installerType = "pkg";
     
     // Set up expectations on the mock object
-    EXPECT_CALL(*mockPkgUtil_,
+    EXPECT_CALL(*mockEnv_.pkgUtil_,
                 installPackage(
                                package.downloadedInstallerPath.filename().u8string(),
                                _

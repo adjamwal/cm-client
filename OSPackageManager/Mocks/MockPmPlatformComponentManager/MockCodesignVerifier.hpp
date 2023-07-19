@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IPmCodesignVerifier.hpp"
+#include "gmock/gmock.h"
 
 // Mock for CodesignVerifier
 class MockCodesignVerifier : public IPmCodesignVerifier {

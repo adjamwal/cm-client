@@ -26,9 +26,24 @@ add_executable(
   # Mocks
   ${TESTEE_DIR}/proxy/CMIDAPIProxy.hpp
   ${TESTEE_DIR}/proxy/CMIDAPIProxyAbstract.hpp
+  ${TESTEE_DIR}/Mocks/MockCMIDAPIProxyAbstract/MockCMIDAPIProxyAbstract.hpp
+  ${TESTEE_DIR}/Mocks/MockFileUtilities/MockFileUtilities.hpp
+  ${TESTEE_DIR}/Mocks/MockPackageManager/MockPackageManager.hpp
   ${TESTEE_DIR}/Mocks/MockPmCertManager/MockPmCertManager.h
   ${TESTEE_DIR}/Mocks/MockPmCertManager/MockPmCertRetriever.cpp
   ${TESTEE_DIR}/Mocks/MockPmCertManager/MockPmCertRetriever.h
+  ${TESTEE_DIR}/Mocks/MockPmPlatformDiscovery/MockPmPlatformDiscovery.hpp
+  ${TESTEE_DIR}/Mocks/MockPmPlatformDependencies/MockPmPlatformDependencies.hpp
+  ${TESTEE_DIR}/Mocks/MockPmPlatformComponentManager/MockCodesignVerifier.hpp
+  ${TESTEE_DIR}/Mocks/MockPmPlatformComponentManager/MockPmPkgUtil.hpp
+  ${TESTEE_DIR}/Mocks/MockPmPlatformComponentManager/MockPmPlatformConfiguration.hpp
+  ${TESTEE_DIR}/Mocks/MockPmPlatformComponentManager/MockPmPlatformComponentManager.hpp
+
+  # Environment
+  ${TESTEE_DIR}/environment/MockEnvironment.h
+  ${TESTEE_DIR}/environment/MockEnvironment.cpp
+  ${TESTEE_DIR}/environment/UnitTestBase.h
+  ${TESTEE_DIR}/environment/UnitTestBase.cpp
 )
 
 add_dependencies(
@@ -68,6 +83,8 @@ target_include_directories(
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
       ${cm-client_SOURCE_DIR}/client/Logger
+      ${cm-client_SOURCE_DIR}/OSPackageManager/environment
+      ${cm-client_SOURCE_DIR}/OSPackageManager/proxy
       ${cm-client_SOURCE_DIR}/OSPackageManager/macOS
       ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
 )

@@ -1,12 +1,16 @@
+/**
+ * @file
+ *
+ * @copyright (c) 2023 Cisco Systems, Inc. All rights reserved
+ */
+
 #pragma once
 
-#include "gtest/gtest.h"
+#include "IPmCertRetriever.hpp"
 #include "gmock/gmock.h"
 
-#include "IPmCertRetriever.hpp"
-
-
-class MockPmCertRetriever: public PackageManager::IPmCertRetriever{
+class MockPmCertRetriever: public PackageManager::IPmCertRetriever
+{
 public:
     MockPmCertRetriever();
     ~MockPmCertRetriever();

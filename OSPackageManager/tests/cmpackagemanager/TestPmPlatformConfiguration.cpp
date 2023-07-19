@@ -1,15 +1,13 @@
+#include "../../macOS/PmPlatformConfiguration.hpp"
+#include "MockCMIDAPIProxy.hpp"
+#include "MockPmCertManager/MockPmCertManager.h"
+#include "UnitTestBase.h"
+
 #include <stddef.h>
 #include <thread>
 #include <memory>
 #include <string>
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
-#include "../../macOS/PmPlatformConfiguration.hpp"
-#include "CMLogger.hpp"
-#include "MockCMIDAPIProxy.hpp"
-#include "MockPmCertManager/MockPmCertRetriever.h"
-#include "MockPmCertManager/MockPmCertManager.h"
-#include "PmLogger.hpp"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -19,24 +17,21 @@ using ::testing::Return;
 using ::testing::NiceMock;
 using ::testing::AnyNumber;
 
-class PmPlatformConfigurationTestWithUninitialisedCMIDAPI : public ::testing::Test {
+class PmPlatformConfigurationTestWithUninitialisedCMIDAPI : public TestEnv::UnitTestBase {
 protected:
     void SetUp() override {
-        PmLogger::initLogger();
         // Set up the test fixture
         mockCMIDApi = std::make_shared<NiceMock<MockCMIDAPIProxy>>(false);
         //TODO: vzakharc - get rid of cert mgr mock in pkg mgr tests
-        auto retrieverMock = std::make_shared<NiceMock<MockPmCertRetriever>>();
-        auto certMgrMock = std::make_shared<NiceMock<MockPmCertManager>>(retrieverMock);
-        EXPECT_CALL(*retrieverMock, LoadSystemSslCertificates()).Times(AnyNumber());
-        EXPECT_CALL(*retrieverMock, FreeSystemSslCertificates()).Times(AnyNumber());
+        auto certMgrMock = std::make_shared<NiceMock<MockPmCertManager>>(mockEnv_.certRetriever_);
+        EXPECT_CALL(*mockEnv_.certRetriever_, LoadSystemSslCertificates()).Times(AnyNumber());
+        EXPECT_CALL(*mockEnv_.certRetriever_, FreeSystemSslCertificates()).Times(AnyNumber());
         platformConfiguration = std::make_unique<PmPlatformConfiguration>(mockCMIDApi, certMgrMock);
     }
     
     void TearDown() override {
         // Verify and clear expectations after each test
         testing::Mock::VerifyAndClearExpectations(mockCMIDApi.get());
-        PmLogger::releaseLogger();
     }
     
     // Define member variables used in the test
@@ -73,18 +68,16 @@ TEST_F(PmPlatformConfigurationTestWithUninitialisedCMIDAPI, GetUrls) {
     EXPECT_FALSE(platformConfiguration->GetPmUrls(cmidUrls));
 }
 
-class PmPlatformConfigurationTestWithInitialisedCMIDAPI : public ::testing::Test {
+class PmPlatformConfigurationTestWithInitialisedCMIDAPI : public TestEnv::UnitTestBase {
 protected:
     void SetUp() override {
-        PmLogger::initLogger();
         // Set up the test fixture
         mockCMIDApi = std::make_shared<NiceMock<MockCMIDAPIProxy>>(true);
         mockCMIDApi->DelegateToFake();
         //TODO: vzakharc - get rid of cert mgr mock in pkg mgr tests
-        auto retrieverMock = std::make_shared<NiceMock<MockPmCertRetriever>>();
-        auto certMgrMock = std::make_shared<NiceMock<MockPmCertManager>>(retrieverMock);
-        EXPECT_CALL(*retrieverMock, LoadSystemSslCertificates()).Times(AnyNumber());
-        EXPECT_CALL(*retrieverMock, FreeSystemSslCertificates()).Times(AnyNumber());
+        auto certMgrMock = std::make_shared<NiceMock<MockPmCertManager>>(mockEnv_.certRetriever_);
+        EXPECT_CALL(*mockEnv_.certRetriever_, LoadSystemSslCertificates()).Times(AnyNumber());
+        EXPECT_CALL(*mockEnv_.certRetriever_, FreeSystemSslCertificates()).Times(AnyNumber());
 
         platformConfiguration = std::make_unique<PmPlatformConfiguration>(mockCMIDApi, certMgrMock);
     }
@@ -92,7 +85,6 @@ protected:
     void TearDown() override {
         // Verify and clear expectations after each test
         testing::Mock::VerifyAndClearExpectations(mockCMIDApi.get());
-        PmLogger::releaseLogger();
     }
     
     // Define member variables used in the test
