@@ -46,6 +46,7 @@ endif()
 # Change manually to force an individual library to be built instead
 set(BUILD_PACKAGE_MANAGER_THIRD_PARTY false)
 set(BUILD_ENDPOINT_IDENTITY_THIRD_PARTY false)
+set(BUILD_CRASHPAD false)
 
 # config.h checks
 include(ConfigureChecks.cmake)

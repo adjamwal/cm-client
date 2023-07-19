@@ -8,7 +8,7 @@ set(component_dst_dir "${CMAKE_CURRENT_BINARY_DIR}/third-party-${component_name}
 set(component_src_dir "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/${component_name}")
 set(component_install_prefix "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/export")
 
-if(NOT BUILD_ALL_THIRD_PARTY)
+if(NOT BUILD_ALL_THIRD_PARTY AND NOT BUILD_CRASHPAD)
     download_component(${component_name} ${component_dst_dir})
 endif()
 

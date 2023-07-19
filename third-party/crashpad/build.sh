@@ -216,7 +216,7 @@ create_artifactory_archive() {
     tar -zcvf "${archive_name}" \
         --exclude=Release --exclude=obj --exclude=apple_cctools \
         --exclude=apple_cf --exclude=getopt --exclude=gtest \
-        --exclude=gyp --exclude=llvm --exclude zlib --exclude .git \
+        --exclude=gyp --exclude=llvm --exclude=zlib --exclude-vcs \
         out/ third_party/
     if [ $? -ne 0 ]; then
         echo "ERROR: Failed to create Crashpad Artifactory archive"
