@@ -4,15 +4,58 @@
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
+#include <regex>
 #include "PmPkgUtilWrapper.hpp"
 
-const std::string pkgUtilExecutable{ "/usr/sbin/pkgutil" };
+namespace { // anonymous namespace
+    
+    const std::string pkgUtilExecutable{ "/usr/sbin/pkgutil" };
+    const std::string pkgInstallerExecutable{ "/usr/sbin/installer" };
+    
+    bool outputParser(const std::string& output, const std::string& textToFind) {
+        return std::regex_search(output, std::regex{textToFind});
+    };
+    
+    std::string decoratePkgUtilVolumeOption(const std::string& command, const std::string& volumePath) {
+        return volumePath.length() ?
+        command + " --volume " + volumePath :
+        command;
+    }
+    
+    std::string decoratePkgInstallerVolumeOption(const std::string& command, const std::string& volumePath) {
+        const std::string target{ volumePath.length() ? volumePath : "/" };
+        return command + " --target " + target;
+    }
+    
+    void trim(std::string& str) {
+        // Remove leading and trailing whitespaces from a string
+        str.erase(0, str.find_first_not_of(" \t\r\n"));
+        str.erase(str.find_last_not_of(" \t\r\n") + 1);
+    }
+    
+    std::vector<std::string> splitString(const std::string_view& str, const char delimiter) {
+        std::vector<std::string> tokens;
+        size_t startPos = 0;
+        while (startPos < str.length()) {
+            size_t endPos = str.find(delimiter, startPos);
+            if (endPos == std::string::npos) {
+                endPos = str.length();
+            }
+            std::string token = std::string(str.substr(startPos, endPos - startPos));
+            if (!token.empty()) {
+                tokens.push_back(std::move(token));
+            }
+            startPos = endPos + 1;
+        }
+        return tokens;
+    }
+}
 
 std::vector<std::string> PmPkgUtilWrapper::listPackages(const std::string& volumePath) const {
+    const std::string command{ pkgUtilExecutable + " --packages" };
+    std::string output = executeCommand( decoratePkgUtilVolumeOption(command, volumePath) );
+    
     std::vector<std::string> packages;
-    const std::string command { pkgUtilExecutable + " --packages" };
-    std::string output = executeCommand(command, volumePath);
-
     size_t pos = 0;
     std::string delimiter = "\n";
     while ((pos = output.find(delimiter)) != std::string::npos) {
@@ -20,20 +63,21 @@ std::vector<std::string> PmPkgUtilWrapper::listPackages(const std::string& volum
         packages.push_back(package);
         output.erase(0, pos + delimiter.length());
     }
-
+    
     return packages;
 }
 
 PmPackageInfo PmPkgUtilWrapper::getPackageInfo(const std::string& packageIdentifier, const std::string& volumePath) const {
     const std::string command { pkgUtilExecutable + " --pkg-info "  + packageIdentifier };
-    const std::string output = executeCommand(command, volumePath);
+    const std::string output = executeCommand( decoratePkgUtilVolumeOption(command, volumePath) );
     return parsePackageInfo(output);
 }
 
 std::vector<std::string> PmPkgUtilWrapper::listPackageFiles(const std::string& packageIdentifier, const std::string& volumePath) const {
-    std::vector<std::string> files;
     const std::string command{ pkgUtilExecutable + " --files " + packageIdentifier };
-    std::string output = executeCommand(command, volumePath);
+    std::string output = executeCommand( decoratePkgUtilVolumeOption(command, volumePath) );
+
+    std::vector<std::string> files;
 
     size_t pos = 0;
     std::string delimiter = "\n";
@@ -46,21 +90,14 @@ std::vector<std::string> PmPkgUtilWrapper::listPackageFiles(const std::string& p
     return files;
 }
 
-std::string PmPkgUtilWrapper::executeCommand(const std::string& command, const std::string& volumePath) const {
-    
-    std::string fullCommand = command;
-    if (!volumePath.empty()) {
-        fullCommand += " --volume " + volumePath;
-    }
-    
+std::string PmPkgUtilWrapper::executeCommand(const std::string& command) const {
     constexpr size_t BUFSIZE = 128;
     std::array<char, BUFSIZE> buffer;
     std::string result;
 
-    std::shared_ptr<FILE> pipe(popen(fullCommand.c_str(), "r"), pclose);
+    std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe) {
-        
-        throw PkgUtilException("Error executing command `" + fullCommand + "`");
+        throw PkgUtilException("Error executing command `" + command + "`");
     }
 
     while (!feof(pipe.get())) {
@@ -70,29 +107,6 @@ std::string PmPkgUtilWrapper::executeCommand(const std::string& command, const s
     }
 
     return result;
-}
-
-void trim(std::string& str) {
-    // Remove leading and trailing whitespaces from a string
-    str.erase(0, str.find_first_not_of(" \t\r\n"));
-    str.erase(str.find_last_not_of(" \t\r\n") + 1);
-}
-
-std::vector<std::string> splitString(const std::string_view& str, const char delimiter) {
-    std::vector<std::string> tokens;
-    size_t startPos = 0;
-    while (startPos < str.length()) {
-        size_t endPos = str.find(delimiter, startPos);
-        if (endPos == std::string::npos) {
-            endPos = str.length();
-        }
-        std::string token = std::string(str.substr(startPos, endPos - startPos));
-        if (!token.empty()) {
-            tokens.push_back(std::move(token));
-        }
-        startPos = endPos + 1;
-    }
-    return tokens;
 }
 
 PmPackageInfo PmPkgUtilWrapper::parsePackageInfo(const std::string& output) const {
@@ -123,4 +137,28 @@ PmPackageInfo PmPkgUtilWrapper::parsePackageInfo(const std::string& output) cons
     return packageInfo;
 }
 
+bool PmPkgUtilWrapper::installPackage(const std::string& packagePath, const std::string& volumePath) const {
+    const std::string command{ pkgInstallerExecutable + " -pkg " + packagePath };
+    const std::string output = executeCommand( decoratePkgInstallerVolumeOption(command, volumePath));
+    
+    if (outputParser(output, "The install was successful")) {
+        // Installation successful
+        return true;
+    } else {
+        // Installation failed
+        return false;
+    }
+}
 
+bool PmPkgUtilWrapper::uninstallPackage(const std::string& packageIdentifier) const {
+    const std::string command{ pkgUtilExecutable + " --force --forget " + packageIdentifier };
+    const std::string output = executeCommand(command);
+    
+    if (outputParser(output, "No receipt")) {
+        // Uninstallation successful
+        return true;
+    } else {
+        // Uninstallation failed
+        return false;
+    }
+}

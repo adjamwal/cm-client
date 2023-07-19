@@ -2,58 +2,119 @@
 #include <gmock/gmock.h>
 #include "PmPkgUtilWrapper.hpp"
 
+using ::testing::NiceMock;
+using ::testing::ElementsAreArray;
+using ::testing::SizeIs;
+
 class MockPkgUtilWrapper : public PmPkgUtilWrapper {
 public:
-    MOCK_METHOD(std::string, executeCommand, (const std::string& command, const std::string& volumePath), (const, override));
+    MOCK_METHOD(std::string, executeCommand, (const std::string& command), (const, override));
 };
 
-TEST(PkgUtilWrapperTest, ListPackagesTest) {
-    MockPkgUtilWrapper pkgUtil;
+// Fixture for PkgUtilWrapper tests
+class PkgUtilWrapperTest : public ::testing::Test {
+protected:
+    NiceMock<MockPkgUtilWrapper> mockWrapper;
+};
+
+TEST_F(PkgUtilWrapperTest, ListPackagesTest) {
     std::vector<std::string> expectedPackages = {"package1", "package2", "package3"};
     std::string mockOutput = "package1\npackage2\npackage3\n";
     
-    EXPECT_CALL(pkgUtil, executeCommand("/usr/sbin/pkgutil --packages", ""))
+    EXPECT_CALL(mockWrapper, executeCommand("/usr/sbin/pkgutil --packages"))
         .WillOnce(
             ::testing::Return(mockOutput)
         );
     
-    std::vector<std::string> packages = pkgUtil.listPackages();
-    ASSERT_EQ(packages.size(), expectedPackages.size());
-    for (size_t i = 0; i < packages.size(); ++i) {
-        ASSERT_EQ(packages[i], expectedPackages[i]);
-    }
+    EXPECT_THAT(mockWrapper.listPackages(), ElementsAreArray(expectedPackages));
 }
 
-TEST(PkgUtilWrapperTest, GetPackageInfoTest) {
-    MockPkgUtilWrapper pkgUtil;
+TEST_F(PkgUtilWrapperTest, GetPackageInfoTest) {
     std::string packageIdentifier = "com.example.package";
     std::string mockOutput = "package-id: com.example.package\nversion: 1.0\nlocation: /path/to/package\n";
     
-    EXPECT_CALL(pkgUtil, executeCommand("/usr/sbin/pkgutil --pkg-info com.example.package", ""))
+    EXPECT_CALL(mockWrapper, executeCommand("/usr/sbin/pkgutil --pkg-info com.example.package"))
         .WillOnce(
             ::testing::Return(mockOutput)
         );
     
-    PmPackageInfo packageInfo = pkgUtil.getPackageInfo(packageIdentifier, "");
+    PmPackageInfo packageInfo = mockWrapper.getPackageInfo(packageIdentifier, "");
     ASSERT_EQ(packageInfo.packageIdentifier, "com.example.package");
     ASSERT_EQ(packageInfo.version, "1.0");
     ASSERT_EQ(packageInfo.installationPath, "/path/to/package");
 }
 
-TEST(PkgUtilWrapperTest, ListPackageFilesTest) {
-    MockPkgUtilWrapper pkgUtil;
+TEST_F(PkgUtilWrapperTest, ListPackageFilesTest) {
     std::vector<std::string> expectedFiles = {"file1", "file2", "file3"};
     std::string packageIdentifier = "com.example.package";
     std::string mockOutput = "file1\nfile2\nfile3\n";
     
-    EXPECT_CALL(pkgUtil, executeCommand("/usr/sbin/pkgutil --files com.example.package", ""))
+    EXPECT_CALL(mockWrapper, executeCommand("/usr/sbin/pkgutil --files com.example.package"))
         .WillOnce(
              ::testing::Return(mockOutput)
          );
     
-    std::vector<std::string> files = pkgUtil.listPackageFiles(packageIdentifier);
-    ASSERT_EQ(files.size(), expectedFiles.size());
-    for (size_t i = 0; i < files.size(); ++i) {
-        ASSERT_EQ(files[i], expectedFiles[i]);
-    }
+    EXPECT_THAT(mockWrapper.listPackageFiles(packageIdentifier), ElementsAreArray(expectedFiles));
+}
+
+// Test case for successful package installation
+TEST_F(PkgUtilWrapperTest, InstallPackage_Success) {
+    const std::string packagePath = "/path/to/package.pkg";
+    const std::string volumePath = "/Volumes/MountedVolume";
+    
+    // Define the expected command and output
+    const std::string expectedCommand = "/usr/sbin/installer -pkg /path/to/package.pkg --target /Volumes/MountedVolume";
+    const std::string expectedOutput = "The install was successful.";
+    
+    // Set up the mock behavior
+    EXPECT_CALL(mockWrapper, executeCommand(expectedCommand)).WillOnce(::testing::Return(expectedOutput));
+    
+    // Perform the installation
+    EXPECT_THAT(mockWrapper.installPackage(packagePath, volumePath), ::testing::IsTrue());
+}
+
+// Test case for failed package installation
+TEST_F(PkgUtilWrapperTest, InstallPackage_Failure) {
+    const std::string packagePath = "/path/to/package.pkg";
+    const std::string volumePath = "/Volumes/MountedVolume";
+    
+    // Define the expected command and output
+    const std::string expectedCommand = "/usr/sbin/installer -pkg /path/to/package.pkg --target /Volumes/MountedVolume";
+    const std::string expectedOutput = "The install failed.";
+    
+    // Set up the mock behavior
+    EXPECT_CALL(mockWrapper, executeCommand(expectedCommand)).WillOnce(::testing::Return(expectedOutput));
+    
+    // Perform the installation
+    EXPECT_THAT(mockWrapper.installPackage(packagePath, volumePath), ::testing::IsFalse());
+}
+
+// Test case for successful package uninstallation
+TEST_F(PkgUtilWrapperTest, UninstallPackage_Success) {
+    const std::string packageIdentifier = "com.example.package";
+    
+    // Define the expected command and output
+    const std::string expectedCommand = "/usr/sbin/pkgutil --force --forget com.example.package";
+    const std::string expectedOutput = "No receipt found.";
+    
+    // Set up the mock behavior
+    EXPECT_CALL(mockWrapper, executeCommand(expectedCommand)).WillOnce(::testing::Return(expectedOutput));
+    
+    // Perform the uninstallation
+    EXPECT_THAT( mockWrapper.uninstallPackage(packageIdentifier), ::testing::IsTrue());
+}
+
+// Test case for failed package uninstallation
+TEST_F(PkgUtilWrapperTest, UninstallPackage_Failure) {
+    const std::string packageIdentifier = "com.example.package";
+    
+    // Define the expected command and output
+    const std::string expectedCommand = "/usr/sbin/pkgutil --force --forget com.example.package";
+    const std::string expectedOutput = "Unable to forget package.";
+    
+    // Set up the mock behavior
+    EXPECT_CALL(mockWrapper, executeCommand(expectedCommand)).WillOnce(::testing::Return(expectedOutput));
+    
+    // Perform the uninstallation
+    EXPECT_THAT(mockWrapper.uninstallPackage(packageIdentifier), ::testing::IsFalse());
 }

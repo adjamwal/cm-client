@@ -28,6 +28,7 @@ set(OS_PACKAGE_MANAGER_SRCS
     macOS/PmPkgUtilWrapper.hpp
     macOS/PmPlatformDiscovery.hpp
     macOS/PmPlatformDiscovery.cpp
+    macOS/PmCodesignVerifierMac.cpp
 )
 
 add_executable(cmpackagemanager ${OS_PACKAGE_MANAGER_SRCS})

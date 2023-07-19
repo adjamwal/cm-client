@@ -7,8 +7,15 @@
 #include "PmPlatformComponentManager.hpp"
 #include "PackageManager/PmTypes.h"
 #include "PmLogger.hpp"
+//#include "PmPkgUtilWrapper.hpp"
+#include "IPmCodesignVerifier.hpp"
+#include "IPmPkgUtil.hpp"
 
-PmPlatformComponentManager::PmPlatformComponentManager(std::shared_ptr<IPmPkgUtil> pkgUtil) : discovery_(pkgUtil) {}
+PmPlatformComponentManager::PmPlatformComponentManager(
+   std::shared_ptr<IPmPkgUtil> pkgUtil,
+   std::shared_ptr<IPmCodesignVerifier> codesignVerifier)
+: pkgUtil_(pkgUtil), codesignVerifier_(codesignVerifier), discovery_(pkgUtil)
+{}
 
 int32_t PmPlatformComponentManager::GetInstalledPackages(const std::vector<PmProductDiscoveryRules> &catalogRules, PackageInventory &packagesDiscovered)
 {
@@ -29,8 +36,50 @@ int32_t PmPlatformComponentManager::GetCachedInventory(PackageInventory &cachedI
 
 int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
 {
-    (void) package;
-    return -1;
+    assert(codesignVerifier_);
+    if (!codesignVerifier_) {
+        PM_LOG_ERROR("No valid codesign verifier");
+        return -1;
+    }
+    
+    assert(pkgUtil_);
+    if (!pkgUtil_) {
+        PM_LOG_ERROR("No valid pkgUtil");
+        return -1;
+    }
+
+    int32_t ret = 0;
+    CodeSignStatus status = CodeSignStatus::CODE_SIGN_OK;
+    
+    std::filesystem::path downloadedInstallerPath = package.downloadedInstallerPath;
+    downloadedInstallerPath.make_preferred();
+    if( !package.signerName.empty() ) {
+        status = codesignVerifier_->Verify(
+            downloadedInstallerPath,
+            package.signerName,
+            SIGTYPE_DEFAULT );
+    }
+    
+    if( status == CodeSignStatus::CODE_SIGN_OK )
+    {
+        if( package.installerType == "pkg" )
+        {
+            const auto success = pkgUtil_->installPackage(downloadedInstallerPath.filename());
+            ret = success ? 0 : -1;
+        }
+        else
+        {
+            PM_LOG_ERROR("Invalid Package Type: %s", package.installerType.c_str());
+            ret = -1;
+        }
+    }
+    else
+    {
+        PM_LOG_ERROR( "Could not verify Package." );
+        ret = static_cast<int32_t>( status );
+    }
+    
+    return ret;
 }
 
 IPmPlatformComponentManager::PmInstallResult PmPlatformComponentManager::UpdateComponent(const PmComponent &package, std::string &error)

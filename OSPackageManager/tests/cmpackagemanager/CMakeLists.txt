@@ -21,6 +21,7 @@ add_executable(
   ${TESTEE_DIR}/macOS/PmPlatformDiscovery.cpp
   ${TESTEE_DIR}/macOS/PmLogger.cpp
   ${TESTEE_DIR}/macOS/PmLogger.hpp
+  ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
   
   # Mocks
   ${TESTEE_DIR}/proxy/CMIDAPIProxy.hpp
@@ -44,6 +45,14 @@ target_link_libraries(
   cmidapi
   crypto
   ssl
+  "-framework CoreFoundation"
+  "-framework IOKit"
+  "-framework CoreServices"
+  "-framework Security"
+  ${SystemConfiguration_framework}
+  ${IOKit_framework}
+  ${CoreServices_framework}
+  ${Security_framework}
   ${GTEST_LIBS}
 )
 
@@ -68,6 +77,18 @@ target_link_directories(
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/lib
 )
+
+# Add a custom command to copy the binary to the build directory
+add_custom_command(
+    TARGET PackageManagerUnitTest POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_CURRENT_SOURCE_DIR}/Resources/mac/signedprocess
+            $<TARGET_FILE_DIR:PackageManagerUnitTest>/signedprocess
+)
+
+# Create a custom target that depends on the copy command
+add_custom_target(CopyBinary ALL DEPENDS PackageManagerUnitTest)
+
 
 include(GoogleTest)
 gtest_discover_tests(PackageManagerUnitTest DISCOVERY_MODE PRE_TEST)

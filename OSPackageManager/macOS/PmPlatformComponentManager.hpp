@@ -6,12 +6,14 @@
 
 #include "PackageManager/IPmPlatformComponentManager.h"
 #include "PmPlatformDiscovery.hpp"
-#include "IPmPkgUtil.hpp"
+
+class IPmCodesignVerifier;
+class IPmPkgUtil;
 
 class PmPlatformComponentManager : public IPmPlatformComponentManager
 {
 public:
-    explicit PmPlatformComponentManager(std::shared_ptr<IPmPkgUtil> pkgUtil);
+    PmPlatformComponentManager(std::shared_ptr<IPmPkgUtil>, std::shared_ptr<IPmCodesignVerifier>);
 
     /**
      * @brief This API is used to retrieve the list of all installed packages on the client. The package manager
@@ -118,5 +120,7 @@ public:
     int32_t RestrictPathPermissionsToAdmins(const std::filesystem::path &filePath);
     
 private:
+    std::shared_ptr<IPmPkgUtil> pkgUtil_;
+    std::shared_ptr<IPmCodesignVerifier> codesignVerifier_;
     PmPlatformDiscovery discovery_;
 };

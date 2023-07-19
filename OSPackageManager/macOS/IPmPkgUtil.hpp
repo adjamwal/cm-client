@@ -21,4 +21,6 @@ public:
     virtual std::vector<std::string> listPackages(const std::string& volumePath = std::string()) const = 0;
     virtual PmPackageInfo getPackageInfo(const std::string& packageIdentifier, const std::string& volumePath = std::string()) const = 0;
     virtual std::vector<std::string> listPackageFiles(const std::string& packageIdentifier, const std::string& volumePath = std::string()) const = 0;
+    virtual bool installPackage(const std::string& packagePath, const std::string& volumePath = std::string()) const = 0;
+    virtual bool uninstallPackage(const std::string& packageIdentifier) const = 0;
 };

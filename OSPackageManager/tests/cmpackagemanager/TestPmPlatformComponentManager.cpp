@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "IPmPkgUtil.hpp"
 #include "MockPmPlatformComponentManager/MockPmPkgUtil.hpp"
+#include "MockPmPlatformComponentManager/MockCodesignVerifier.hpp"
 #include "PmPlatformComponentManager.hpp"
 #include "PmLogger.hpp"
 
@@ -12,21 +13,24 @@ protected:
     void SetUp() override {
         PmLogger::initLogger();
         // Create a mock object for IPmPkgUtil
-        mockPkgUtil_ = std::make_shared<MockPmPkgUtil>();
+        mockPkgUtil_ = std::make_shared<StrictMock<MockPmPkgUtil>>();
+        mockCodesignVerifier_ = std::make_shared<StrictMock<MockCodesignVerifier>>();
         
         // Initialize PmPlatformComponentManager with the mock object
-        manager_ = std::shared_ptr<PmPlatformComponentManager>( new PmPlatformComponentManager(mockPkgUtil_));
+        manager_ = std::make_shared<PmPlatformComponentManager>(mockPkgUtil_, mockCodesignVerifier_);
     }
     
     void TearDown() override {
         // Reset the mock object
         mockPkgUtil_.reset();
+        mockCodesignVerifier_.reset();
         manager_.reset();
         PmLogger::releaseLogger();
     }
     
     // Mocked IPmPkgUtil object
     std::shared_ptr<MockPmPkgUtil> mockPkgUtil_;
+    std::shared_ptr<MockCodesignVerifier> mockCodesignVerifier_;
     
     // Instance of PmPlatformComponentManager to be tested
     std::shared_ptr<PmPlatformComponentManager> manager_;
@@ -113,4 +117,114 @@ TEST_F(PmPlatformComponentManagerTest, EmptyCachedInventory) {
     // Verify the result and expectations
     EXPECT_EQ(resultCached, 0);
     EXPECT_EQ(cachedInventory.packages.size(), 0);
+}
+
+// Test case for InstallComponent
+TEST_F(PmPlatformComponentManagerTest, InstallComponent_Positive) {
+    // Prepare test data
+    const std::string volumePath = "/Volumes/MountedVolume";
+    PmComponent package;
+    package.downloadedInstallerPath = "/path/to/package.pkg";
+    package.signerName = "TestSigner";
+    package.installerType = "pkg";
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockPkgUtil_,
+                installPackage(
+                   package.downloadedInstallerPath.filename().u8string(),
+                   _
+                ))
+        .WillOnce(Return(true));
+    
+    // Set up expectations on the codesignVerifier
+    EXPECT_CALL(*mockCodesignVerifier_,
+                Verify(
+                    package.downloadedInstallerPath.u8string(),
+                    package.signerName,
+                    SIGTYPE_DEFAULT))
+        .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
+    
+        // Invoke the function under test
+    int32_t result = manager_->InstallComponent(package);
+    
+        // Verify the result and expectations
+    EXPECT_EQ(result, 0);
+}
+
+TEST_F(PmPlatformComponentManagerTest, InstallComponent_UnknownPkgType_Negative) {
+    // Prepare test data
+    const std::string volumePath = "/Volumes/MountedVolume";
+    PmComponent package;
+    package.downloadedInstallerPath = "/path/to/package.pkg";
+    package.signerName = "TestSigner";
+    package.installerType = "dmg";
+    
+    // Set up expectations on the codesignVerifier
+    EXPECT_CALL(*mockCodesignVerifier_,
+                Verify(
+                   package.downloadedInstallerPath.u8string(),
+                   package.signerName,
+                   SIGTYPE_DEFAULT))
+    .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
+    
+        // Invoke the function under test
+    int32_t result = manager_->InstallComponent(package);
+    
+    // Verify the result and expectations
+    EXPECT_EQ(result, -1);
+}
+
+TEST_F(PmPlatformComponentManagerTest, InstallComponent_PastKillDate_Negative) {
+    // Prepare test data
+    const std::string volumePath = "/Volumes/MountedVolume";
+    PmComponent package;
+    package.downloadedInstallerPath = "/path/to/package.pkg";
+    package.signerName = "TestSigner";
+    package.installerType = "dmg";
+    
+    // Set up expectations on the codesignVerifier
+    EXPECT_CALL(*mockCodesignVerifier_,
+                Verify(
+                   package.downloadedInstallerPath.u8string(),
+                   package.signerName,
+                   SIGTYPE_DEFAULT))
+    .WillOnce(Return(CodeSignStatus::CODE_SIGN_VERIFICATION_FAILED));
+    
+    // Invoke the function under test
+    int32_t result = manager_->InstallComponent(package);
+    
+    // TODO, oskryp: have to add enum to describe ComponentManager error codes
+    // Verify the result and expectations
+    EXPECT_EQ(result, -16);
+}
+
+TEST_F(PmPlatformComponentManagerTest, InstallComponent_InstallFailed_Negative) {
+    // Prepare test data
+    const std::string volumePath = "/Volumes/MountedVolume";
+    PmComponent package;
+    package.downloadedInstallerPath = "/path/to/package.pkg";
+    package.signerName = "TestSigner";
+    package.installerType = "pkg";
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockPkgUtil_,
+                installPackage(
+                               package.downloadedInstallerPath.filename().u8string(),
+                               _
+                               ))
+    .WillOnce(Return(false));
+    
+    // Set up expectations on the codesignVerifier
+    EXPECT_CALL(*mockCodesignVerifier_,
+                Verify(
+                   package.downloadedInstallerPath.u8string(),
+                   package.signerName,
+                   SIGTYPE_DEFAULT))
+    .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
+    
+    // Invoke the function under test
+    int32_t result = manager_->InstallComponent(package);
+    
+    // Verify the result and expectations
+    EXPECT_EQ(result, -1);
 }
