@@ -7,6 +7,7 @@
 
 #include "PmPlatformDependencies.hpp"
 #include "agent/PackageManagerAgent.hpp"
+#include "configuration/Config.hpp"
 #include "PmLogger.hpp"
 
 #include <sys/stat.h>
@@ -49,6 +50,8 @@ Daemon::Daemon()
 void Daemon::start()
 {
     isRunning_ = true;
+    config_ = std::make_unique<Config>(configFile_);
+    PmLogger::getLogger().SetLogLevel(config_->getLogLevel());
     PmLogger::getLogger().initFileLogging(loggerDir_, static_cast<std::string>(kLogFileName),
         kMaxSize, kMaxFiles);
 

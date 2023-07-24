@@ -21,6 +21,8 @@ add_executable(
   ${TESTEE_DIR}/macOS/PmPlatformDiscovery.cpp
   ${TESTEE_DIR}/macOS/PmLogger.cpp
   ${TESTEE_DIR}/macOS/PmLogger.hpp
+  ${TESTEE_DIR}/configuration/Config.cpp
+  ${TESTEE_DIR}/configuration/Config.hpp
   ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
   
   # Mocks
@@ -51,6 +53,7 @@ add_dependencies(
     third-party-ciscossl
     third-party-EndpointIdentity
     third-party-gtest
+    third-party-jsoncpp
     third-party-PackageManager
     third-party-spdlog
 )
@@ -59,6 +62,7 @@ target_link_libraries(
   PackageManagerUnitTest
   cmidapi
   crypto
+  jsoncpp
   ssl
   "-framework CoreFoundation"
   "-framework IOKit"
@@ -86,6 +90,7 @@ target_include_directories(
       ${cm-client_SOURCE_DIR}/OSPackageManager/environment
       ${cm-client_SOURCE_DIR}/OSPackageManager/proxy
       ${cm-client_SOURCE_DIR}/OSPackageManager/macOS
+      ${cm-client_SOURCE_DIR}/OSPackageManager/configuration
       ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
 )
 

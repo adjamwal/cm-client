@@ -11,6 +11,8 @@ set(OS_PACKAGE_MANAGER_SRCS
     main.cpp
     agent/PackageManagerAgent.cpp
     agent/PackageManagerAgent.hpp
+    configuration/Config.hpp
+    configuration/Config.cpp
     macOS/IFileUtilities.hpp
     macOS/IPmCertRetriever.hpp
     macOS/FileUtilities.cpp
