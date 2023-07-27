@@ -33,3 +33,12 @@ if(NOT TARGET "third-party-${component_name}")
 
     upload_component(${component_name} not_used)
 endif()
+
+ExternalProject_Add_Step(third-party-${component_name} post_install_symlink_fix
+    WORKING_DIRECTORY "${component_dst_dir}/libshared"
+    DEPENDEES install
+    COMMAND rm -rf libcrypto.dylib
+    COMMAND rm -rf libssl.dylib
+    COMMAND ln -sf libcrypto.1.1.dylib libcrypto.dylib
+    COMMAND ln -sf libssl.1.1.dylib libssl.dylib
+)

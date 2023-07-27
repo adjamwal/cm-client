@@ -75,11 +75,15 @@ if [ "${usage}" = "true" ] || [ "x${CM_BUILD_VER}" = "x" -a "${clean}" = "false"
 fi
 
 CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=1"
-CMAKE_BUILD_DIR="debug"
+CM_BUILD_DIR_PREFIX=""
+if [ "${SYSTEM}" = "Darwin" ] && [ "${xcode}" = "true" ]; then
+    CM_BUILD_DIR_PREFIX="xcode_"
+fi
+CMAKE_BUILD_DIR="${CM_BUILD_DIR_PREFIX}debug"
 BUILD_STAGING_DIR="$(pwd)/Staging"
 if [ "${release}" = "true"  ]; then
     CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
-    CMAKE_BUILD_DIR="release"
+    CMAKE_BUILD_DIR="${CM_BUILD_DIR_PREFIX}release"
 fi
 if [ "${BUILD_SUBMODULES_FROM_SRC}" = "YES" ]; then
     CMAKE_EXTRA_ARGS="-DBUILD_ALL_THIRD_PARTY:BOOL=ON ${CMAKE_EXTRA_ARGS}"

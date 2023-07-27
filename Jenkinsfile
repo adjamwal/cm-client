@@ -55,7 +55,6 @@ def hasLabel(target_label) {
   return retval;
 }
 
-// TODO: Add Xcode build stage when Xcode build is more reliable
 def run_mac_ci() {
   stage('Mac Checkout') {
     if (continueCI()) {
@@ -92,6 +91,29 @@ def run_mac_ci() {
       }
       dir("cm-client/debug/OSPackageManager/tests"){
         sh 'ctest --output-on-failure'
+      }
+    }
+  }
+
+  stage("Build Xcode Debug") {
+    if (continueCI()) {
+      withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
+        dir("cm-client"){
+          sh './build -x -d'
+          sh 'xcodebuild build -project xcode_debug/cm-client.xcodeproj -configuration "Debug" -scheme ALL_BUILD'
+        }
+      }
+    }
+  }
+
+  stage("Build Xcode Release") {
+    if (continueCI()) {
+      withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
+        dir("cm-client"){
+          env.CM_BUILD_VER = "1.0.0000"
+          sh './build -x -r'
+          sh 'xcodebuild build -project xcode_release/cm-client.xcodeproj -configuration "Release" -scheme ALL_BUILD'
+        }
       }
     }
   }
