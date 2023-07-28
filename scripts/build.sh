@@ -191,10 +191,27 @@ else
             BUILD_TYPE="${CMAKE_BUILD_DIR}"
             DMG_INSTALLER_DIR="Installer"
             DMG_BUILDER_SCRIPT="build_cm_installer.sh"
+
+            if [ -d "${BUILD_STAGING_DIR}" ]; then
+                echo "Removing existing build Staging directory"
+                rm -rf "${BUILD_STAGING_DIR}"
+            fi
+
+            echo "Creating build Staging directory"
+            mkdir -p "${BUILD_STAGING_DIR}"
+
             pushd "${DMG_INSTALLER_DIR}"
                 "./${DMG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
                 echo "** CM Installer built successfully **"
             popd
+
+            echo "** Building Sample Installer **"
+            SAMPLE_PKG_BUILDER_SCRIPT="build_sample_installer.sh"
+            pushd "${DMG_INSTALLER_DIR}"
+                "./${SAMPLE_PKG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
+                echo "** Sample Installer built successfully **"
+            popd
+
         fi
     fi
 fi

@@ -34,10 +34,6 @@ else
 fi
 
 BUILD_STAGING_DIR="${2}"
-if [ -d "${BUILD_STAGING_DIR}" ]; then
-    echo "Removing existing build Staging directory"
-    rm -rf "${BUILD_STAGING_DIR}"
-fi
 echo "Creating build Staging directory"
 mkdir -p "${BUILD_STAGING_DIR}"
 
