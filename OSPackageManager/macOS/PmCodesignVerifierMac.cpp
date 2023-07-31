@@ -689,6 +689,7 @@ CodeSignStatus CodesignVerifier::VerifyWithKilldate( const std::string& strPath,
             status = CodeSignStatus::CODE_SIGN_OK;
         }
     }
+    PM_LOG_INFO("Package %s codesign verification: status = %d", strPath.c_str(), status);
     return status;
 }
 

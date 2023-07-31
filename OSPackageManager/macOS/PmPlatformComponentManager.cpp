@@ -37,6 +37,9 @@ int32_t PmPlatformComponentManager::GetCachedInventory(PackageInventory &cachedI
 
 int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
 {
+    if (!fileUtils_->PathIsValid(package.downloadedInstallerPath))
+        return -1;
+    
     assert(codesignVerifier_);
     if (!codesignVerifier_) {
         PM_LOG_ERROR("No valid codesign verifier");
@@ -65,7 +68,7 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
     {
         if( package.installerType == "pkg" )
         {
-            const auto success = pkgUtil_->installPackage(downloadedInstallerPath.filename());
+            const auto success = pkgUtil_->installPackage(downloadedInstallerPath);
             ret = success ? 0 : -1;
         }
         else
@@ -80,6 +83,7 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
         ret = static_cast<int32_t>( status );
     }
     
+    PM_LOG_DEBUG("Package installation status %d", ret);
     return ret;
 }
 

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "PmPkgUtilWrapper.hpp"
+#include "UnitTestBase.h"
 
 using ::testing::NiceMock;
 using ::testing::ElementsAreArray;
@@ -12,7 +13,7 @@ public:
 };
 
 // Fixture for PkgUtilWrapper tests
-class PkgUtilWrapperTest : public ::testing::Test {
+class PkgUtilWrapperTest : public TestEnv::UnitTestBase {
 protected:
     NiceMock<MockPkgUtilWrapper> mockWrapper;
 };
@@ -63,7 +64,7 @@ TEST_F(PkgUtilWrapperTest, InstallPackage_Success) {
     const std::string volumePath = "/Volumes/MountedVolume";
     
     // Define the expected command and output
-    const std::string expectedCommand = "/usr/sbin/installer -pkg /path/to/package.pkg --target /Volumes/MountedVolume";
+    const std::string expectedCommand = "/usr/sbin/installer -pkg /path/to/package.pkg -target /Volumes/MountedVolume";
     const std::string expectedOutput = "The install was successful.";
     
     // Set up the mock behavior
@@ -79,7 +80,7 @@ TEST_F(PkgUtilWrapperTest, InstallPackage_Failure) {
     const std::string volumePath = "/Volumes/MountedVolume";
     
     // Define the expected command and output
-    const std::string expectedCommand = "/usr/sbin/installer -pkg /path/to/package.pkg --target /Volumes/MountedVolume";
+    const std::string expectedCommand = "/usr/sbin/installer -pkg /path/to/package.pkg -target /Volumes/MountedVolume";
     const std::string expectedOutput = "The install failed.";
     
     // Set up the mock behavior

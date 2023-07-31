@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <regex>
+
+#include "PmLogger.hpp"
 #include "PmPkgUtilWrapper.hpp"
 
 namespace { // anonymous namespace
@@ -24,7 +26,7 @@ namespace { // anonymous namespace
     
     std::string decoratePkgInstallerVolumeOption(const std::string& command, const std::string& volumePath) {
         const std::string target{ volumePath.length() ? volumePath : "/" };
-        return command + " --target " + target;
+        return command + " -target " + target;
     }
     
     void trim(std::string& str) {
@@ -52,6 +54,7 @@ namespace { // anonymous namespace
 }
 
 std::vector<std::string> PmPkgUtilWrapper::listPackages(const std::string& volumePath) const {
+    PM_LOG_INFO("Listing packages");
     const std::string command{ pkgUtilExecutable + " --packages" };
     std::string output = executeCommand( decoratePkgUtilVolumeOption(command, volumePath) );
     
@@ -68,12 +71,14 @@ std::vector<std::string> PmPkgUtilWrapper::listPackages(const std::string& volum
 }
 
 PmPackageInfo PmPkgUtilWrapper::getPackageInfo(const std::string& packageIdentifier, const std::string& volumePath) const {
+    PM_LOG_INFO("Getting package %s info", packageIdentifier.c_str());
     const std::string command { pkgUtilExecutable + " --pkg-info "  + packageIdentifier };
     const std::string output = executeCommand( decoratePkgUtilVolumeOption(command, volumePath) );
     return parsePackageInfo(output);
 }
 
 std::vector<std::string> PmPkgUtilWrapper::listPackageFiles(const std::string& packageIdentifier, const std::string& volumePath) const {
+    PM_LOG_INFO("List package %s files", packageIdentifier.c_str());
     const std::string command{ pkgUtilExecutable + " --files " + packageIdentifier };
     std::string output = executeCommand( decoratePkgUtilVolumeOption(command, volumePath) );
 
@@ -91,14 +96,15 @@ std::vector<std::string> PmPkgUtilWrapper::listPackageFiles(const std::string& p
 }
 
 std::string PmPkgUtilWrapper::executeCommand(const std::string& command) const {
-    constexpr size_t BUFSIZE = 128;
-    std::array<char, BUFSIZE> buffer;
-    std::string result;
-
+    
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe) {
         throw PkgUtilException("Error executing command `" + command + "`");
     }
+    
+    constexpr size_t BUFSIZE = 128;
+    std::array<char, BUFSIZE> buffer;
+    std::string result;
 
     while (!feof(pipe.get())) {
         if (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
@@ -138,6 +144,7 @@ PmPackageInfo PmPkgUtilWrapper::parsePackageInfo(const std::string& output) cons
 }
 
 bool PmPkgUtilWrapper::installPackage(const std::string& packagePath, const std::string& volumePath) const {
+    PM_LOG_INFO("Installing package %s", packagePath.c_str());
     const std::string command{ pkgInstallerExecutable + " -pkg " + packagePath };
     const std::string output = executeCommand( decoratePkgInstallerVolumeOption(command, volumePath));
     
@@ -151,6 +158,7 @@ bool PmPkgUtilWrapper::installPackage(const std::string& packagePath, const std:
 }
 
 bool PmPkgUtilWrapper::uninstallPackage(const std::string& packageIdentifier) const {
+    PM_LOG_INFO("Uninstalling package %s", packageIdentifier.c_str());
     const std::string command{ pkgUtilExecutable + " --force --forget " + packageIdentifier };
     const std::string output = executeCommand(command);
     

@@ -124,11 +124,18 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_Positive) {
     // Set up expectations on the mock object
     EXPECT_CALL(*mockEnv_.pkgUtil_,
                 installPackage(
-                   package.downloadedInstallerPath.filename().u8string(),
+                   package.downloadedInstallerPath.u8string(),
                    _
                 ))
         .WillOnce(Return(true));
     
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.fileUtils_,
+                PathIsValid(
+                   package.downloadedInstallerPath
+                ))
+        .WillOnce(Return(true));
+
     // Set up expectations on the codesignVerifier
     EXPECT_CALL(*mockCodesignVerifier_,
                 Verify(
@@ -160,6 +167,13 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_UnknownPkgType_Negative)
                    SIGTYPE_DEFAULT))
     .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
     
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.fileUtils_,
+                PathIsValid(
+                            package.downloadedInstallerPath
+                            ))
+    .WillOnce(Return(true));
+    
         // Invoke the function under test
     int32_t result = manager_->InstallComponent(package);
     
@@ -183,6 +197,14 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_PastKillDate_Negative) {
                    SIGTYPE_DEFAULT))
     .WillOnce(Return(CodeSignStatus::CODE_SIGN_VERIFICATION_FAILED));
     
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.fileUtils_,
+                PathIsValid(
+                    package.downloadedInstallerPath
+                ))
+    .WillOnce(Return(true));
+
+    
     // Invoke the function under test
     int32_t result = manager_->InstallComponent(package);
     
@@ -202,10 +224,18 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_InstallFailed_Negative) 
     // Set up expectations on the mock object
     EXPECT_CALL(*mockEnv_.pkgUtil_,
                 installPackage(
-                               package.downloadedInstallerPath.filename().u8string(),
-                               _
-                               ))
+                   package.downloadedInstallerPath.u8string(),
+                   _
+               ))
     .WillOnce(Return(false));
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.fileUtils_,
+                PathIsValid(
+                    package.downloadedInstallerPath
+                ))
+    .WillOnce(Return(true));
+
     
     // Set up expectations on the codesignVerifier
     EXPECT_CALL(*mockCodesignVerifier_,

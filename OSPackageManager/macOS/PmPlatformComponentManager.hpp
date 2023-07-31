@@ -3,6 +3,7 @@
  *
  * @copyright (c) 2022 Cisco Systems, Inc. All rights reserved
  */
+#pragma once
 
 #include "PackageManager/IPmPlatformComponentManager.h"
 #include "PmPlatformDiscovery.hpp"

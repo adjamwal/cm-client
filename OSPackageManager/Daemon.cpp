@@ -54,7 +54,7 @@ void Daemon::start()
     PmLogger::getLogger().SetLogLevel(config_->getLogLevel());
     PmLogger::getLogger().initFileLogging(loggerDir_, static_cast<std::string>(kLogFileName),
         kMaxSize, kMaxFiles);
-
+        
     task_ = std::thread(&Daemon::mainTask, this);
     task_.join();
 }
