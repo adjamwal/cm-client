@@ -197,9 +197,6 @@ else
                 rm -rf "${BUILD_STAGING_DIR}"
             fi
 
-            echo "Creating build Staging directory"
-            mkdir -p "${BUILD_STAGING_DIR}"
-
             pushd "${DMG_INSTALLER_DIR}"
                 "./${DMG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
                 echo "** CM Installer built successfully **"

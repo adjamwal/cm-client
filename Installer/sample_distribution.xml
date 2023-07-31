@@ -23,7 +23,7 @@
     </choice>
 
     <!-- List all component packages -->
-    <pkg-ref id="com.cisco.secureclient.testpackage1" auth="root">cisco-secure-client-macos-testpackage1.pkg</pkg-ref>
+    <pkg-ref id="com.cisco.secureclient.testpackage1" auth="root">cisco-secure-client-macos-cloudmanagement-testpackage1.pkg</pkg-ref>
     <volume-check script='VolumeCheck()'/>
     <script>
     function VolumeCheck()

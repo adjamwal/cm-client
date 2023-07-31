@@ -16,14 +16,18 @@
 #                               of signed pkg files
 # NOTARIZATION_PASS             The password used for notarization
 #                               of signed pkg files
+# Note, 'cisco-secure-client-macos-cloudmanagement' in SAMPLE_PREFIX is vital
+# at the moment, as wildcard is used on Jenkins job to upload artefacts.
+# When we are ready to upgrade the naming, scripts/jenkins/Release.Jenksinsfile
+# has to be updated also to support that.
 
-SAMPLE_PREFIX="cisco-secure-client-macos-testpackage1"
+SAMPLE_PREFIX="cisco-secure-client-macos-cloudmanagement-testpackage1"
 SAMPLE_PKG_NAME="${SAMPLE_PREFIX}.pkg"
 
 echo "Creating ${SAMPLE_PKG_NAME}"
 
 if [ $# -ne 2 ]; then
-    echo "Usage: build_cm_installer.sh [debug|release] [staging_dir]"
+    echo "Usage: build_sample_installer.sh [debug|release] [staging_dir]"
 fi
 
 VER="1.0"
@@ -66,7 +70,7 @@ CM_BINARIES=(
 
 clear_and_recreate_payload_staging()
 {
-    echo "creating CM package Payload Staging Area"
+    echo "creating Sample package Payload Staging Area"
 
     rm -rf "${PAYLOAD_STAGING}"
     mkdir -p "${PAYLOAD_STAGING}${SAMPLE_BIN_DIR}"
