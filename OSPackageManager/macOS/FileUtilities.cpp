@@ -49,8 +49,13 @@ bool FileUtilities::HasUserRestrictionsApplied(const std::filesystem::path &file
 {
     if (!PathIsValid(filePath))
         return false;
+    
+    const auto pathPermissions = std::filesystem::status(filePath).permissions();
 
-    return false;
+    // Check if others have read permission
+    const bool bOthersHaveAccess = std::filesystem::perms::others_read == (pathPermissions & std::filesystem::perms::others_read);
+    
+    return bOthersHaveAccess;
 }
 
 bool FileUtilities::ApplyAdminRestrictions(const std::filesystem::path &filePath)
@@ -91,8 +96,18 @@ bool FileUtilities::ApplyUserRestrictions(const std::filesystem::path &filePath)
 {
     if (!PathIsValid(filePath))
         return false;
-
-    return false;
+    
+    // Add read permission for others
+    std::error_code errCode;
+    std::filesystem::permissions(filePath, std::filesystem::perms::others_read,
+       std::filesystem::perm_options::add, errCode);
+    
+    if (errCode) {
+        PM_LOG_ERROR("ApplyUserRestrictions failed adding permissions on file:\"%s\" with code: %d and message: \"%s\"", filePath.c_str(), errCode.value(), errCode.message().c_str());
+        return false;
+    }
+    
+    return true;
 }
 
 }

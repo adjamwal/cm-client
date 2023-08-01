@@ -24,6 +24,7 @@ add_executable(
   ${TESTEE_DIR}/configuration/Config.cpp
   ${TESTEE_DIR}/configuration/Config.hpp
   ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
+  ${TESTEE_DIR}/macOS/FileUtilities.cpp
   
   # Mocks
   ${TESTEE_DIR}/proxy/CMIDAPIProxy.hpp
