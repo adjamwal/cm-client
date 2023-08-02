@@ -11,6 +11,7 @@
 
 #include "PackageManager/IPmLogger.h"
 #include <string>
+#include <filesystem>
 
 class PmLogger : public IPMLogger
 {
@@ -51,7 +52,11 @@ private:
     void initDevNullDummyFile();
 };
 
-#define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
+#if defined(__FILE_NAME__)
+#  define __FILENAME__ __FILE_NAME__
+#else
+#  define __FILENAME__ std::filesystem::path(__FILE__).filename().string().c_str()
+#endif
 
 #ifndef __FUNCTION__
 #   define __FUNCTION__ __func__

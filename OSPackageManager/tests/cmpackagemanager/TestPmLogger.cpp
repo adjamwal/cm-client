@@ -49,30 +49,71 @@ protected:
         clearFile();
     }
     
-    void checkLogRecordsExists(const std::vector<std::string>& records)
+    void checkLogRecordsExists(const std::vector<std::string>& records,
+                               const std::function<void(const std::string&)>& predicate = {})
     {
         std::ifstream inputFile;
         inputFile.open(filePath_.native());
         ASSERT_TRUE(inputFile.is_open());
         
-
         std::string line;
         size_t i = 0;
         while (std::getline(inputFile, line))
         {
             ASSERT_TRUE(i < records.size());
             EXPECT_TRUE(line.find(records[i]) != std::string::npos);
+            
+            if (predicate) {
+                predicate(line); // Call the predicate functor on each processed line
+            }
+            
             ++i;
         }
         EXPECT_TRUE(i == records.size());
-
+        
         inputFile.close();
     }
-
+    
     std::unique_ptr<PmLogger> pLogger_;
     std::string fileName_;
     std::filesystem::path filePath_;
 };
+
+class TestPmLoggerMacros : public TestPmLogger {
+public:
+    void SetUp() override
+    {
+        clearFile();
+        PmLogger::initLogger();
+        auto &logger = PmLogger::getLogger();
+        logger.initFileLogging(filePath_.parent_path().native(),
+                                  filePath_.filename().native(), 1048576 * 15, 5);
+    }
+    
+    void TearDown() override
+    {
+        PmLogger::releaseLogger();
+        clearFile();
+    }
+};
+
+TEST_F(TestPmLoggerMacros, ShrinkCallingFilePath)
+{
+    PM_LOG_DEBUG("test");
+    checkLogRecordsExists({"test"}, [](const std::string& line) {
+        const std::string filenameMarker(__FILENAME__);
+        size_t pos = line.find(filenameMarker);
+        ASSERT_TRUE(pos != std::string::npos);
+        
+        // Extract the part of the line before and after the filenameMarker
+        std::string partBefore = line.substr(0, pos);
+        std::string partAfter = line.substr(pos + filenameMarker.length());
+        
+        // Check that both parts of the line do not contain any path separator characters
+        const char pathSeparator = '/'; // You can modify this if needed for a different platform
+        ASSERT_FALSE(partBefore.find(pathSeparator) != std::string::npos || partAfter.find(pathSeparator) != std::string::npos);
+    });
+}
 
 TEST_F(TestPmLogger, LogLevelChangeRecordExists)
 {
@@ -296,3 +337,4 @@ INSTANTIATE_TEST_SUITE_P(Default, TestPmLoggerWideChars, ::testing::Values(
         "\x45\x6E\x67\x6C\x69\x73\x68\x2E"
    )
 ));
+
