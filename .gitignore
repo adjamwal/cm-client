@@ -41,4 +41,6 @@
 # Build Directory
 /debug/
 /release/
+/xcode_debug/
+/xcode_release/
 /Staging/

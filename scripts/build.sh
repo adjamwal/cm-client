@@ -118,10 +118,60 @@ if [ "${clean}" = "true" ]; then
     if [ -d release ]; then
         rm -fr release
     fi
+    if [ -d xcode_debug ]; then
+        rm -fr xcode_debug
+    fi
+    if [ -d xcode_release ]; then
+        rm -fr xcode_release
+    fi
+
     rm -fr Staging
 
     # Recursively find all files named CMakeCache.txt and delete them
     find . -type f -name "CMakeCache.txt" -exec rm {} \; -print
+            
+    # Each entry contains two parts: root_folder and folder_to_delete
+    # Separate them by a space like this: "<root_folder> <folder_to_delete>"
+    COMPONENT_ROOT_FOLDERS=(
+	"PackageManager export"
+	"EndpointIdentity export"
+	"third-party/crashpad export"
+	"third-party/crashpad/crashpad out"
+	# Add more folders if needed
+    )
+
+# Function to check if a folder is tracked by Git
+is_folder_tracked() {
+    local folder=$1
+    git ls-files --error-unmatch "$folder" &>/dev/null
+}
+
+# Function to delete a folder if it is not tracked by Git
+delete_folder_if_not_tracked() {
+    local root_folder=$1
+    local folder_to_remove=$2
+
+    # Check if the root folder exists
+    if [ -d "$root_folder" ]; then
+        # Check if the folder is NOT tracked by Git
+        if ! is_folder_tracked "$folder_to_remove"; then
+            # Delete the folder
+            rm -rf "$root_folder/$folder_to_remove"
+            echo "Deleted $folder_to_remove folder in: $root_folder"
+        else
+            echo "$folder_to_remove folder in $root_folder is tracked by Git. Skipping deletion."
+        fi
+    else
+        echo "Error: $root_folder does not exist."
+    fi
+}
+
+# Loop through each component root folder and delete folders if not tracked by Git
+for entry in "${COMPONENT_ROOT_FOLDERS[@]}"; do
+    root_folder="${entry% *}"             # Extract root folder from the entry
+    folder_to_delete="${entry#* }"        # Extract folder_to_delete from the entry
+    delete_folder_if_not_tracked "$root_folder" "$folder_to_delete"
+done
 
     echo
     echo "** Build clean completed **"
