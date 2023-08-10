@@ -17,5 +17,7 @@ class MockFileUtilities : public PackageManager::IFileUtilities
     MOCK_METHOD(bool, ApplyAdminRestrictions, (const std::filesystem::path &filePath), (override));
     MOCK_METHOD(bool, ApplyUserRestrictions, (const std::filesystem::path &filePath), (override));
     MOCK_METHOD(int32_t, FileSearchWithWildCard, (const std::filesystem::path&, std::vector<std::filesystem::path>&), (override));
+    MOCK_METHOD(std::string, ResolvePath, (const std::string&), (override));
+    MOCK_METHOD(std::string, ResolveKnownFolderIdForDefaultUser, (const std::string&), (override));
 };
 

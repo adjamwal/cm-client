@@ -32,12 +32,12 @@ bool FileUtilities::HasAdminRestrictionsApplied(const std::filesystem::path &fil
         return false;
     
     const auto pathPermissions = std::filesystem::status(filePath).permissions();
-    
-        //x flag is not mandatory
+ 
+    //x flag is not mandatory
     bool bAdminHasAccess = std::filesystem::perms::owner_read == (pathPermissions & std::filesystem::perms::owner_read);
     bAdminHasAccess &= std::filesystem::perms::owner_write == (pathPermissions & std::filesystem::perms::owner_write);
     
-        //r flag is allowed
+    //r flag is allowed
     bool bOthersHaveAccess = std::filesystem::perms::others_write == (pathPermissions & std::filesystem::perms::others_write);
     bOthersHaveAccess |= std::filesystem::perms::others_exec == (pathPermissions & std::filesystem::perms::others_exec);
     
@@ -54,7 +54,7 @@ bool FileUtilities::HasUserRestrictionsApplied(const std::filesystem::path &file
     
     const auto pathPermissions = std::filesystem::status(filePath).permissions();
     
-        // Check if others have read permission
+    // Check if others have read permission
     const bool bOthersHaveAccess = std::filesystem::perms::others_read == (pathPermissions & std::filesystem::perms::others_read);
     
     return bOthersHaveAccess;
@@ -68,7 +68,7 @@ bool FileUtilities::ApplyAdminRestrictions(const std::filesystem::path &filePath
     if (HasAdminRestrictionsApplied(filePath))
         return true;
     
-        //Remove extra permissions
+    //Remove extra permissions
     std::error_code errCode;
     try{
         std::filesystem::permissions(filePath, std::filesystem::perms::others_write
@@ -99,10 +99,10 @@ bool FileUtilities::ApplyUserRestrictions(const std::filesystem::path &filePath)
     if (!PathIsValid(filePath))
         return false;
     
-        // Add read permission for others
+    // Add read permission for others
     std::error_code errCode;
     std::filesystem::permissions(filePath, std::filesystem::perms::others_read,
-                                 std::filesystem::perm_options::add, errCode);
+       std::filesystem::perm_options::add, errCode);
     
     if (errCode) {
         PM_LOG_ERROR("ApplyUserRestrictions failed adding permissions on file:\"%s\" with code: %d and message: \"%s\"", filePath.c_str(), errCode.value(), errCode.message().c_str());
@@ -130,4 +130,24 @@ int32_t FileUtilities::FileSearchWithWildCard(const std::filesystem::path& searc
     
     return dwError;
 }
+
+std::string FileUtilities::ResolvePath(const std::string &basePath)
+{
+    const std::regex folderIdRegex(R"(<FOLDERID_([^>]+)>)");
+    std::smatch matches;
+    
+    if (std::regex_search(basePath, matches, folderIdRegex)) {
+        const auto& folderIdString = matches[1].str();
+        const auto knownFolder = ResolveKnownFolderIdForDefaultUser(folderIdString);
+        
+        if (!knownFolder.empty()) {
+            return std::regex_replace(basePath, folderIdRegex, knownFolder);
+        } else {
+            PM_LOG_WARNING("Failed to resolve path %s", basePath.c_str());
+        }
+    }
+    
+    return basePath;
+}
+
 }

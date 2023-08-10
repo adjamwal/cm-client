@@ -16,6 +16,7 @@ set(OS_PACKAGE_MANAGER_SRCS
     macOS/IFileUtilities.hpp
     macOS/IPmCertRetriever.hpp
     macOS/FileUtilities.cpp
+    macOS/MacOSUtilities.mm
     macOS/FileUtilities.hpp
     macOS/PmCertManager.cpp
     macOS/PmCertManager.hpp
@@ -76,6 +77,7 @@ target_link_libraries(cmpackagemanager
     "-framework IOKit"
     "-framework CoreServices"
     "-framework Security"
+    "-framework Foundation"
 )
 
 target_compile_definitions(cmpackagemanager
@@ -110,6 +112,8 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
     # DEVELOPMENT_TEAM ${DEVELOPMENT_TEAM_ID}
     # PROVISIONING_PROFILE_SPECIFIER my_profile_name
 endif()
+
+set_property(TARGET cmpackagemanager APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
 
 target_enable_warnings(cmpackagemanager)
 

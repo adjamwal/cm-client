@@ -4,7 +4,7 @@
 get_filename_component(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
 get_filename_component(TESTEE_DIR "${TESTS_DIR}" DIRECTORY)
 
-file(GLOB_RECURSE TEST_SRCS Test*.cpp)
+file(GLOB_RECURSE TEST_SRCS Test*.cpp Test*.mm)
 
 add_executable(
   PackageManagerUnitTest
@@ -25,6 +25,7 @@ add_executable(
   ${TESTEE_DIR}/configuration/Config.hpp
   ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.cpp
+  ${TESTEE_DIR}/macOS/macOSUtilities.mm
   
   # Mocks
   ${TESTEE_DIR}/proxy/CMIDAPIProxy.hpp
@@ -69,12 +70,11 @@ target_link_libraries(
   "-framework IOKit"
   "-framework CoreServices"
   "-framework Security"
-  ${SystemConfiguration_framework}
-  ${IOKit_framework}
-  ${CoreServices_framework}
-  ${Security_framework}
+  "-framework Foundation"
   ${GTEST_LIBS}
 )
+
+set_property(TARGET PackageManagerUnitTest APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
 
 target_compile_definitions(
     PackageManagerUnitTest

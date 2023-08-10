@@ -18,7 +18,7 @@ class MockPmPlatformComponentManager : public IPmPlatformComponentManager
     MOCK_METHOD(int32_t, UninstallComponent, (const PmComponent& package), (override));
     MOCK_METHOD(int32_t, DeployConfiguration, (const PackageConfigInfo& config), (override));
     MOCK_METHOD(std::string, ResolvePath, (const std::string& basePath), (override));
-    MOCK_METHOD(int32_t, FileSearchWithWildCard, (const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results), (override));
+    MOCK_METHOD(int32_t, FileSearchWithWildCard, (const std::filesystem::path&, std::vector<std::filesystem::path>&), (override));
     MOCK_METHOD(void, NotifySystemRestart, (), (override));
     MOCK_METHOD(int32_t, ApplyBultinUsersReadPermissions, (const std::filesystem::path& filePath), (override));
     MOCK_METHOD(int32_t, RestrictPathPermissionsToAdmins, (const std::filesystem::path& filePath), (override));

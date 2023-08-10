@@ -113,7 +113,8 @@ int32_t PmPlatformComponentManager::DeployConfiguration(const PackageConfigInfo 
 
 std::string PmPlatformComponentManager::ResolvePath(const std::string &basePath)
 {
-    return basePath;
+    assert(fileUtils_);
+    return fileUtils_->ResolvePath(basePath);
 }
 
 int32_t PmPlatformComponentManager::FileSearchWithWildCard(const std::filesystem::path &searchPath, std::vector<std::filesystem::path> &results)
