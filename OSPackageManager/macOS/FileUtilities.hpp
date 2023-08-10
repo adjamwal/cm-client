@@ -6,11 +6,16 @@
 
 #pragma once
 
+#include <unordered_map>
 #include "IFileUtilities.hpp"
 
 namespace PackageManager
 {
 
+struct NSSearchPathDirectoryMap {
+    const static std::unordered_map<std::string, unsigned int> knownFolderMap;
+};
+    
 class FileUtilities : public IFileUtilities{
 public:
     FileUtilities() = default;
@@ -20,6 +25,7 @@ public:
     bool HasUserRestrictionsApplied(const std::filesystem::path &filePath) override;
     bool ApplyAdminRestrictions(const std::filesystem::path &filePath) override;
     bool ApplyUserRestrictions(const std::filesystem::path &filePath) override;
+    int32_t FileSearchWithWildCard(const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results) override;
 };
 
 }

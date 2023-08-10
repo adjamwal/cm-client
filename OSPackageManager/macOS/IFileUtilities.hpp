@@ -21,7 +21,7 @@ public:
     virtual bool HasUserRestrictionsApplied(const std::filesystem::path &filePath) = 0;
     virtual bool ApplyAdminRestrictions(const std::filesystem::path &filePath) = 0;
     virtual bool ApplyUserRestrictions(const std::filesystem::path &filePath) = 0;
-
+    virtual int32_t FileSearchWithWildCard(const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results) = 0;
 };
 
 }

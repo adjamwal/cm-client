@@ -118,9 +118,8 @@ std::string PmPlatformComponentManager::ResolvePath(const std::string &basePath)
 
 int32_t PmPlatformComponentManager::FileSearchWithWildCard(const std::filesystem::path &searchPath, std::vector<std::filesystem::path> &results)
 {
-    (void) searchPath;
-    (void) results;
-    return -1;
+    assert(fileUtils_);
+    return fileUtils_->FileSearchWithWildCard(searchPath, results);
 }
 
 void PmPlatformComponentManager::NotifySystemRestart()

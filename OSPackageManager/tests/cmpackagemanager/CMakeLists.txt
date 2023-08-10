@@ -103,10 +103,17 @@ target_link_directories(
 
 # Add a custom command to copy the binary to the build directory
 add_custom_command(
-    TARGET PackageManagerUnitTest POST_BUILD
+    TARGET PackageManagerUnitTest PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_CURRENT_SOURCE_DIR}/Resources/mac/signedprocess
             $<TARGET_FILE_DIR:PackageManagerUnitTest>/signedprocess
+)
+
+add_custom_command(
+    TARGET PackageManagerUnitTest PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/Resources/mac/root
+            $<TARGET_FILE_DIR:PackageManagerUnitTest>/root
 )
 
 # Create a custom target that depends on the copy command
