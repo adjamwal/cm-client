@@ -1,0 +1,2373 @@
+{
+  "businesses": [
+    {
+      "id": "00000000-0000-0000-0000-777777777777",
+      "name": "scottorg",
+      "enablements": [
+        "channel-under_test",
+        "channel-alpha",
+        "channel-beta",
+        "channel-deprecated",
+        "no-deployment-limit"
+      ]
+    },
+    {
+      "id": "6a0caaa8-eb2c-418b-ab31-62558d3753a5",
+      "name": "UCB-SXINT",
+      "enablements": [
+        "channel-under_test",
+        "channel-alpha",
+        "channel-beta",
+        "channel-deprecated",
+        "no-deployment-limit"
+      ]
+    },
+    {
+      "id": "a407b0a4-5039-49e6-996d-34c718dbec69",
+      "name": "mmaxin",
+      "enablements": [
+        "channel-under_test",
+        "channel-alpha",
+        "channel-beta",
+        "channel-deprecated",
+        "no-deployment-limit"
+      ]
+    },
+    {
+      "id": "cc6a35bc-1739-4fcd-a285-aa95adbd5e41",
+      "name": "Houman SDC",
+      "enablements": [
+        "channel-under_test",
+        "channel-alpha",
+        "channel-beta",
+        "channel-deprecated",
+        "no-deployment-limit"
+      ]
+    },
+    {
+      "id": "28bb3050-2809-47c4-b48e-fef35dcc0a7e",
+      "name": "Cisco",
+      "enablements": [
+        "channel-under_test",
+        "channel-alpha",
+        "channel-beta",
+        "channel-deprecated",
+        "no-deployment-limit"
+      ]
+    },
+    {
+      "id": "3ce7d315-0ef9-5c4a-9d6b-721283a3a4dc",
+      "name": "BK Test Org",
+      "enablements": [
+        "channel-under_test",
+        "channel-alpha",
+        "channel-beta",
+        "channel-deprecated",
+        "no-deployment-limit"
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "name": "Experimental Mac Test Stable",
+      "product": "MacTest1",
+      "installer_sha256": "8040e40a7200cfb54656e705a446c003ab731b64b6709b6f39040144c6715536",
+      "installer_type": "pkg",
+      "installer_uri":       "https://cisco.box.com/shared/static/7vzmsx2x6mkfa6hrxl87nl86g7v925h5.pkg",
+      "state": "stable",
+      "version": "1.0.0.0"
+    },
+    {
+      "name": "Experimental Mac Test Latest",
+      "product": "MacTest2",
+      "installer_sha256": "8040e40a7200cfb54656e705a446c003ab731b64b6709b6f39040144c6715536",
+      "installer_type": "pkg",
+      "installer_uri":       "https://cisco.box.com/shared/static/7vzmsx2x6mkfa6hrxl87nl86g7v925h5.pkg",
+      "state": "latest",
+      "version": "1.0.0.0"
+    },
+    {
+      "name": "Cisco Secure Endpoint",
+      "product": "AMP",
+      "installer_args": {
+        "$ref": "#/common/install_args/amp/silent_install"
+      },
+      "installer_sha256": "6f08fec60312d1c2537237149dc891c7b52f949166a4c135865a657bfced1ec2",
+      "installer_type": "exe",
+      "installer_uri": "https://sourcefire-apps.s3.amazonaws.com/fireAMP/windows/8.0.1.21164/Release-Logging/installer-univ-tcp.exe",
+      "state": "stable",
+      "configurables": {
+        "$ref": "#/common/configurables/amp"
+      },
+      "version": "8.0.1.21164"
+    },
+    {
+      "name": "Cisco Secure Endpoint",
+      "product": "AMP",
+      "installer_args": {
+        "$ref": "#/common/install_args/amp/silent_install"
+      },
+      "installer_sha256": "5ff20df3c151fc79d18727dde24cd4390f800f19928bcf1d4558b29fc6fed833",
+      "installer_type": "exe",
+      "installer_uri": "https://sourcefire-apps.s3.amazonaws.com/fireAMP/windows/8.1.3.21242/Release-Logging/installer-univ-tcp.exe",
+      "state": "stable",
+      "configurables": {
+        "$ref": "#/common/configurables/amp"
+      },
+      "version": "8.1.3.21242"
+    },
+    {
+      "name": "Cisco Secure Endpoint - QA stable",
+      "product": "AMP",
+      "installer_args": {
+        "$ref": "#/common/install_args/amp/silent_install"
+      },
+      "installer_sha256": "6cb1af974df8b0bd178958b74844bcbdf4fc446a18b3534e414bd605ada2e282",
+      "installer_type": "exe",
+      "installer_uri": "https://cisco-amp-connector-builds-qa1.s3.amazonaws.com/fireAMP/windows/8.1.5.21322/Release-Logging/installer-univ-tcp.exe",
+      "state": "stable",
+      "configurables": {
+        "$ref": "#/common/configurables/amp"
+      },
+      "version": "8.1.5.21322"
+    },
+    {
+      "name": "Cisco Secure Endpoint - Under test",
+      "product": "AMP",
+      "installer_args": {
+        "$ref": "#/common/install_args/amp/silent_install"
+      },
+      "installer_sha256": "82e3aeab36bada730681b9398461c14209d460b5df5c06801f88c878444ccdc4",
+      "installer_type": "exe",
+      "installer_uri": "https://cisco-amp-connector-builds-qa1.s3.amazonaws.com/fireAMP/windows/8.1.7.21389/Release-Logging/installer-univ-tcp.exe",
+      "state": "latest",
+      "configurables": {
+        "$ref": "#/common/configurables/amp"
+      },
+      "version": "8.1.7.21389"
+    },
+    {
+      "name": "Cisco Secure Endpoint - Under test - Upgrade",
+      "product": "AMP",
+      "installer_args": {
+        "$ref": "#/common/install_args/amp/silent_install"
+      },
+      "installer_sha256": "8be82ef9ab9eef8af5c503cbad8266a3b6721fdbb46f9e173509028c082998f8",
+      "installer_type": "exe",
+      "installer_uri": "https://cisco-amp-connector-builds-qa1.s3.amazonaws.com/fireAMP/windows/99.0.99.21389/Release-Logging/installer-univ-tcp.exe",
+      "state": "private",
+      "configurables": {
+        "$ref": "#/common/configurables/amp"
+      },
+      "version": "99.0.99.21389"
+    },
+    {
+      "name": "Cisco Cloud Management - QA stable",
+      "product": "cm-enterprise",
+      "installer_args_pass": [
+        "BS_CONFIG=<INST_TEMP_DIR>\\bs.json"
+      ],
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/CloudManagement/Releases/Windows/Enterprise/1.0.1.400/x64/Cisco-CM-Installer-x64-1.0.1.400.msi",
+      "installer_sha256": "f8a5195225dd36a2ac53a945dd366dd379b1e9346848519c195400296a968468",
+      "installer_signer_name": "CISCO SYSTEMS CANADA CO",
+      "installer_type": "msi",
+      "configurables": {
+        "$ref": "#/common/configurables/cm-enterprise"
+      },
+      "state": "stable",
+      "version": "1.0.1.400"
+    },
+    {
+      "name": "Cisco Cloud Management - Under test",
+      "product": "cm-enterprise",
+      "installer_args_pass": [
+        "BS_CONFIG=<INST_TEMP_DIR>\\bs.json"
+      ],
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/cm-enterprise-1.0.2.419.msi",
+      "installer_sha256": "24048ff1695cb64564033f5ec8450523f2bbc8273ecf22f2c64b8e6994ab450b",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "configurables": {
+        "$ref": "#/common/configurables/cm-enterprise"
+      },
+      "state": "latest",
+      "version": "1.0.2.419"
+    },
+    {
+      "name": "Cisco Cloud Management - Under test - Upgrade",
+      "product": "cm-enterprise",
+      "installer_args_pass": [
+        "BS_CONFIG=<INST_TEMP_DIR>\\bs.json"
+      ],
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/x64/cm-enterprise-99.0.2.419.msi",
+      "installer_sha256": "afbb0bf5c49ad57c0ce67dbf0de3b02724e372bc0da4333082d193424f215f1d",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "configurables": {
+        "$ref": "#/common/configurables/cm-enterprise"
+      },
+      "state": "private",
+      "version": "99.0.2.419"
+    },
+    {
+      "name": "AnyConnect VPN",
+      "product": "ac-core-vpn",
+      "installer_args": {
+        "$ref": "#/common/install_args/ac-core-vpn/block_vpn_tearing_down"
+      },
+      "installer_args_pass": {
+        "$ref": "#/common/install_args/ac-core-vpn/allow_vpn_tearing_down"
+      },
+      "installer_sha256": "8580893693135f6a4199fcab2a6b52ee320a425cd6b48e1def021d6f232f14ac",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00529/cisco-secure-client-win-5.0.00529-core-vpn-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "state": "stable",
+      "version": "5.0.529.0"
+    },
+    {
+      "name": "DART",
+      "product": "ac-dart",
+      "installer_sha256": "85d879d258587be6917a6939791ad8c117757fa6ad0991f691e11a8ffa3d3c58",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00529/cisco-secure-client-win-5.0.00529-dart-predeploy-k9.msi",
+      "state": "stable",
+      "version": "5.0.529.0"
+    },
+    {
+      "name": "ISE Posture",
+      "product": "ac-iseposture",
+      "installer_sha256": "08dbf6e3cf32033d4bf39d5e03ab577202da8a541822de551633cfc74475dca5",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00529/cisco-secure-client-win-5.0.00529-iseposture-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "state": "stable",
+      "version": "5.0.529.0"
+    },
+    {
+      "name": "Network Access Manager",
+      "product": "ac-nam",
+      "installer_sha256": "9ffb127eb442585c31ddc14c5691dbe6c476d2988667600119ad065f17940858",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00529/cisco-secure-client-win-5.0.00529-nam-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "state": "stable",
+      "version": "5.0.529.0"
+    },
+    {
+      "name": "Network Visibility Module",
+      "product": "ac-nvm",
+      "installer_sha256": "45c57882b7e3043facc8a0f738fabd8e3446a059c2595f6c4a411731db1b75fd",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00529/cisco-secure-client-win-5.0.00529-nvm-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-legacy"
+      },
+      "state": "stable",
+      "version": "5.0.529.0"
+    },
+    {
+      "name": "Secure Firewall Posture",
+      "product": "ac-posture",
+      "installer_sha256": "ef52bc8e607ef9e4280700db8768c106c7a2579f95495cb40196f92bf78f1113",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00529/cisco-secure-client-win-5.0.00529-posture-predeploy-k9.msi",
+      "state": "stable",
+      "version": "5.0.529.0"
+    },
+    {
+      "name": "Start Before Login",
+      "product": "ac-gina",
+      "installer_sha256": "463202113b0fc50a19c141d3f44e93780bf9ff60c98a8fd3c73665e5c879dc51",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00529/cisco-secure-client-win-5.0.00529-sbl-predeploy-k9.msi",
+      "state": "stable",
+      "version": "5.0.529.0"
+    },
+    {
+      "name": "Umbrella",
+      "product": "ac-umbrella",
+      "installer_sha256": "559814cbbc8f8f6a8edf63358bed4c8d263ebbd5253c12af8cf226fe48324943",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00529/cisco-secure-client-win-5.0.00529-umbrella-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "state": "stable",
+      "version": "5.0.529.0"
+    },
+    {
+      "name": "AnyConnect VPN",
+      "product": "ac-core-vpn",
+      "installer_args": {
+        "$ref": "#/common/install_args/ac-core-vpn/block_vpn_tearing_down"
+      },
+      "installer_args_pass": {
+        "$ref": "#/common/install_args/ac-core-vpn/allow_vpn_tearing_down"
+      },
+      "installer_sha256": "9a9f1b49b5c3e3a849bc8767ea63926585547c23d08742b7f86f8d84abf9da6a",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00556/cisco-secure-client-win-5.0.00556-core-vpn-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "state": "stable",
+      "version": "5.0.556.0"
+    },
+    {
+      "name": "DART",
+      "product": "ac-dart",
+      "installer_sha256": "248e062e276f7a2ade2980f7c4998acba7ca4e3665cc2aa272362c50cdd046d3",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00556/cisco-secure-client-win-5.0.00556-dart-predeploy-k9.msi",
+      "state": "stable",
+      "version": "5.0.556.0"
+    },
+    {
+      "name": "ISE Posture",
+      "product": "ac-iseposture",
+      "installer_sha256": "f86a083bf9eae0765d3d31726ca15436236ab7afbd8536828beb5ba6d38ad6a8",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00556/cisco-secure-client-win-5.0.00556-iseposture-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "state": "stable",
+      "version": "5.0.556.0"
+    },
+    {
+      "name": "Network Access Manager",
+      "product": "ac-nam",
+      "installer_sha256": "3b17d9a5a7a52b0e613a2b4afde0fe99569d66ac38f119e1ba695f6752df2065",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00556/cisco-secure-client-win-5.0.00556-nam-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "state": "stable",
+      "version": "5.0.556.0"
+    },
+    {
+      "name": "Network Visibility Module",
+      "product": "ac-nvm",
+      "installer_sha256": "d32683169545f7ecb0b5c4e210d0f5ce595aecaf377b290a22375d589dd7ff1d",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00556/cisco-secure-client-win-5.0.00556-nvm-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-legacy"
+      },
+      "state": "stable",
+      "version": "5.0.556.0"
+    },
+    {
+      "name": "Secure Firewall Posture",
+      "product": "ac-posture",
+      "installer_sha256": "2112cde66c26bbe03e46b693a09843f709ab244d7eafcc89e89e34f317770767",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00556/cisco-secure-client-win-5.0.00556-posture-predeploy-k9.msi",
+      "state": "stable",
+      "version": "5.0.556.0"
+    },
+    {
+      "name": "Start Before Login",
+      "product": "ac-gina",
+      "installer_sha256": "b31f3deaf1b65f9780a536993013ba06c27a3caadc58489de24246178f23ffcf",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00556/cisco-secure-client-win-5.0.00556-sbl-predeploy-k9.msi",
+      "state": "stable",
+      "version": "5.0.556.0"
+    },
+    {
+      "name": "Umbrella",
+      "product": "ac-umbrella",
+      "installer_sha256": "4cf5c9f4ef9e6973e0abcfa9d4e2234369243429539644f458179c2554237eae",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.00556/cisco-secure-client-win-5.0.00556-umbrella-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "state": "stable",
+      "version": "5.0.556.0"
+    },
+    {
+      "name": "AnyConnect VPN",
+      "product": "ac-core-vpn",
+      "installer_args": {
+        "$ref": "#/common/install_args/ac-core-vpn/block_vpn_tearing_down"
+      },
+      "installer_args_pass": {
+        "$ref": "#/common/install_args/ac-core-vpn/allow_vpn_tearing_down"
+      },
+      "installer_sha256": "0d598cce56cf6d3272d5e1b1c1266b5f5c816fc367d61d2113eaa41f07d1fc18",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.01242/cisco-secure-client-win-5.0.01242-core-vpn-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "state": "latest",
+      "version": "5.0.1242.0"
+    },
+    {
+      "name": "DART",
+      "product": "ac-dart",
+      "installer_sha256": "e92aa78a7916c9af06576281c1952165a4b1eb1325ca05aca15f6c45e979fdc5",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.01242/cisco-secure-client-win-5.0.01242-dart-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.1242.0"
+    },
+    {
+      "name": "ISE Posture",
+      "product": "ac-iseposture",
+      "installer_sha256": "ea31d4c57dfb80b18dfe1d1d9d147232dabede62029d2cefd4bc6ec142487261",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.01242/cisco-secure-client-win-5.0.01242-iseposture-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "state": "latest",
+      "version": "5.0.1242.0"
+    },
+    {
+      "name": "Network Access Manager",
+      "product": "ac-nam",
+      "installer_sha256": "b1e7352875de8be25629405d020be560b0b7ac70b4a8312335fb42a368a0c11f",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.01242/cisco-secure-client-win-5.0.01242-nam-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "state": "latest",
+      "version": "5.0.1242.0"
+    },
+    {
+      "name": "Network Visibility Module",
+      "product": "ac-nvm",
+      "installer_sha256": "d788133190926c81eedf16317b1642a22442870f985c6aba1fa768af7bae5709",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.01242/cisco-secure-client-win-5.0.01242-nvm-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-legacy"
+      },
+      "state": "latest",
+      "version": "5.0.1242.0"
+    },
+    {
+      "name": "Secure Firewall Posture",
+      "product": "ac-posture",
+      "installer_sha256": "07b3a512e4a1784b28eca62a627a3d3f53d060b944c41cb0ca44a09e9bd05472",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.01242/cisco-secure-client-win-5.0.01242-posture-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.1242.0"
+    },
+    {
+      "name": "Start Before Login",
+      "product": "ac-gina",
+      "installer_sha256": "627122d20915c1b361c6766b76d9023d352d268863fc81f8a966a0f9693395df",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.01242/cisco-secure-client-win-5.0.01242-sbl-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.1242.0"
+    },
+    {
+      "name": "Umbrella",
+      "product": "ac-umbrella",
+      "installer_sha256": "e8eb5d59ea9716bbe9fbfc16193417b96699a0268c363baed4cb7a2589335137",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.01242/cisco-secure-client-win-5.0.01242-umbrella-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "state": "latest",
+      "version": "5.0.1242.0"
+    },
+    {
+      "name": "AnyConnect VPN",
+      "product": "ac-core-vpn",
+      "installer_args": {
+        "$ref": "#/common/install_args/ac-core-vpn/block_vpn_tearing_down"
+      },
+      "installer_args_pass": {
+        "$ref": "#/common/install_args/ac-core-vpn/allow_vpn_tearing_down"
+      },
+      "installer_sha256": "989cc96136dd14be39961188de60f463f22a8d368ed387c53701f8c70f148261",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02039/cisco-secure-client-win-5.0.02039-core-vpn-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "state": "latest",
+      "version": "5.0.2039.0"
+    },
+    {
+      "name": "DART",
+      "product": "ac-dart",
+      "installer_sha256": "67f657be8e8f4217531f7b1606ef8a106234bfd96e9d4bccfa93bc666620fedc",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02039/cisco-secure-client-win-5.0.02039-dart-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.2039.0"
+    },
+    {
+      "name": "ISE Posture",
+      "product": "ac-iseposture",
+      "installer_sha256": "a3e075b50263323fce71a7eb6b14aacced95fb6177d3b416f9bf21cb5d85e5ca",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02039/cisco-secure-client-win-5.0.02039-iseposture-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "state": "latest",
+      "version": "5.0.2039.0"
+    },
+    {
+      "name": "Network Access Manager",
+      "product": "ac-nam",
+      "installer_sha256": "65146cd95d9897558715c49815a32d55219a7e046de397f3879346fdcc7239b4",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02039/cisco-secure-client-win-5.0.02039-nam-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "state": "latest",
+      "version": "5.0.2039.0"
+    },
+    {
+      "name": "Network Visibility Module",
+      "product": "ac-nvm",
+      "installer_sha256": "4a1feef3eb0d3d821672cf48c6fcf825a8eb705bdfd4e90a43be669936a1912d",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02039/cisco-secure-client-win-5.0.02039-nvm-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-legacy"
+      },
+      "state": "latest",
+      "version": "5.0.2039.0"
+    },
+    {
+      "name": "Secure Firewall Posture",
+      "product": "ac-posture",
+      "installer_sha256": "5d9d0b9ba4261bec69096cda8b7464dd91e8baf0d0294ce67662e9d4202aecb8",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02039/cisco-secure-client-win-5.0.02039-posture-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.2039.0"
+    },
+    {
+      "name": "Start Before Login",
+      "product": "ac-gina",
+      "installer_sha256": "4fb4816346230cde34bb79bfdcc1e33643b9f594f6b39568e48801a3d3aae407",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02039/cisco-secure-client-win-5.0.02039-sbl-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.2039.0"
+    },
+    {
+      "name": "Umbrella",
+      "product": "ac-umbrella",
+      "installer_sha256": "a5e1f365a477534044492f725521c88deaa497ac66f482df9cb690f11d6e36bf",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02039/cisco-secure-client-win-5.0.02039-umbrella-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "state": "latest",
+      "version": "5.0.2039.0"
+    },
+    {
+      "name": "AnyConnect VPN",
+      "product": "ac-core-vpn",
+      "installer_args": {
+        "$ref": "#/common/install_args/ac-core-vpn/block_vpn_tearing_down"
+      },
+      "installer_args_pass": {
+        "$ref": "#/common/install_args/ac-core-vpn/allow_vpn_tearing_down"
+      },
+      "installer_sha256": "cad25621dd5609bf41582ec2df8d3a1a745009d6a2d2aa545f3728f2ae44b330",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02804/cisco-secure-client-win-5.0.02804-core-vpn-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "state": "alpha",
+      "version": "5.0.2804.0"
+    },
+    {
+      "name": "DART",
+      "product": "ac-dart",
+      "installer_sha256": "059264960ef254053494f096e5e79356a476c398642ad69fb90166445f3d7935",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02804/cisco-secure-client-win-5.0.02804-dart-predeploy-k9.msi",
+      "state": "alpha",
+      "version": "5.0.2804.0"
+    },
+    {
+      "name": "ISE Posture",
+      "product": "ac-iseposture",
+      "installer_sha256": "90dcef799ff2726c0aa04c630cbcd467c3cf0d6a4c72f112d359bfd420615320",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02804/cisco-secure-client-win-5.0.02804-iseposture-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "state": "alpha",
+      "version": "5.0.2804.0"
+    },
+    {
+      "name": "Network Access Manager",
+      "product": "ac-nam",
+      "installer_sha256": "e1c5b403c8893a1d5fe63d9af7e4a5bca9c72ac26e8ebb744053d232c1863edf",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02804/cisco-secure-client-win-5.0.02804-nam-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "state": "alpha",
+      "version": "5.0.2804.0"
+    },
+    {
+      "name": "Network Visibility Module",
+      "product": "ac-nvm",
+      "installer_sha256": "73a6a07961d2f6e6e3db02d813819109e06d87a645b944222ad33ada22dc0fd8",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02804/cisco-secure-client-win-5.0.02804-nvm-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-legacy"
+      },
+      "state": "alpha",
+      "version": "5.0.2804.0"
+    },
+    {
+      "name": "Secure Firewall Posture",
+      "product": "ac-posture",
+      "installer_sha256": "2c5430fb91baabfdb44a202a71a3bb4caca210ee3d0eb1a9730de4474fc4bcbf",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02804/cisco-secure-client-win-5.0.02804-posture-predeploy-k9.msi",
+      "state": "alpha",
+      "version": "5.0.2804.0"
+    },
+    {
+      "name": "Start Before Login",
+      "product": "ac-gina",
+      "installer_sha256": "db22b13475678bcbe418f704a300e91559fdfcc03adb910bc089cfecd43fcdd5",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02804/cisco-secure-client-win-5.0.02804-sbl-predeploy-k9.msi",
+      "state": "alpha",
+      "version": "5.0.2804.0"
+    },
+    {
+      "name": "Umbrella",
+      "product": "ac-umbrella",
+      "installer_sha256": "49d45f294b1471d809ab76292c729adb83855a82d760c2d9b923f25568806c92",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02804/cisco-secure-client-win-5.0.02804-umbrella-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "state": "alpha",
+      "version": "5.0.2804.0"
+    },
+    {
+      "name": "AnyConnect VPN",
+      "product": "ac-core-vpn",
+      "installer_args": {
+        "$ref": "#/common/install_args/ac-core-vpn/block_vpn_tearing_down"
+      },
+      "installer_args_pass": {
+        "$ref": "#/common/install_args/ac-core-vpn/allow_vpn_tearing_down"
+      },
+      "installer_sha256": "844e06e7912ea534eef15c4906a31ceb98a27fa3dfe575c59c3c8f9aeee3486e",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02810/cisco-secure-client-win-5.0.02810-core-vpn-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "state": "latest",
+      "version": "5.0.2810.0"
+    },
+    {
+      "name": "DART",
+      "product": "ac-dart",
+      "installer_sha256": "aa4a8e4c5b04052ade42a4de5ba1804e5c909f19fbb9b3dee36fa600e4740bf1",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02810/cisco-secure-client-win-5.0.02810-dart-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.2810.0"
+    },
+    {
+      "name": "ISE Posture",
+      "product": "ac-iseposture",
+      "installer_sha256": "d8d57ded885e26fb83ed1943fe666bf99704c2f1d852392c21b16df79a722c32",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02810/cisco-secure-client-win-5.0.02810-iseposture-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "state": "latest",
+      "version": "5.0.2810.0"
+    },
+    {
+      "name": "Network Access Manager",
+      "product": "ac-nam",
+      "installer_sha256": "ff1da01f4e2535ae0ffc14598d70a4643dde071d128d23b10ea2b49305ba0d63",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02810/cisco-secure-client-win-5.0.02810-nam-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "state": "latest",
+      "version": "5.0.2810.0"
+    },
+    {
+      "name": "Network Visibility Module",
+      "product": "ac-nvm",
+      "installer_sha256": "5cb235e1ec224b6e410f218fa412e34032226c63381e54637ec454569a26ee0c",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02810/cisco-secure-client-win-5.0.02810-nvm-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-xdr"
+      },
+      "state": "latest",
+      "version": "5.0.2810.0"
+    },
+    {
+      "name": "Secure Firewall Posture",
+      "product": "ac-posture",
+      "installer_sha256": "f49676d9d2a214964d67a392de9488852c6730e8b84825df1a1f8f1585fada2c",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02810/cisco-secure-client-win-5.0.02810-posture-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.2810.0"
+    },
+    {
+      "name": "Start Before Login",
+      "product": "ac-gina",
+      "installer_sha256": "6f280b7b44c7262b479fd9e740f71b4536c13bbfda6c16c17c38f38252a511e1",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02810/cisco-secure-client-win-5.0.02810-sbl-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.2810.0"
+    },
+    {
+      "name": "Umbrella",
+      "product": "ac-umbrella",
+      "installer_sha256": "ed20c62873ebd496aa4292ad32ffb269e0d81458bb1d9d641fed3dcb91308bcb",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02810/cisco-secure-client-win-5.0.02810-umbrella-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "state": "latest",
+      "version": "5.0.2810.0"
+    },
+    {
+      "name": "AnyConnect VPN",
+      "product": "ac-core-vpn",
+      "installer_args": {
+        "$ref": "#/common/install_args/ac-core-vpn/block_vpn_tearing_down"
+      },
+      "installer_args_pass": {
+        "$ref": "#/common/install_args/ac-core-vpn/allow_vpn_tearing_down"
+      },
+      "installer_sha256": "d6caa99c25f3dadd75650d5d91bd9296bd018df77d7e8a8279d0153a4781ef65",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02814/cisco-secure-client-win-5.0.02814-core-vpn-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "state": "beta",
+      "version": "5.0.2814.0"
+    },
+    {
+      "name": "DART",
+      "product": "ac-dart",
+      "installer_sha256": "6c03d33bf90a19f7fcbc3f0edd197492d4dca7e2d1fc1fe46f5f7663848cc293",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02814/cisco-secure-client-win-5.0.02814-dart-predeploy-k9.msi",
+      "state": "beta",
+      "version": "5.0.2814.0"
+    },
+    {
+      "name": "ISE Posture",
+      "product": "ac-iseposture",
+      "installer_sha256": "55e7ebfc529b4246f61fa9cbd3bcc2c620bc750f00d06ea3734e690e077f4b58",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02814/cisco-secure-client-win-5.0.02814-iseposture-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "state": "beta",
+      "version": "5.0.2814.0"
+    },
+    {
+      "name": "Network Access Manager",
+      "product": "ac-nam",
+      "installer_sha256": "46e1541cc76e424b2463cd4e6447b87eefed1e728f2e4258b14a99a4246c667a",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02814/cisco-secure-client-win-5.0.02814-nam-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "state": "beta",
+      "version": "5.0.2814.0"
+    },
+    {
+      "name": "Network Visibility Module",
+      "product": "ac-nvm",
+      "installer_sha256": "b5594f9997d71bc74c1b34bf605154bc805cd6fbf6a83f40ffd52ab0c20e1bd3",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02814/cisco-secure-client-win-5.0.02814-nvm-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-xdr"
+      },
+      "state": "beta",
+      "version": "5.0.2814.0"
+    },
+    {
+      "name": "Secure Firewall Posture",
+      "product": "ac-posture",
+      "installer_sha256": "0150ff3a88ba4ca1fda99beef8afb68cd81e3e4ae72e5595601daf5dd4be220f",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02814/cisco-secure-client-win-5.0.02814-posture-predeploy-k9.msi",
+      "state": "beta",
+      "version": "5.0.2814.0"
+    },
+    {
+      "name": "Start Before Login",
+      "product": "ac-gina",
+      "installer_sha256": "32905814b54b97241312beca58e0f61c246067db40bdd51e2132ea428b1a398c",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02814/cisco-secure-client-win-5.0.02814-sbl-predeploy-k9.msi",
+      "state": "beta",
+      "version": "5.0.2814.0"
+    },
+    {
+      "name": "Umbrella",
+      "product": "ac-umbrella",
+      "installer_sha256": "b3dec3211c4653897438534d054930ddced97b5ddcf67012a008f86c361bc396",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.02814/cisco-secure-client-win-5.0.02814-umbrella-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "state": "beta",
+      "version": "5.0.2814.0"
+    },
+    {
+      "name": "AnyConnect VPN",
+      "product": "ac-core-vpn",
+      "installer_args": {
+        "$ref": "#/common/install_args/ac-core-vpn/block_vpn_tearing_down"
+      },
+      "installer_args_pass": {
+        "$ref": "#/common/install_args/ac-core-vpn/allow_vpn_tearing_down"
+      },
+      "installer_sha256": "9ba368a84b6fc50b112871257887fda970fb1ac73306e6ebc4eb04b5b515c6fb",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.03076/cisco-secure-client-win-5.0.03076-core-vpn-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "state": "latest",
+      "version": "5.0.3076.0"
+    },
+    {
+      "name": "DART",
+      "product": "ac-dart",
+      "installer_sha256": "8e23dbb45c37d5b65941590706dd2f33874298714d2796abf95bec2e7880270e",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.03076/cisco-secure-client-win-5.0.03076-dart-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.3076.0"
+    },
+    {
+      "name": "ISE Posture",
+      "product": "ac-iseposture",
+      "installer_sha256": "d5b5d4c56d48e76545bfc0e2987e3b6b76624c15eadb3fb912eb615c0eff403e",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.03076/cisco-secure-client-win-5.0.03076-iseposture-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "state": "latest",
+      "version": "5.0.3076.0"
+    },
+    {
+      "name": "Network Access Manager",
+      "product": "ac-nam",
+      "installer_sha256": "1648729aaf920d20f22fd67a9686e206ea586e0aa25f94fb6cf6c6a7c977c188",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.03076/cisco-secure-client-win-5.0.03076-nam-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "state": "latest",
+      "version": "5.0.3076.0"
+    },
+    {
+      "name": "Network Visibility Module",
+      "product": "ac-nvm",
+      "installer_sha256": "13edb2788c0d918c148a71d78e4eb24198546a3d49a840649de8a48452fd00e6",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.03076/cisco-secure-client-win-5.0.03076-nvm-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-legacy"
+      },
+      "state": "latest",
+      "version": "5.0.3076.0"
+    },
+    {
+      "name": "Secure Firewall Posture",
+      "product": "ac-posture",
+      "installer_sha256": "d7479d488f37ad973153ec11afa4aa9c92126bc37ef00a30c1294c1ca6c0b914",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.03076/cisco-secure-client-win-5.0.03076-posture-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.3076.0"
+    },
+    {
+      "name": "Start Before Login",
+      "product": "ac-gina",
+      "installer_sha256": "f62deb4805fb8328c3527e9458ad0e99b6f268f9fdc7fee27326f15a4f9a8a11",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.03076/cisco-secure-client-win-5.0.03076-sbl-predeploy-k9.msi",
+      "state": "latest",
+      "version": "5.0.3076.0"
+    },
+    {
+      "name": "Umbrella",
+      "product": "ac-umbrella",
+      "installer_sha256": "aa7143cafb22b14c7ac24ceb48bb7fc008dd623af682c1b3e99f5e9d3a0131a4",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.03076/cisco-secure-client-win-5.0.03076-umbrella-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "state": "latest",
+      "version": "5.0.3076.0"
+    },
+    {
+      "name": "AnyConnect VPN",
+      "product": "ac-core-vpn",
+      "installer_args": {
+        "$ref": "#/common/install_args/ac-core-vpn/block_vpn_tearing_down"
+      },
+      "installer_args_pass": {
+        "$ref": "#/common/install_args/ac-core-vpn/allow_vpn_tearing_down"
+      },
+      "installer_sha256": "8c0874b749fec6ccbe0d8831c791ee552ce6bc2ed22aee82c239ff544fefed69",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.04016/cisco-secure-client-win-5.0.04016-core-vpn-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "state": "beta",
+      "version": "5.0.4016.0"
+    },
+    {
+      "name": "DART",
+      "product": "ac-dart",
+      "installer_sha256": "f5f048c8589abd9a3cbbe5746e265500e1a1920819177e260b7b6cecbe976de9",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.04016/cisco-secure-client-win-5.0.04016-dart-predeploy-k9.msi",
+      "state": "beta",
+      "version": "5.0.4016.0"
+    },
+    {
+      "name": "ISE Posture",
+      "product": "ac-iseposture",
+      "installer_sha256": "0f01ed46802f2b453bfa4565609a53c735af899bd9e82481c33635f4ffecc3d2",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.04016/cisco-secure-client-win-5.0.04016-iseposture-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "state": "beta",
+      "version": "5.0.4016.0"
+    },
+    {
+      "name": "Network Access Manager",
+      "product": "ac-nam",
+      "installer_sha256": "65bd0282f601c3074ed4abf344262292f612da12b16d004ae52a97edcb4fbaeb",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.04016/cisco-secure-client-win-5.0.04016-nam-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "state": "beta",
+      "version": "5.0.4016.0"
+    },
+    {
+      "name": "Network Visibility Module",
+      "product": "ac-nvm",
+      "installer_sha256": "750d9ea3360b1ae74c51a976f8508a240dcb818e26520272d1429286b3f7d4dd",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.04016/cisco-secure-client-win-5.0.04016-nvm-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-xdr"
+      },
+      "state": "beta",
+      "version": "5.0.4016.0"
+    },
+    {
+      "name": "Secure Firewall Posture",
+      "product": "ac-posture",
+      "installer_sha256": "55a4ca8f6d603de063699dcc21a656c0d8039700681ba8e5e0c57eba4b958749",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.04016/cisco-secure-client-win-5.0.04016-posture-predeploy-k9.msi",
+      "state": "beta",
+      "version": "5.0.4016.0"
+    },
+    {
+      "name": "Start Before Login",
+      "product": "ac-gina",
+      "installer_sha256": "7f9b062dcfb7e2e640a1890887ccfd990742bc2b9c04463bb496ef0403666871",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.04016/cisco-secure-client-win-5.0.04016-sbl-predeploy-k9.msi",
+      "state": "beta",
+      "version": "5.0.4016.0"
+    },
+    {
+      "name": "Umbrella",
+      "product": "ac-umbrella",
+      "installer_sha256": "3b29ef3f8e7016e82bc0b3408e0fb242c1acb2a45ec9bcc72922fa44e1167e67",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/Pub/CSC-Test-Builds/5.0.04016/cisco-secure-client-win-5.0.04016-umbrella-predeploy-k9.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "state": "beta",
+      "version": "5.0.4016.0"
+    },
+    {
+      "name": "Example Product",
+      "product": "example-product",
+      "installer_sha256": "240c141a9c8104ea818590c9caef501937c082b47f642606dd4d0fdf7038548b",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageB-x64-1.0.0.0.msi",
+      "configurables": {
+        "$ref": "#/common/configurables/example-product"
+      },
+      "state": "latest",
+      "version": "1.0.0.0"
+    },
+    {
+      "name": "msi Test Package 1.0 - Happy Path",
+      "product": "test-package-1",
+      "installer_sha256": "5f4efc6ae19e7176419fdb52e3a0d300f503e8f70abc4005299cc0b31a0dfaee",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageA-x64-1.0.0.0.msi",
+      "state": "private",
+      "version": "1.0.0.0",
+      "configurables": {
+        "$ref": "#/common/configurables/test-package"
+      }
+    },
+    {
+      "name": "msi Test Package 2.0 - Happy Path",
+      "product": "test-package-1",
+      "installer_sha256": "0658f22521f14437e40b9a251d705b7f29d2a4114f1819ab6acdd7be813c6f77",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageA-x64-2.0.0.0.msi",
+      "state": "private",
+      "version": "2.0.0.0",
+      "configurables": {
+        "$ref": "#/common/configurables/test-package"
+      }
+    },
+    {
+      "name": "msi Test Package 1.0 - Install Failure",
+      "product": "test-package-2",
+      "installer_args": [
+        "FAIL=true"
+      ],
+      "installer_sha256": "5f4efc6ae19e7176419fdb52e3a0d300f503e8f70abc4005299cc0b31a0dfaee",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageA-x64-1.0.0.0.msi",
+      "state": "private",
+      "version": "1.0.0.0"
+    },
+    {
+      "name": "msi Test Package 1.0 - Multiple Install Args - Happy Path",
+      "product": "test-package-5",
+      "installer_args": [
+        "/QN",
+        "/L+*V <FOLDERID_ProgramData>\\Cisco\\UC\\dummy_install.log"
+      ],
+      "installer_sha256": "5f4efc6ae19e7176419fdb52e3a0d300f503e8f70abc4005299cc0b31a0dfaee",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageA-x64-1.0.0.0.msi",
+      "state": "private",
+      "version": "1.0.0.0",
+      "configurables": {
+        "$ref": "#/common/configurables/test-package"
+      }
+    },
+    {
+      "name": "msi Test Package 1.0 - Multiple Install Args - No signer",
+      "product": "test-package-3",
+      "installer_args": [
+        "/QN",
+        "/L+*V <FOLDERID_ProgramData>\\Cisco\\UC\\dummy_install.log"
+      ],
+      "installer_sha256": "5f4efc6ae19e7176419fdb52e3a0d300f503e8f70abc4005299cc0b31a0dfaee",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageA-x64-1.0.0.0.msi",
+      "state": "private",
+      "version": "1.0.0.0"
+    },
+    {
+      "name": "msi Test Package 1.0 - Wrong signer",
+      "product": "test-package-4",
+      "installer_sha256": "5f4efc6ae19e7176419fdb52e3a0d300f503e8f70abc4005299cc0b31a0dfaee",
+      "installer_signer_name": "Cisco Systems",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageA-x64-1.0.0.0.msi",
+      "state": "private",
+      "version": "1.0.0.0"
+    },
+    {
+      "name": "msi Test Package 1.0 - Reboot required",
+      "product": "test-package-6",
+      "installer_args": [
+        "SR=true"
+      ],
+      "installer_sha256": "5f4efc6ae19e7176419fdb52e3a0d300f503e8f70abc4005299cc0b31a0dfaee",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageA-x64-1.0.0.0.msi",
+      "state": "private",
+      "version": "1.0.0.0"
+    },
+    {
+      "name": "msi Test Package 1.0 - Reboot forced",
+      "product": "test-package-7",
+      "installer_args": [
+        "FR=true"
+      ],
+      "installer_sha256": "5f4efc6ae19e7176419fdb52e3a0d300f503e8f70abc4005299cc0b31a0dfaee",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageA-x64-1.0.0.0.msi",
+      "state": "private",
+      "version": "1.0.0.0"
+    },
+    {
+      "name": "msi Test Package 1.0 - Happy Path",
+      "product": "test-package-b-1",
+      "installer_sha256": "240c141a9c8104ea818590c9caef501937c082b47f642606dd4d0fdf7038548b",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageB-x64-1.0.0.0.msi",
+      "state": "private",
+      "version": "1.0.0.0"
+    },
+    {
+      "name": "msi Test Package 2.0 - Happy Path",
+      "product": "test-package-b-1",
+      "installer_sha256": "a51f851f922fe41536c4311189f2be38c33592606c336fd6d2c08fa809792337",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageB-x64-2.0.0.0.msi",
+      "state": "private",
+      "version": "2.0.0.0"
+    },
+    {
+      "name": "msi Test Package 1.0 - Reboot required",
+      "product": "test-package-b-2",
+      "installer_args": [
+        "SR=true"
+      ],
+      "installer_sha256": "240c141a9c8104ea818590c9caef501937c082b47f642606dd4d0fdf7038548b",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "msi",
+      "installer_uri": "https://nexus.engine.sourcefire.com/repository/raw/UnifiedConnector/Windows/TestPackages/TestPackageB-x64-1.0.0.0.msi",
+      "state": "private",
+      "version": "1.0.0.0"
+    }
+  ],
+  "products": [
+    {
+      "product": "MacTest1",
+      "product_name": "Mac Test Package 1",
+      "discovery": [
+        {
+          "type": "pkgutil",
+          "pkgId": "com.cisco.secureclient.testpackage1",
+          "name": "TestPackageA",
+          "vendor": "TestPackageB"
+        }
+      ],
+      "description": "Mac Test Package 1.0 - Happy Path",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "MacTest2",
+      "product_name": "Mac Test Package 2",
+      "discovery": [
+        {
+          "type": "pkgutil",
+          "pkgId": "com.cisco.secureclient.testpackage2",
+          "name": "TestPackageC",
+          "vendor": "TestPackageD"
+        }
+      ],
+      "description": "Mac Test Package 1.0 - Happy Path",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "cm-enterprise",
+      "product_name": "Cloud Management",
+      "configurables": {
+        "$ref": "#/common/configurables/cm-enterprise"
+      },
+      "order_for_install": 2147483647,
+      "order_for_upgrade": -2147483648,
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "Cisco Secure Client - Cloud Management",
+          "vendor": "Cisco Systems, Inc."
+        }
+      ],
+      "in_network_install": true,
+      "description": "Cisco Cloud Management is a module in Cisco Secure Client that enabled cloud driven profile and software updates. This module enables the endpoint to use Cisco Secure Client cloud infrastructure for deployment.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/cloud-management-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/cloud-management-light.svg",
+      "required": true
+    },
+    {
+      "product": "AMP",
+      "product_name": "Secure Endpoint",
+      "configurables": {
+        "$ref": "#/common/configurables/amp"
+      },
+      "order_for_install": 2147483646,
+      "order_for_upgrade": 2147483647,
+      "discovery": [
+        {
+          "type": "registry",
+          "install": {
+            "type": "WOW6432",
+            "key": "HKLM\\SOFTWARE\\Immunet Protect\\InstallDir"
+          },
+          "version": {
+            "type": "WOW6432",
+            "key": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Immunet Protect\\DisplayVersion"
+          }
+        }
+      ],
+      "description": "Cisco Secure Endpoint (formerly AMP for Endpoints) integrates prevention, detection, threat hunting and response capabilities in a single solution, leveraging the power of cloud-based analytics. Secure Endpoint will protect your Windows, Mac, Linux, Android, and iOS devices through a public or private cloud deployment.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure-client-modules/secure-endpoint-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure-client-modules/secure-endpoint-light.svg",
+      "required": true
+    },
+    {
+      "product": "ac-core-vpn",
+      "product_name": "AnyConnect VPN",
+      "bundle": "vpn",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-core-vpn"
+      },
+      "order_for_install": -1,
+      "order_for_upgrade": -1,
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "bcccb25e-c6a6-4340-9018-da0fb34af226"
+        }
+      ],
+      "description": "Cisco AnyConnect VPN solutions help organizations provide highly secure remote access and increase flexibility and cost savings.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure-client-modules/vpn-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure-client-modules/vpn-light.svg",
+      "required": true
+    },
+    {
+      "product": "ac-umbrella",
+      "product_name": "Umbrella",
+      "bundle": "vpn",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-umbrella"
+      },
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "83babc56-d5f0-4d1c-ba08-b83ffe315188"
+        }
+      ],
+      "description": "Cisco Umbrella provides secure access to the internet and usage of cloud apps everywhere.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure-client-modules/secure-cloud-edge-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure-client-modules/secure-cloud-edge-light.svg"
+    },
+    {
+      "product": "ac-dart",
+      "product_name": "Diagnostics and Reporting Tool",
+      "bundle": "vpn",
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "5e67517c-544d-41aa-b999-19a724a15749"
+        }
+      ],
+      "description": "Cisco Diagnostics and Reporting Tool is used to collect data for troubleshooting Cisco VPN.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure-client-modules/dart-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure-client-modules/dart-light.svg"
+    },
+    {
+      "product": "ac-gina",
+      "product_name": "Start Before Logon",
+      "bundle": "vpn",
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "a0b378d8-4ddb-48f4-9208-999539581e31"
+        }
+      ],
+      "dependencies": [
+        "ac-core-vpn"
+      ],
+      "description": "Improve logon security for Windows using Start Before Logon.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure-client-modules/start-before-login-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure-client-modules/start-before-login-light.svg"
+    },
+    {
+      "product": "ac-iseposture",
+      "product_name": "ISE Posture",
+      "bundle": "vpn",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-iseposture"
+      },
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "a9fc1e72-3d3e-48f5-97e2-3133c22bf13f"
+        }
+      ],
+      "description": "Check the posture of your endpoints with ISE Posture.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure-client-modules/ise-posture-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure-client-modules/ise-posture-light.svg"
+    },
+    {
+      "product": "ac-posture",
+      "product_name": "Secure Firewall Posture",
+      "bundle": "vpn",
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "4d9518fa-2da2-4f4f-aafe-6fc7a5d9a4f4"
+        }
+      ],
+      "description": "ASA System Scan Posture Module is a service that comes with SecureX.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure-client-modules/sfp-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure-client-modules/sfp-light.svg"
+    },
+    {
+      "product": "ac-nam",
+      "product_name": "Network Access Manager",
+      "bundle": "vpn",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nam"
+      },
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "ee40f063-1eec-42dd-861e-11b582939941"
+        }
+      ],
+      "description": "Cisco Network Access Manager optimizes network resources, troubleshoots performance issues and delivers a consistent end-user experience.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure-client-modules/nam-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure-client-modules/nam-light.svg"
+    },
+    {
+      "product": "ac-nvm",
+      "product_name": "Network Visibility Module",
+      "bundle": "vpn",
+      "configurables": {
+        "$ref": "#/common/configurables/ac-nvm-xdr"
+      },
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "330729cc-ba67-4400-95f1-a27e286cbcde"
+        }
+      ],
+      "description": "Cisco Network Visibility Module provides visibility into network connected devices and user behaviors.",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure-client-modules/nvm-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure-client-modules/nvm-light.svg"
+    },
+    {
+      "product": "example-product",
+      "product_name": "Example Product",
+      "configurables": {
+        "$ref": "#/common/configurables/example-product"
+      },
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestPackageB",
+          "vendor": "TestPackageB"
+        }
+      ],
+      "description": "Example Product used to demonstrate new functionality.",
+      "logo_dark": "https://brand-assets.security.cisco.com/cisco-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/cisco-light.svg"
+    },
+    {
+      "product": "test-package-1",
+      "product_name": "Test Package 1",
+      "configurables": {
+        "$ref": "#/common/configurables/test-package"
+      },
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestPackageA",
+          "vendor": "TestPackageA"
+        }
+      ],
+      "in_network_install": true,
+      "description": "msi Test Package 1.0 - Happy Path",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "test-package-2",
+      "product_name": "Test Package 2",
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "8c028f5d-d916-40b5-a678-f66b9789ec2b"
+        }
+      ],
+      "in_network_install": true,
+      "description": "msi Test Package 1.0 - Install Failure",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "test-package-3",
+      "product_name": "Test Package 3",
+      "discovery": [
+        {
+          "type": "registry",
+          "install": {
+            "key": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{2851D8D5-7E8C-48A5-A21B-271241A13C9E}\\InstallLocation"
+          },
+          "version": {
+            "key": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{2851D8D5-7E8C-48A5-A21B-271241A13C9E}\\DisplayVersion"
+          }
+        }
+      ],
+      "in_network_install": true,
+      "description": "msi Test Package 1.0 - Multiple Install Args - No signer",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "test-package-4",
+      "product_name": "Test Package 4",
+      "discovery": [
+        {
+          "type": "msi_upgrade_code",
+          "code": "11111111-2222-3333-4444-555555555555"
+        },
+        {
+          "type": "msi",
+          "name": "TestPackageA",
+          "vendor": "TestPackageA"
+        }
+      ],
+      "in_network_install": true,
+      "description": "msi Test Package 1.0 - Wrong signer",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "test-package-5",
+      "product_name": "Test Package 5",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestPackageA",
+          "vendor": "TestPackageA"
+        }
+      ],
+      "in_network_install": true,
+      "description": "msi Test Package 1.0 - Multiple Install Args - Happy Path",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "test-package-6",
+      "product_name": "Test Package 6",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestPackageA",
+          "vendor": "TestPackageA"
+        }
+      ],
+      "in_network_install": true,
+      "description": "msi Test Package 1.0 - Reboot required",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "test-package-7",
+      "product_name": "Test Package 7",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestPackageA",
+          "vendor": "TestPackageA"
+        }
+      ],
+      "in_network_install": true,
+      "description": "msi Test Package 1.0 - Reboot forced",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "test-package-b-1",
+      "product_name": "Test Package B-1",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestPackageB",
+          "vendor": "TestPackageB"
+        }
+      ],
+      "in_network_install": true,
+      "description": "msi Test Package 1.0 - Happy Path",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "test-package-b-2",
+      "product_name": "Test Package B-2",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestPackageB",
+          "vendor": "TestPackageB"
+        }
+      ],
+      "in_network_install": true,
+      "description": "msi Test Package 1.0 - Reboot Required",
+      "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
+      "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
+    },
+    {
+      "product": "test-auto-1",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestAuto1",
+          "vendor": "TestAuto1"
+        }
+      ]
+    },
+    {
+      "product": "test-auto-2",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestAuto2",
+          "vendor": "TestAuto2"
+        }
+      ]
+    },
+    {
+      "product": "test-auto-3",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestAuto3",
+          "vendor": "TestAuto3"
+        }
+      ]
+    },
+    {
+      "product": "test-auto-4",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestAuto4",
+          "vendor": "TestAuto4"
+        }
+      ]
+    },
+    {
+      "product": "test-auto-5",
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestAuto5",
+          "vendor": "TestAuto5"
+        }
+      ]
+    },
+    {
+      "product": "test-auto-uc",
+      "configurables": {
+        "$ref": "#/common/configurables/test-auto-uc"
+      },
+      "channels": [
+        "alpha",
+        "beta",
+        "latest",
+        "recommended"
+      ],
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestAuto5",
+          "vendor": "TestAuto5"
+        }
+      ]
+    },
+    {
+      "product": "test-auto-uc-enterprise",
+      "configurables": {
+        "$ref": "#/common/configurables/test-auto-uc-enterprise"
+      },
+      "channels": [
+        "alpha",
+        "beta",
+        "latest",
+        "recommended"
+      ],
+      "discovery": [
+        {
+          "type": "msi",
+          "name": "TestAuto5",
+          "vendor": "TestAuto5"
+        }
+      ]
+    }
+  ],
+  "common": {
+    "install_args": {
+      "amp": {
+        "silent_install": [
+          "/S"
+        ]
+      },
+      "ac-core-vpn": {
+        "block_vpn_tearing_down": [
+          "RESTRICT_SOFTWARE_UPDATE_IF_VPN_SESSION_ACTIVE=1"
+        ],
+        "allow_vpn_tearing_down": [
+          "RESTRICT_SOFTWARE_UPDATE_IF_VPN_SESSION_ACTIVE=0"
+        ]
+      }
+    },
+    "configurables": {
+      "amp": [
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/AMP/bootstrap.xml",
+          "formats": [
+            "amp"
+          ],
+          "required": true
+        }
+      ],
+      "test-auto-uc-enterprise": [
+        {
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/UC/Configuration/uc.json",
+          "formats": [
+            "json"
+          ],
+          "required": false
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/UC/Configuration/pm.json",
+          "formats": [
+            "json"
+          ],
+          "required": false
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/UC/Configuration/id.json",
+          "formats": [
+            "json"
+          ],
+          "required": false
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/CM/Configuration/cm_config.json",
+          "formats": [
+            "json",
+            "cm"
+          ],
+          "required": true
+        }
+      ],
+      "test-auto-uc": [
+        {
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/UC/Configuration/uc.json",
+          "formats": [
+            "json"
+          ],
+          "required": false
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/UC/Configuration/pm.json",
+          "formats": [
+            "json"
+          ],
+          "required": false
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/UC/Configuration/id.json",
+          "formats": [
+            "json"
+          ],
+          "required": false
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/CM/Configuration/cm_config.json",
+          "formats": [
+            "json",
+            "cm"
+          ],
+          "required": true
+        }
+      ],
+      "cm-enterprise": [
+        {
+          "allow_defaults_from_format": "cm",
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Cisco Secure Client/CM/Configuration/cm_config.json",
+          "formats": [
+            "json",
+            "cm"
+          ],
+          "required": false
+        }
+      ],
+      "ac-core-vpn": [
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/VPN/Profile/*.xml",
+          "formats": [
+            "vpn"
+          ],
+          "max_instances": 50
+        },
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/VPN/Profile/CloudManaged.xml",
+          "formats": [
+            "vpn"
+          ],
+          "max_instances": 1
+        },
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/AnyConnectLocalPolicy.xml",
+          "formats": [
+            "local-policy"
+          ],
+          "max_instances": 1
+        },
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/CustomerExperienceFeedback/CustomerExperience_Feedback.xml",
+          "formats": [
+            "customer-experience-feedback"
+          ],
+          "max_instances": 1
+        },
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/VPN/Profile/MgmtTun/VpnMgmtTunProfile.xml",
+          "formats": [
+            "vpn-management-tunnel"
+          ],
+          "max_instances": 1
+        }
+      ],
+      "ac-umbrella": [
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/Umbrella/OrgInfo.json",
+          "formats": [
+            "umbrella-org-info"
+          ],
+          "max_instances": 1
+        }
+      ],
+      "ac-iseposture": [
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/ISE Posture/ISEPostureBootstrap.xml",
+          "formats": [
+            "ise-posture"
+          ],
+          "max_instances": 1
+        }
+      ],
+      "ac-nam": [
+        {
+          "deploy_path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/Network Access Manager/newConfigFiles/configuration.xml",
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/Network Access Manager/system/configuration.xml",
+          "formats": [
+            "nam"
+          ],
+          "max_instances": 1
+        }
+      ],
+      "ac-nvm-legacy": [
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/NVM/NVM_ServiceProfile.xml",
+          "formats": [
+            "nvm"
+          ],
+          "max_instances": 1
+        }
+      ],
+      "ac-nvm-xdr": [
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/NVM/NVM_ServiceProfile.xml",
+          "formats": [
+            "nvm"
+          ],
+          "max_instances": 1
+        },
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/NVM/NVM_ServiceProfile.xml",
+          "formats": [
+            "nvm-cloud"
+          ],
+          "max_instances": 1
+        },
+        {
+          "path": {
+            "$ref": "#/static_configs/NVM_BootstrapProfile_DEV/deploy_path"
+          },
+          "formats": [
+            "static"
+          ],
+          "required": false,
+          "max_instances": 1
+        }
+      ],
+      "test-package": [
+        {
+          "path": "<FOLDERID_ProgramFiles>/TestPackage/NewDir/test.json",
+          "formats": [
+            "json"
+          ],
+          "required": false
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/Cisco/Immunet/UC/Configuration/dummy_config.json",
+          "formats": [
+            "json"
+          ],
+          "required": false
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/TestPackage/Wildcard/wildcard*.json",
+          "formats": [
+            "json"
+          ],
+          "max_instances": 3
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/TestPackage/Wildcard/wild?card.json",
+          "formats": [
+            "json"
+          ],
+          "max_instances": 3
+        },
+        {
+          "path": "<FOLDERID_ProgramFiles>/TestPackage/Wildcard/test*wild??.json",
+          "formats": [
+            "json"
+          ],
+          "max_instances": 3
+        }
+      ],
+      "example-product": [
+        {
+          "path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/example_product/config.xml",
+          "formats": [
+            "example-product"
+          ],
+          "max_instances": 1
+        },
+        {
+          "path": {
+            "$ref": "#/static_configs/example-static-file/deploy_path"
+          },
+          "formats": [
+            "static"
+          ],
+          "required": false,
+          "max_instances": 1
+        }
+      ]
+    }
+  },
+  "channels": [
+    {
+      "name": "under_test",
+      "enablement_required": true,
+      "states": [
+        "private",
+        "alpha",
+        "beta",
+        "latest",
+        "stable"
+      ]
+    },
+    {
+      "name": "alpha",
+      "enablement_required": true,
+      "states": [
+        "alpha",
+        "beta",
+        "latest",
+        "stable"
+      ]
+    },
+    {
+      "name": "beta",
+      "enablement_required": true,
+      "states": [
+        "beta",
+        "latest",
+        "stable"
+      ]
+    },
+    {
+      "name": "latest",
+      "states": [
+        "latest",
+        "stable"
+      ]
+    },
+    {
+      "name": "recommended",
+      "states": [
+        "stable"
+      ]
+    },
+    {
+      "name": "deprecated",
+      "enablement_required": true,
+      "states": [
+        "deprecated"
+      ]
+    }
+  ],
+  "formats": {
+    "amp": {
+      "bootstrap_methods": [
+        "amp"
+      ],
+      "translator": "raw",
+      "validators": []
+    },
+    "cm": {
+      "filetype": "json",
+      "layout": "cm",
+      "translator": "cm",
+      "validators": [
+        "json"
+      ]
+    },
+    "customer-experience-feedback": {
+      "filetype": "xml",
+      "layout": "customer-experience-feedback",
+      "translator": "customer-experience-feedback",
+      "validators": [
+        "json"
+      ]
+    },
+    "example-product": {
+      "filetype": "xml",
+      "layout": "example-product",
+      "translator": "example-product",
+      "validators": [
+        "json"
+      ]
+    },
+    "ise-posture": {
+      "filetype": "xml",
+      "layout": "ise-posture",
+      "translator": "ise-posture",
+      "validators": [
+        "json"
+      ]
+    },
+    "json": {
+      "translator": "raw",
+      "validators": [
+        "json"
+      ]
+    },
+    "local-policy": {
+      "filetype": "xml",
+      "layout": "local-policy",
+      "translator": "local-policy",
+      "validators": [
+        "json"
+      ]
+    },
+    "nam": {
+      "filetype": "xml",
+      "layout": "nam",
+      "translator": "raw",
+      "validators": []
+    },
+    "nvm-cloud": {
+      "filetype": "xml",
+      "layout": "nvm-cloud",
+      "translator": "nvm-cloud",
+      "validators": [
+        "json"
+      ]
+    },
+    "nvm": {
+      "filetype": "xml",
+      "layout": "nvm",
+      "translator": "nvm",
+      "validators": [
+        "json"
+      ]
+    },
+    "raw": {
+      "translator": "raw",
+      "validators": []
+    },
+    "static": {
+      "translator": "raw",
+      "validators": []
+    },
+    "umbrella-org-info": {
+      "filetype": "json",
+      "layout": "umbrella",
+      "translator": "raw",
+      "validators": [
+        "json"
+      ]
+    },
+    "vpn-management-tunnel": {
+      "filetype": "xml",
+      "layout": "vpn-management-tunnel",
+      "translator": "vpn-management-tunnel",
+      "validators": [
+        "json"
+      ]
+    },
+    "vpn": {
+      "filetype": "xml",
+      "layout": "vpn",
+      "translator": "vpn",
+      "validators": [
+        "json"
+      ]
+    }
+  },
+  "layouts": [
+    {
+      "content": {},
+      "id": "cm",
+      "name": "Cloud Management",
+      "path": "qa/layouts/cm.json"
+    },
+    {
+      "content": {},
+      "id": "customer-experience-feedback",
+      "name": "Customer Experience Feedback",
+      "path": "qa/layouts/customer-experience-feedback.json"
+    },
+    {
+      "content": {},
+      "id": "example-product",
+      "name": "Example Product",
+      "path": "qa/layouts/example-product.json"
+    },
+    {
+      "content": {},
+      "id": "ise-posture",
+      "name": "ISE Posture",
+      "path": "qa/layouts/ise-posture.json"
+    },
+    {
+      "content": {},
+      "id": "local-policy",
+      "name": "Local Policy",
+      "path": "qa/layouts/local-policy.json"
+    },
+    {
+      "content": {},
+      "id": "nam",
+      "name": "Network Access Manager",
+      "path": "qa/layouts/nam.json"
+    },
+    {
+      "content": {},
+      "id": "nvm-cloud",
+      "name": "Network Visibility Module",
+      "path": "dev/layouts/nvm-cloud.json"
+    },
+    {
+      "content": {},
+      "id": "nvm",
+      "name": "Network Visibility Module",
+      "path": "dev/layouts/nvm.json"
+    },
+    {
+      "content": {},
+      "id": "umbrella",
+      "name": "Umbrella",
+      "path": "qa/layouts/umbrella.json"
+    },
+    {
+      "content": {},
+      "id": "vpn-management-tunnel",
+      "name": "VPN Management Tunnel",
+      "path": "qa/layouts/vpn-management-tunnel.json"
+    },
+    {
+      "content": {},
+      "id": "vpn",
+      "name": "VPN",
+      "path": "qa/layouts/vpn.json"
+    }
+  ],
+  "managed_defaults": {
+    "cm": {
+      "path": "qa/managed_defaults/cm.json"
+    },
+    "example-product": {
+      "path": "qa/managed_defaults/example-product.json"
+    },
+    "nvm-cloud": {
+      "path": "dev/managed_defaults/nvm-cloud.json"
+    }
+  },
+  "static_configs": {
+    "example-static-file": {
+      "deploy_path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/example_product/static_config.xml",
+      "config_path": "qa/static_configs/example_product_test.xml",
+      "config_sha256": "1f156fff33b34e842de8835bcbecc25ab628f32775f4a7d3f1ade5c77a17d82c"
+    },
+    "NVM_BootstrapProfile_DEV": {
+      "deploy_path": "<FOLDERID_ProgramData>/Cisco/Cisco Secure Client/NVM/NVM_BootstrapProfile.xml",
+      "config_path": "dev/static_configs/NVM_BootstrapProfile_DEV.xml",
+      "config_sha256": "8b6ea37ed3ba380d4d8ec4713ae3ed66cbb6ce3ab2ff036ca9140999fe714e27"
+    }
+  },
+  "template_configs": {
+    "cm_default": {
+      "format": "cm",
+      "id": "cccccccc-0000-0000-0000-000000000001",
+      "name": "Cloud Management Default Profile",
+      "path": "qa/templates/cm_default.json"
+    },
+    "example-product_no_static_config": {
+      "format": "example-product",
+      "name": "Example Product - No Static Config",
+      "path": "qa/templates/example-product_no_static_config.json"
+    },
+    "example-product_static_config": {
+      "format": "example-product",
+      "name": "Example Product - With Static Config",
+      "path": "qa/templates/example-product_static_config.json"
+    },
+    "nvm_cloud_default": {
+      "format": "nvm-cloud",
+      "id": "cccccccc-0000-0000-0000-000000000002",
+      "name": "NVM Cloud Default Profile",
+      "path": "qa/templates/nvm_cloud_default.json"
+    }
+  },
+  "template_deployments": [
+    {
+      "id": "dddddddd-0000-0000-0000-000000000001",
+      "name": "XDR Default Deployment",
+      "default": true,
+      "packages": [
+        {
+          "name": "cm-enterprise",
+          "channel": "beta",
+          "template_configs": [
+            "cm_default"
+          ]
+        },
+        {
+          "name": "ac-core-vpn",
+          "channel": "beta"
+        },
+        {
+          "name": "ac-nvm",
+          "channel": "beta",
+          "template_configs": [
+            "nvm_cloud_default"
+          ]
+        },
+        {
+          "name": "ac-dart",
+          "channel": "beta"
+        }
+      ]
+    }
+  ],
+  "translators": {
+    "cm": {
+      "source": "qa/translations/cm.js",
+      "type": "code-js-file"
+    },
+    "customer-experience-feedback": {
+      "source": "qa/translations/customer-experience-feedback.js",
+      "type": "code-js-file"
+    },
+    "example-product": {
+      "source": "qa/translations/example-product.js",
+      "type": "code-js-file"
+    },
+    "ise-posture": {
+      "source": "qa/translations/ise-posture.js",
+      "type": "code-js-file"
+    },
+    "local-policy": {
+      "source": "qa/translations/local-policy.js",
+      "type": "code-js-file"
+    },
+    "nam": {
+      "source": "qa/translations/nam.js",
+      "type": "code-js-file"
+    },
+    "nvm": {
+      "source": "dev/translations/nvm.js",
+      "type": "code-js-file"
+    },
+    "nvm-cloud": {
+      "source": "dev/translations/nvm-cloud.js",
+      "type": "code-js-file"
+    },
+    "umbrella": {
+      "source": "qa/translations/umbrella.js",
+      "type": "code-js-file"
+    },
+    "vpn-management-tunnel": {
+      "source": "qa/translations/vpn-management-tunnel.js",
+      "type": "code-js-file"
+    },
+    "vpn": {
+      "source": "qa/translations/vpn.js",
+      "type": "code-js-file"
+    },
+    "raw": {
+      "type": "raw"
+    }
+  },
+  "required_bundles": [
+    "cm-enterprise"
+  ],
+  "validators": {
+    "json": [
+      "json"
+    ]
+  },
+
+  "securex_overrides": {
+    "layouts": [
+      {
+        "content": {},
+        "id": "nvm",
+        "name": "Network Visibility Module",
+        "path": "qa/securex_overrides/layouts/nvm.json"
+      }
+    ],
+    "translators": {
+      "nvm": {
+        "source": "qa/securex_overrides/translations/nvm.js",
+        "type": "code-js-file"
+      }
+    }
+  }
+}

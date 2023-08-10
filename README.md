@@ -130,3 +130,30 @@ cmake --build . --config Debug --target install
 ~~~
 
 Examples where this might be the case include `<third-party-components>` such as `jsoncpp`, and `gtest`.
+
+# Local webserver
+
+While backend might be in development or there is a need in something special, we can leverage interaction to local webserver. Its configuration directory is located in the codebase root directory at `./webserver` 
+
+To use it:
+* Install golang from https://go.dev/doc/install
+* Run the server from `./webserver` directory by invoking `go run server.go` in terminal
+
+Opening http://localhost:5000/catalog in browser opens Mac catalog itself
+Opening http://localhost:5000/checkin in browser opens checkin reponse from server 
+
+Navigating same urls through regular `http` access (eg. through PM) receives same output as browser does.
+To achieve that, modify in `PmPlatformConfiguration::GetPmUrls(PmUrlList& urls)` code so that it looks like:
+
+`urls.checkinUrl = "http://localhost:5000/checkin";`
+`urls.catalogUrl = "http://localhost:5000/catalog";`
+
+With this modification we can finetune what we want from backend without really interacting with it, as well as testing various scenarios on webserver.
+
+Mac test package (signed by Cisco Enterprise certificate and notarised by Apple) can be found there https://clg5-lab-macjenkins.cisco.com/view/CM%20Client/job/Secure-Client/job/Release-CM-Client-Test/
+
+Make sure to download and place test .pkg into webserver's folder, modifying the checkin response file, so it points to correct .pkg with recent version in its name. 
+
+More detailed information can be found there:
+https://code.engine.sourcefire.com/UnifiedConnector/WindowsUnifiedConnector/blob/master/Docs/CM.md#workflow
+https://jira-eng-rtp3.cisco.com/jira/browse/CM4E-277

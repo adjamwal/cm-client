@@ -1,0 +1,12 @@
+{
+  "deployment_id": "40f60118-a793-5f47-93bf-2f93f4140404",
+  "packages": [
+    {
+      "installer_sha256": "8040e40a7200cfb54656e705a446c003ab731b64b6709b6f39040144c6715536",
+      "installer_signer_name": "Cisco Systems, Inc.",
+      "installer_type": "pkg",
+      "installer_uri": "http://localhost:5000/cisco-secure-client-macos-cloudmanagement-testpackage1-1.0.pkg",
+      "package": "MacTest1/1.0.0.0"
+    }
+  ]
+} 
