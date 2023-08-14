@@ -57,11 +57,11 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
     
     std::filesystem::path downloadedInstallerPath = package.downloadedInstallerPath;
     downloadedInstallerPath.make_preferred();
-    if( !package.signerName.empty() ) {
-        status = codesignVerifier_->Verify(
+    if( package.installerType == "pkg" && !package.signerName.empty() ) {
+        status = codesignVerifier_->PackageVerify(
             downloadedInstallerPath,
-            package.signerName,
-            SIGTYPE_DEFAULT );
+            package.signerName
+        );
     }
     
     if( status == CodeSignStatus::CODE_SIGN_OK )

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <filesystem>
 
 #define SIGTYPE_DEFAULT     SigType::SIGTYPE_NATIVE
 
@@ -22,6 +23,7 @@ class IPmCodesignVerifier
 {
 public:
     virtual ~IPmCodesignVerifier() = default;
-    virtual CodeSignStatus Verify( const std::string& strPath, const std::string& strSigner, SigType sig_type ) = 0;
-    virtual CodeSignStatus VerifyWithKilldate( const std::string& strPath, const std::string& strSigner, SigType sig_type, uint64_t killdate ) = 0;
+    virtual CodeSignStatus ExecutableVerify( const std::filesystem::path& path, const std::string& strSigner, SigType sig_type ) = 0;
+    virtual CodeSignStatus ExecutableVerifyWithKilldate( const std::filesystem::path& path, const std::string& strSigner, SigType sig_type, uint64_t killdate ) = 0;
+    virtual CodeSignStatus PackageVerify( const std::filesystem::path& path, const std::string& strSigner ) = 0;
 };

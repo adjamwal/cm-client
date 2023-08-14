@@ -138,10 +138,10 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_Positive) {
 
     // Set up expectations on the codesignVerifier
     EXPECT_CALL(*mockCodesignVerifier_,
-                Verify(
-                    package.downloadedInstallerPath.u8string(),
-                    package.signerName,
-                    SIGTYPE_DEFAULT))
+                PackageVerify(
+                    package.downloadedInstallerPath,
+                    package.signerName)
+                )
         .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
     
         // Invoke the function under test
@@ -155,17 +155,9 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_UnknownPkgType_Negative)
     // Prepare test data
     const std::string volumePath = "/Volumes/MountedVolume";
     PmComponent package;
-    package.downloadedInstallerPath = "/path/to/package.pkg";
+    package.downloadedInstallerPath = "/path/to/package.dmg";
     package.signerName = "TestSigner";
     package.installerType = "dmg";
-    
-    // Set up expectations on the codesignVerifier
-    EXPECT_CALL(*mockCodesignVerifier_,
-                Verify(
-                   package.downloadedInstallerPath.u8string(),
-                   package.signerName,
-                   SIGTYPE_DEFAULT))
-    .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
     
     // Set up expectations on the mock object
     EXPECT_CALL(*mockEnv_.fileUtils_,
@@ -187,14 +179,15 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_PastKillDate_Negative) {
     PmComponent package;
     package.downloadedInstallerPath = "/path/to/package.pkg";
     package.signerName = "TestSigner";
-    package.installerType = "dmg";
+    package.installerType = "pkg";
     
     // Set up expectations on the codesignVerifier
     EXPECT_CALL(*mockCodesignVerifier_,
-                Verify(
-                   package.downloadedInstallerPath.u8string(),
-                   package.signerName,
-                   SIGTYPE_DEFAULT))
+                PackageVerify(
+                   package.downloadedInstallerPath,
+                   package.signerName
+                )
+    )
     .WillOnce(Return(CodeSignStatus::CODE_SIGN_VERIFICATION_FAILED));
     
     // Set up expectations on the mock object
@@ -239,10 +232,11 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_InstallFailed_Negative) 
     
     // Set up expectations on the codesignVerifier
     EXPECT_CALL(*mockCodesignVerifier_,
-                Verify(
-                   package.downloadedInstallerPath.u8string(),
-                   package.signerName,
-                   SIGTYPE_DEFAULT))
+                PackageVerify(
+                   package.downloadedInstallerPath,
+                   package.signerName
+                )
+    )
     .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
     
     // Invoke the function under test

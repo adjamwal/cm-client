@@ -1,3 +1,5 @@
+#pragma once
+
 #include "IPmPkgUtil.hpp"
 
 /**
@@ -6,6 +8,7 @@
  */
 class PmPkgUtilWrapper : public IPmPkgUtil {
 public:
+    
     /**
      * @brief Lists the packages installed on the specified volume or the default volume.
      * @param volumePath The path to the volume (optional).
@@ -43,6 +46,8 @@ public:
      * @return True if the uninstallation was successful, false otherwise.
      */
     bool uninstallPackage(const std::string& packageIdentifier) const override;
+    
+    bool verifyPackageCodesign(const std::filesystem::path& packagePath, std::string& signer) const override;
     
 private:
     /**

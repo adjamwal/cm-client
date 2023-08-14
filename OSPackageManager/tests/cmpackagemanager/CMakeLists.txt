@@ -111,6 +111,13 @@ add_custom_command(
 
 add_custom_command(
     TARGET PackageManagerUnitTest PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_CURRENT_SOURCE_DIR}/Resources/mac/test_package.pkg
+            $<TARGET_FILE_DIR:PackageManagerUnitTest>/test_package.pkg
+)
+
+add_custom_command(
+    TARGET PackageManagerUnitTest PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_SOURCE_DIR}/Resources/mac/root
             $<TARGET_FILE_DIR:PackageManagerUnitTest>/root

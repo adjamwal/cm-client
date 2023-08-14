@@ -10,17 +10,20 @@
 #include "PmPkgUtilWrapper.hpp"
 #include "FileUtilities.hpp"
 #include "PmCodesignVerifier.hpp"
+#include "PmPkgUtilWrapper.hpp"
 
 using namespace PackageManager;
 
 PmPlatformDependencies::PmPlatformDependencies()
-    : pmConfiguration_ { PmPlatformConfiguration(
+    :
+      pmPkgUtil_( std::make_shared<PmPkgUtilWrapper>() ),
+      pmConfiguration_ { PmPlatformConfiguration(
         std::make_shared<CMIDAPIProxy>(),
         std::make_shared<PmCertManager>(std::make_shared<PmCertRetrieverImpl>())
       )},
       pmComponentManager_ { PmPlatformComponentManager(
-        std::make_shared<PmPkgUtilWrapper>(),
-        std::make_shared<CodesignVerifier>(),
+        pmPkgUtil_,
+        std::make_shared<CodesignVerifier>(pmPkgUtil_),
         std::make_shared<PackageManager::FileUtilities>()) }
 { }
 

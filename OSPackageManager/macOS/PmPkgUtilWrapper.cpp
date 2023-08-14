@@ -13,11 +13,28 @@ namespace { // anonymous namespace
     
     const std::string pkgUtilExecutable{ "/usr/sbin/pkgutil" };
     const std::string pkgInstallerExecutable{ "/usr/sbin/installer" };
+    const std::string pkgCodesignVerifierExecutable{ "/usr/sbin/spctl" };
+    
+    const std::regex kSpctlSignerIdPattern("origin=\\* \\(([A-Z0-9]+)\\)");
+    const std::regex kPkgUtilSignerIdpattern("Certificate Chain:\n.*\\((\\w+)\\)");
+    const std::regex kPkgUtilSignerNamePattern("Developer ID Installer: (\\w+) \\(\\w+\\)");
     
     bool outputParser(const std::string& output, const std::string& textToFind) {
         return std::regex_search(output, std::regex{textToFind});
     };
     
+    bool extractSignerByPattern(const std::string& input, const std::regex& pattern, std::string& signer) {
+        std::smatch matches;
+        if (std::regex_search(input, matches, pattern)) {
+            if (matches.size() > 1) {
+                signer = matches[1].str();
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     std::string decoratePkgUtilVolumeOption(const std::string& command, const std::string& volumePath) {
         return volumePath.length() ?
         command + " --volume " + volumePath :
@@ -167,6 +184,21 @@ bool PmPkgUtilWrapper::uninstallPackage(const std::string& packageIdentifier) co
         return true;
     } else {
         // Uninstallation failed
+        return false;
+    }
+}
+
+bool PmPkgUtilWrapper::verifyPackageCodesign(const std::filesystem::path& packagePath, std::string& signer) const {
+    PM_LOG_INFO("Verify package %s code signing", packagePath.c_str());
+//    const std::string command{ pkgCodesignVerifierExecutable + " -a -vvv -t install " + packagePath.string() };
+    const std::string command{ pkgUtilExecutable + " --check-signature " + packagePath.string() };
+    const std::string output = executeCommand(command);
+    
+    if (outputParser(output, "signed by") && extractSignerByPattern(output, kPkgUtilSignerNamePattern, signer)) {
+        PM_LOG_INFO("Package %s has valid codesigning by %s", packagePath.string().c_str(), signer.c_str());
+        return true;
+    } else {
+        PM_LOG_WARNING("Package %s has no valid codesigning", packagePath.string().c_str());
         return false;
     }
 }
