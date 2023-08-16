@@ -8,7 +8,7 @@
 #include "PmPlatformConfiguration.hpp"
 
 #include "PackageManager/IPmPlatformDependencies.h"
-#include "../proxy/CMIDAPIProxy.hpp"
+#include "CMIDAPIProxy.hpp"
 
 class IPmPkgUtil;
 

@@ -35,9 +35,16 @@ set(OS_PACKAGE_MANAGER_SRCS
     macOS/PmPlatformDiscovery.hpp
     macOS/PmPlatformDiscovery.cpp
     macOS/PmCodesignVerifierMac.cpp
+    proxy/IProxyDiscoveryEngine.h
+    proxy/ProxyDiscoveryEngine.h
+    proxy/ProxyDiscoveryEngine.mm
+    util/ScopedGuard.hpp
 )
 
 add_executable(cmpackagemanager ${OS_PACKAGE_MANAGER_SRCS})
+
+set_property(TARGET cmpackagemanager APPEND_STRING PROPERTY 
+              COMPILE_FLAGS "-fobjc-arc")
 
 add_dependencies(cmpackagemanager
     third-party-ciscossl
@@ -52,8 +59,11 @@ add_dependencies(cmpackagemanager
 target_include_directories(cmpackagemanager
     PUBLIC
     ${CM_THIRDPARTY_EXPORT}/include
+    ${cm-client_SOURCE_DIR}
     # This include should be based on platform when we extend support for Linux
     ${CMAKE_CURRENT_SOURCE_DIR}/macOS
+    ${CMAKE_CURRENT_SOURCE_DIR}/util
+    ${CMAKE_CURRENT_SOURCE_DIR}/proxy
 )
 
 target_link_directories(cmpackagemanager BEFORE
@@ -72,6 +82,7 @@ target_link_libraries(cmpackagemanager
     curl
     crypto
     ssl
+    util
     z
     "-framework SystemConfiguration"
     "-framework IOKit"
@@ -112,8 +123,6 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
     # DEVELOPMENT_TEAM ${DEVELOPMENT_TEAM_ID}
     # PROVISIONING_PROFILE_SPECIFIER my_profile_name
 endif()
-
-set_property(TARGET cmpackagemanager APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
 
 target_enable_warnings(cmpackagemanager)
 

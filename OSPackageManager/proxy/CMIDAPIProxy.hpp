@@ -1,4 +1,4 @@
-#include "../proxy/CMIDAPIProxyAbstract.hpp"
+#include "CMIDAPIProxyAbstract.hpp"
 
 class CMIDAPIProxy : public CMIDAPIProxyAbstract {
 public:

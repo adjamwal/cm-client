@@ -6,12 +6,16 @@
 #pragma once
 
 #include "PackageManager/IPmPlatformConfiguration.h"
-#include "../proxy/CMIDAPIProxyAbstract.hpp"
+#include "CMIDAPIProxyAbstract.hpp"
+#include "IProxyDiscoveryEngine.h"
 
 #include "cmid/CMIDAPI.h"
 #include "PmCertManager.hpp"
 
-class PmPlatformConfiguration : public IPmPlatformConfiguration
+#include <memory>
+#include <unordered_map>
+
+class PmPlatformConfiguration : public IPmPlatformConfiguration, public IProxyObserver
 {
 public:
     explicit PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
@@ -21,24 +25,24 @@ public:
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud. This may return a cached value
      */
-    bool GetIdentityToken(std::string &token);
+    bool GetIdentityToken(std::string &token) override;
 
     /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
      *   communicating with the cloud. This may return a cached value
      */
-    bool GetUcIdentity(std::string &identity);
+    bool GetUcIdentity(std::string &identity) override;
 
     /**
      * @brief Refreshes the UCID and UCID token values
      */
-    bool RefreshIdentity();
+    bool RefreshIdentity() override;
 
     /**
      * @brief (Optional) Reloads ssl certs from the cert store
      *   Needed in Windows since curl can't load system certs without schannel
      */
-    int32_t ReloadSslCertificates();
+    int32_t ReloadSslCertificates() override;
 
     /**
      * @brief (Optional) Retrieves the clients system certs
@@ -47,7 +51,7 @@ public:
      *  @param[in|out] certificates - Array of certs returned. The platfrom should allocated these
      *  @param[out] count - Number to certs returned
      */
-    int32_t GetSslCertificates(X509 ***certificates, size_t &count);
+    int32_t GetSslCertificates(X509 ***certificates, size_t &count) override;
 
     /**
      * @brief (Optional) Frees the cert list allocated by GetSslCertificates
@@ -55,17 +59,17 @@ public:
      *  @param[in] certificates - The cert array to be freed
      *  @param[in] count - Number to certs in the array
      */
-    void ReleaseSslCertificates(X509 **certificates, size_t count);
+    void ReleaseSslCertificates(X509 **certificates, size_t count) override;
 
     /**
      * @brief Provides the user agent for http requests
      */
-    std::string GetHttpUserAgent();
+    std::string GetHttpUserAgent() override;
 
     /**
      * @brief Gets the install directory
      */
-    std::string GetInstallDirectory();
+    std::string GetInstallDirectory() override;
 
     /**
      * @brief Gets the log directory
@@ -75,17 +79,17 @@ public:
     /**
      * @brief Gets the data directory
      */
-    std::string GetDataDirectory();
+    std::string GetDataDirectory() override;
 
     /**
      * @brief Gets the PM version string
      */
-    std::string GetPmVersion();
+    std::string GetPmVersion() override;
 
     /**
      * @brief Retrieve the PM URLs from the identity module
      */
-    bool GetPmUrls(PmUrlList &urls);
+    bool GetPmUrls(PmUrlList &urls) override;
 
     /**
      * @brief (Optional) On windows this triggers the Windows AIA mechanism to
@@ -93,7 +97,7 @@ public:
      *
      *  @param[in] url
      */
-    bool UpdateCertStoreForUrl(const std::string &url);
+    bool UpdateCertStoreForUrl(const std::string &url) override;
 
     /**
      * @brief Starts the proxy discovery process
@@ -103,7 +107,7 @@ public:
      *
      * @return list of proxies discovered
      */
-    std::list<PmProxy> StartProxyDiscovery(const std::string &testUrl, const std::string &pacUrl);
+    std::list<PmProxy> StartProxyDiscovery(const std::string &testUrl, const std::string &pacUrl) override;
 
     /**
      * @brief Starts the async proxy discovery process
@@ -115,7 +119,16 @@ public:
      *
      * @return true if the discovery process was started
      */
-    bool StartProxyDiscoveryAsync(const std::string &testUrl, const std::string &pacUrl, AsyncProxyDiscoveryCb cb, void *context);
+    bool StartProxyDiscoveryAsync(const std::string &testUrl, const std::string &pacUrl, AsyncProxyDiscoveryCb cb, void *context) override;
+    
+    /**
+     * @brief callback that is called by pProxyEngine_ when discovery process is completed.
+     *
+     * @param[in] proxies - list of the discovered proxies
+     *
+     * @return void
+     */
+    void updateProxyList(const std::list<PmProxy>& proxies, const std::string& guid) override;
     
 protected:
     cmid_result_t GetUrl( cmid_url_type_t urlType, std::string& url );
@@ -123,4 +136,6 @@ protected:
 private:
     std::shared_ptr<CMIDAPIProxyAbstract> cmidapi_;
     std::shared_ptr<PackageManager::PmCertManager> certmgr_;
+    std::unique_ptr<IProxyDiscoveryEngine> pProxyEngine_;
+    std::unordered_map<std::string, std::pair<void*, AsyncProxyDiscoveryCb>> proxyCallbacks_;
 };

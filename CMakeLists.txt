@@ -74,6 +74,10 @@ include(ExternalProject_PackageManager)
 include(ExternalProject_EndpointIdentity)
 
 ##
+## util library
+add_subdirectory(util)
+
+##
 ## Package Manager client
 add_subdirectory(OSPackageManager)
 

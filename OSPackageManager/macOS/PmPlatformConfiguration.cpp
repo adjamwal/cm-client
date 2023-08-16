@@ -7,6 +7,8 @@
 #include <string>
 #include "PmPlatformConfiguration.hpp"
 #include "PmLogger.hpp"
+#include "ProxyDiscoveryEngine.h"
+#include "util/GuidUtil.hpp"
 
 namespace
 {
@@ -42,9 +44,11 @@ constexpr std::string_view kHttpUserAgentPrefix{"PackageManager/"};
 PmPlatformConfiguration::PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
                                                  std::shared_ptr<PackageManager::PmCertManager> certmgr)
     :   cmidapi_(cmidapi),
-        certmgr_(certmgr)
+        certmgr_(certmgr),
+        pProxyEngine_(std::make_unique<ProxyDiscoveryEngine>())
 {
     certmgr_->LoadSystemSslCertificates();
+    pProxyEngine_->addObserver(this);
 }
 
 bool PmPlatformConfiguration::GetIdentityToken(std::string& token)
@@ -204,16 +208,39 @@ bool PmPlatformConfiguration::UpdateCertStoreForUrl(const std::string &url)
 
 std::list<PmProxy> PmPlatformConfiguration::StartProxyDiscovery(const std::string &testUrl, const std::string &pacUrl)
 {
-    (void) testUrl;
-    (void) pacUrl;
-    return std::list<PmProxy>();
+    return pProxyEngine_->getProxies(testUrl, pacUrl);
 }
 
 bool PmPlatformConfiguration::StartProxyDiscoveryAsync(const std::string &testUrl, const std::string &pacUrl, AsyncProxyDiscoveryCb cb, void *context)
 {
-    (void) testUrl;
-    (void) pacUrl;
-    (void) cb;
-    (void) context;
-    return false;
+    pProxyEngine_->waitPrevOpCompleted();
+    std::string guid = util::generateGUID();
+    proxyCallbacks_[guid] = std::make_pair(context, cb);
+    pProxyEngine_->requestProxiesAsync(testUrl, pacUrl, guid);
+    return true;
+}
+
+void PmPlatformConfiguration::updateProxyList(const std::list<PmProxy>& proxies, const std::string& guid)
+{
+    auto it = proxyCallbacks_.find(guid);
+    if (it == proxyCallbacks_.end())
+    {
+        PM_LOG_ERROR("Unable to find proxy callback with the guid %s in a callbacks map.", guid.c_str());
+        return;
+    }
+    std::pair<void*, AsyncProxyDiscoveryCb> p = it->second;
+    proxyCallbacks_.erase(it);
+    
+    {
+        //Log output for verification.
+        PM_LOG_NOTICE("Obtained proxy list: ");
+        for (auto&& p: proxies)
+        {
+            PM_LOG_NOTICE("Proxy: URL: [%s], Type: [%s], Port: [%d].", p.url.c_str(),
+                          p.proxyType.c_str(), p.port);
+        }
+        PM_LOG_NOTICE("End of the proxy list.");
+    }
+    
+    p.second(p.first, proxies);
 }

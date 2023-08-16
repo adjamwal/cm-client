@@ -25,6 +25,10 @@ add_executable(
   ${TESTEE_DIR}/configuration/Config.hpp
   ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.cpp
+  ${TESTEE_DIR}/proxy/IProxyDiscoveryEngine.h
+  ${TESTEE_DIR}/proxy/ProxyDiscoveryEngine.h
+  ${TESTEE_DIR}/proxy/ProxyDiscoveryEngine.mm
+  ${TESTEE_DIR}/util/ScopedGuard.hpp
   ${TESTEE_DIR}/macOS/macOSUtilities.mm
   
   # Mocks
@@ -50,6 +54,8 @@ add_executable(
   ${TESTEE_DIR}/environment/UnitTestBase.cpp
 )
 
+set_property(TARGET PackageManagerUnitTest APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
+
 add_dependencies(
     PackageManagerUnitTest
     third-party-ciscossl
@@ -66,15 +72,15 @@ target_link_libraries(
   crypto
   jsoncpp
   ssl
+  util
   "-framework CoreFoundation"
   "-framework IOKit"
   "-framework CoreServices"
   "-framework Security"
   "-framework Foundation"
+  "-framework SystemConfiguration"
   ${GTEST_LIBS}
 )
-
-set_property(TARGET PackageManagerUnitTest APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
 
 target_compile_definitions(
     PackageManagerUnitTest
@@ -87,12 +93,15 @@ target_include_directories(
   PackageManagerUnitTest
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
+      ${cm-client_SOURCE_DIR}
       ${cm-client_SOURCE_DIR}/client/Logger
       ${cm-client_SOURCE_DIR}/OSPackageManager/environment
       ${cm-client_SOURCE_DIR}/OSPackageManager/proxy
       ${cm-client_SOURCE_DIR}/OSPackageManager/macOS
       ${cm-client_SOURCE_DIR}/OSPackageManager/configuration
       ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
+      ${cm-client_SOURCE_DIR}/OSPackageManager/util
+      ${cm-client_SOURCE_DIR}/OSPackageManager/proxy
 )
 
 target_link_directories(

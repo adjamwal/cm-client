@@ -5,7 +5,7 @@
  */
 
 #pragma once
-#include "../proxy/CMIDAPIProxyAbstract.hpp"
+#include "CMIDAPIProxyAbstract.hpp"
 #include "gmock/gmock.h"
 
 class MockCMIDAPIProxyAbstract : public CMIDAPIProxyAbstract
