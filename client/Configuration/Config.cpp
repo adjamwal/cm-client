@@ -53,6 +53,12 @@ Config::Config()
 
 }
 
+const std::string Config::getPath()
+{
+    const std::filesystem::path filePath = std::filesystem::path(cmConfigPath) / std::filesystem::path(configFileName);
+    return filePath;
+}
+
 bool Config::reload()
 {
     const std::filesystem::path filePath = std::filesystem::path(cmConfigPath) / std::filesystem::path(configFileName);

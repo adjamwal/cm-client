@@ -40,6 +40,8 @@ set(OS_PACKAGE_MANAGER_SRCS
     proxy/ProxyDiscoveryEngine.h
     proxy/ProxyDiscoveryEngine.mm
     util/ScopedGuard.hpp
+    ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
+    ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
 )
 
 add_executable(cmpackagemanager ${OS_PACKAGE_MANAGER_SRCS})

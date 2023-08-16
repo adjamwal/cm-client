@@ -17,6 +17,8 @@ set(CM_CLIENT_SRCS
     Configuration/Config.cpp
     Configuration/ConfigWatchdog.hpp
     Logger/CMLogger.cpp
+    ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
+    ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
 )
 
 add_executable(csccloudmanagement ${CM_CLIENT_SRCS})
@@ -52,6 +54,7 @@ target_link_libraries(csccloudmanagement
     "-framework IOKit"
     "-framework CoreServices"
     "-framework Security"
+    "-framework Foundation"
 )
 
 target_compile_definitions(csccloudmanagement

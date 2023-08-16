@@ -17,6 +17,11 @@ const char* kPmRootKey = "pm";
 const char* kLogLevelKey = "loglevel";
 }
 
+const std::string Config::getPath()
+{
+    return configPath_;
+}
+
 Config::Config(const std::string& configPath)
 {
     reload(configPath);

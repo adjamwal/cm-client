@@ -7,6 +7,7 @@
 #pragma once
 
 #include "PackageManager/IPmLogger.h"
+#include "common/macOS/FileWatcher.hpp"
 
 #include <atomic>
 #include <thread>
@@ -36,6 +37,7 @@ private:
     std::string bootstrap_;
     std::string configFile_;
     std::string loggerDir_;
+    std::unique_ptr<FileWatcher> fileWatcher_;
 
     void mainTask();
 };

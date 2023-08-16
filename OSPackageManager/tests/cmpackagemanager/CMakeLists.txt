@@ -30,7 +30,8 @@ add_executable(
   ${TESTEE_DIR}/proxy/ProxyDiscoveryEngine.mm
   ${TESTEE_DIR}/util/ScopedGuard.hpp
   ${TESTEE_DIR}/macOS/macOSUtilities.mm
-  
+  ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
+
   # Mocks
   ${TESTEE_DIR}/proxy/CMIDAPIProxy.hpp
   ${TESTEE_DIR}/proxy/CMIDAPIProxyAbstract.hpp

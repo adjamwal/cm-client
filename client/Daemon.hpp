@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "common/macOS/FileWatcher.hpp"
 #include <atomic>
 #include <thread>
 
@@ -30,7 +31,7 @@ private:
     std::unique_ptr<CMIDLoader> cmidLoader_;
     std::unique_ptr<PMLoader> pmLoader_;
     
-
+    std::unique_ptr<FileWatcher> fileWatcher_;
     std::atomic<bool> isRunning_;
     std::thread task_;
 

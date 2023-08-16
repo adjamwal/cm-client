@@ -24,19 +24,17 @@ public:
     Config &operator=(Config &&other) = delete;
 
     IPMLogger::Severity getLogLevel() const;
-
+    const std::string getPath();
     bool reload(const std::string& configPath);
     void onConfigChanged();
     std::function<void()> subscribeForConfigChanges();
 
-    
 private:
     bool parsePmConfig();
     static IPMLogger::Severity getDefaultLogLevel();
 
     std::filesystem::path configPath_;
     IPMLogger::Severity logLevel_ = getDefaultLogLevel();
-    
 };
 
 } // namespace PackageManager

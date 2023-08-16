@@ -45,11 +45,9 @@ public:
 #endif
 
     CM_LOG_LVL_T getLogLevel() const;
-
+    const std::string getPath();
     void onConfigChanged();
-
     std::function<void()> subscribeForConfigChanges();
-
 
 private:
    

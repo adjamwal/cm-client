@@ -29,16 +29,16 @@ namespace
 
 namespace PackageManager
 {
+const std::string fileWatcherName {"PackageManager_FileWatcher"};
 
 Daemon::Daemon()
 {
 #ifdef CM_CONFIG_PATH
     bootstrap_ = (std::filesystem::path(CM_CONFIG_PATH) /
-        std::filesystem::path("bs.json")).native();
+                  std::filesystem::path("bs.json")).native();
     configFile_ = (std::filesystem::path(CM_CONFIG_PATH) /
-        std::filesystem::path("cm_config.json")).native();
+                   std::filesystem::path("cm_config.json")).native();
 #endif
-
 #ifdef CM_SHARED_LOG_PATH
     setLoggerDir(CM_SHARED_LOG_PATH);
 #else
@@ -46,12 +46,14 @@ Daemon::Daemon()
     setLoggerDir(static_cast<std::string>(kLogDir));
 #endif
 #endif
+    config_ = std::make_unique<Config>(configFile_);
+    fileWatcher_ = std::make_unique<FileWatcher>(fileWatcherName);
 }
 
 void Daemon::start()
 {
     isRunning_ = true;
-    config_ = std::make_unique<Config>(configFile_);
+    fileWatcher_->add(config_->getPath(), []() {ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
     ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
     PmLogger::getLogger().SetLogLevel(config_->getLogLevel());
     PmLogger::getLogger().initFileLogging(loggerDir_, static_cast<std::string>(kLogFileName),

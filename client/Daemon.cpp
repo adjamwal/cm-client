@@ -17,12 +17,19 @@
 
 namespace CloudManagement
 {
+const std::string fileWatcherName {"CloudManagement_FileWatcher"};
+
+void configCallback()
+{
+//TODO: place for config update integration
+}
 
 //! @todo creation of PM, should also load the process
 Daemon::Daemon()
     : config_ { std::make_unique<Config>() },
       cmidLoader_ { std::make_unique<CMIDLoader>() },
-      pmLoader_ { std::make_unique<PMLoader>() }
+      pmLoader_ { std::make_unique<PMLoader>() },
+      fileWatcher_{std::make_unique<FileWatcher>(fileWatcherName)}
 {
     CMLogger::getInstance().setLogLevel(config_->getLogLevel());
     ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
@@ -31,6 +38,8 @@ Daemon::Daemon()
 void Daemon::start()
 {
     CM_LOG_DEBUG("Starting cloud management");
+ 
+    fileWatcher_->add(config_->getPath(), []() {ConfigWatchdog::getConfigWatchdog().detectedСonfigСhanges();});
     isRunning_ = true;
 
     task_ = std::thread(&Daemon::mainTask, this);
