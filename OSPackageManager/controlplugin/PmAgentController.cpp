@@ -97,7 +97,7 @@ void PmAgentController::monitorProcess()
         IProcessWrapper::EWaitForProcStatus waitCode = pProcessWrapper_->waitForProcess(pid_);
         {
             std::lock_guard<std::mutex> lock( mutex_ );
-            util::scoped_guard([this]() {
+            auto guard = util::scoped_guard([this]() {
                 ++monitorIteration_;
             });
             if (waitCode == IProcessWrapper::EWaitForProcStatus::ImpossibleError)
@@ -109,8 +109,8 @@ void PmAgentController::monitorProcess()
             {
                 try
                 {
-                    pProcessWrapper_->kill(pid_);
-                    CM_LOG_DEBUG( "Process name = [%s] with pid = [%d] terminated.", PM_AGENT_BINARY, pid_ );
+                    CM_LOG_DEBUG( "Process name = [%s] with pid = [%d] produced ECHILD sinal. But it is still alive", PM_AGENT_BINARY, pid_ );
+                    continue;
                 }
                 catch(std::system_error& e)
                 {
