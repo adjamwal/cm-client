@@ -9,6 +9,7 @@
 #include "ComponentLoader/PMLoader.hpp"
 #include "Configuration/Config.hpp"
 #include "Logger/CMLogger.hpp"
+#include "Configuration/ConfigWatchdog.hpp"
 
 #include <sys/stat.h>
 #include <chrono>
@@ -24,6 +25,7 @@ Daemon::Daemon()
       pmLoader_ { std::make_unique<PMLoader>() }
 {
     CMLogger::getInstance().setLogLevel(config_->getLogLevel());
+    ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
 }
 
 void Daemon::start()

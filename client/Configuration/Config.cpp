@@ -111,4 +111,21 @@ CM_LOG_LVL_T Config::getLogLevel() const
     return logLevel_;
 }
 
+void Config::onConfigChanged()
+{
+    if (reload())
+    {
+        CMLogger::getInstance().setLogLevel(this->getLogLevel());
+        CM_LOG_DEBUG("Config succesfully updated");
+    }
+}
+
+std::function<void()> Config::subscribeForConfigChanges()
+{
+    return [=]() {
+            onConfigChanged();
+            };
+}
+
+
 } // namespace CloudManagement

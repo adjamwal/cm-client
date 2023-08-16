@@ -15,6 +15,7 @@ set(CM_CLIENT_SRCS
     ComponentLoader/PMLoader.cpp
     Configuration/Config.hpp
     Configuration/Config.cpp
+    Configuration/ConfigWatchdog.hpp
     Logger/CMLogger.cpp
 )
 

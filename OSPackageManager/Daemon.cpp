@@ -9,6 +9,7 @@
 #include "agent/PackageManagerAgent.hpp"
 #include "configuration/Config.hpp"
 #include "PmLogger.hpp"
+#include "configuration/ConfigWatchdog.hpp"
 
 #include <sys/stat.h>
 #include <chrono>
@@ -51,6 +52,7 @@ void Daemon::start()
 {
     isRunning_ = true;
     config_ = std::make_unique<Config>(configFile_);
+    ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
     PmLogger::getLogger().SetLogLevel(config_->getLogLevel());
     PmLogger::getLogger().initFileLogging(loggerDir_, static_cast<std::string>(kLogFileName),
         kMaxSize, kMaxFiles);
@@ -130,7 +132,6 @@ void Daemon::mainTask()
         using namespace std::chrono_literals;
 
         cout << "PM Just chillin here..." << endl;
-
         //auto start = chrono::high_resolution_clock::now();
         (void) chrono::high_resolution_clock::now();
         this_thread::sleep_for(1000ms);

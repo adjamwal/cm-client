@@ -44,12 +44,17 @@ public:
     static const std::string cmidLogPath;
 #endif
 
-    bool reload(); // separate function to allow re-load. 
     CM_LOG_LVL_T getLogLevel() const;
-    
+
+    void onConfigChanged();
+
+    std::function<void()> subscribeForConfigChanges();
+
 
 private:
-    
+   
+    bool reload(); // separate function to allow re-load. 
+
     bool readCmConfig(const std::filesystem::path&);
 
     const std::string ucKey = "uc";

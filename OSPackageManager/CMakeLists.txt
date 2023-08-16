@@ -13,6 +13,7 @@ set(OS_PACKAGE_MANAGER_SRCS
     agent/PackageManagerAgent.hpp
     configuration/Config.hpp
     configuration/Config.cpp
+    configuration/ConfigWatchdog.hpp
     macOS/IFileUtilities.hpp
     macOS/IPmCertRetriever.hpp
     macOS/FileUtilities.cpp

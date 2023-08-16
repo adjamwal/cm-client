@@ -19,12 +19,17 @@ const char* kLogLevelKey = "loglevel";
 
 Config::Config(const std::string& configPath)
 {
+    reload(configPath);
+}
+
+bool Config::reload(const std::string& configPath)
+{
     if (!std::filesystem::exists(configPath)) {
         PM_LOG_WARNING("Config file does not exist.");
-        return;
+        return false;
     }
     configPath_ = configPath;
-    parsePmConfig();
+    return parsePmConfig();
 }
 
 bool Config::parsePmConfig()
@@ -78,4 +83,21 @@ IPMLogger::Severity Config::getDefaultLogLevel()
 #else
     return IPMLogger::LOG_NOTICE;
 #endif
+}
+
+
+void Config::onConfigChanged()
+{     
+    if(reload(configPath_)) 
+    {
+        PmLogger::getLogger().SetLogLevel(this->getLogLevel());
+        PM_LOG_DEBUG("Config succesfully updated");
+    }
+}
+
+std::function<void()> Config::subscribeForConfigChanges()
+{
+    return [=]() {
+            onConfigChanged();
+        };
 }
