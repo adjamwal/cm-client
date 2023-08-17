@@ -46,13 +46,13 @@ Daemon::Daemon()
     setLoggerDir(static_cast<std::string>(kLogDir));
 #endif
 #endif
-    config_ = std::make_unique<Config>(configFile_);
     fileWatcher_ = std::make_unique<FileWatcher>(fileWatcherName);
 }
 
 void Daemon::start()
 {
     isRunning_ = true;
+    config_ = std::make_unique<Config>(configFile_);
     fileWatcher_->add(config_->getPath(), []() {ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
     ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
     PmLogger::getLogger().SetLogLevel(config_->getLogLevel());
