@@ -89,13 +89,16 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
 
 IPmPlatformComponentManager::PmInstallResult PmPlatformComponentManager::UpdateComponent(const PmComponent &package, std::string &error)
 {
+    (void) package;
+    (void) error;
+
     IPmPlatformComponentManager::PmInstallResult result = {
-        .pmResult = IPmPlatformComponentManager::PM_INSTALL_FAILURE,
+        .pmResult = InstallComponent(package) == 0
+                    ? IPmPlatformComponentManager::PM_INSTALL_SUCCESS
+                    : IPmPlatformComponentManager::PM_INSTALL_FAILURE,
         .platformResult = 0
     };
 
-    (void) package;
-    (void) error;
     return result;
 }
 

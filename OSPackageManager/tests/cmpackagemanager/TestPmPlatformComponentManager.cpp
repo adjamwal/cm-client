@@ -151,6 +151,43 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_Positive) {
     EXPECT_EQ(result, 0);
 }
 
+// Test case for InstallComponent via Update
+TEST_F(PmPlatformComponentManagerTest, UpdateComponent_Positive) {
+    // Prepare test data
+    const std::string volumePath = "/Volumes/MountedVolume";
+    PmComponent package;
+    package.downloadedInstallerPath = "/path/to/package.pkg";
+    package.signerName = "TestSigner";
+    package.installerType = "pkg";
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.pkgUtil_,
+                installPackage(
+                   package.downloadedInstallerPath.u8string(),
+                   _
+                ))
+        .WillOnce(Return(true));
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.fileUtils_,
+                PathIsValid(
+                   package.downloadedInstallerPath
+                ))
+        .WillOnce(Return(true));
+
+    // Set up expectations on the codesignVerifier
+    EXPECT_CALL(*mockCodesignVerifier_,
+                PackageVerify(
+                    package.downloadedInstallerPath,
+                    package.signerName)
+                )
+        .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
+    
+        // Invoke the function under test
+    std::string errOut;
+    ASSERT_EQ(manager_->UpdateComponent(package, errOut).pmResult, IPmPlatformComponentManager::PM_INSTALL_SUCCESS);
+}
+
 TEST_F(PmPlatformComponentManagerTest, InstallComponent_UnknownPkgType_Negative) {
     // Prepare test data
     const std::string volumePath = "/Volumes/MountedVolume";
