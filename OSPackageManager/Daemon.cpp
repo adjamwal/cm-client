@@ -10,6 +10,7 @@
 #include "configuration/Config.hpp"
 #include "PmLogger.hpp"
 #include "configuration/ConfigWatchdog.hpp"
+#include "IProxyLogger.h"
 
 #include <sys/stat.h>
 #include <chrono>
@@ -58,6 +59,7 @@ void Daemon::start()
     PmLogger::getLogger().SetLogLevel(config_->getLogLevel());
     PmLogger::getLogger().initFileLogging(loggerDir_, static_cast<std::string>(kLogFileName),
         kMaxSize, kMaxFiles);
+    proxy::SetProxyLogger(&PmLogger::getLogger().getProxyLogger());
         
     task_ = std::thread(&Daemon::mainTask, this);
     task_.join();

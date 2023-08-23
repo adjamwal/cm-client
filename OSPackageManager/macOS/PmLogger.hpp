@@ -10,6 +10,7 @@
 #pragma once
 
 #include "PackageManager/IPmLogger.h"
+#include "IProxyLogger.h"
 #include <string>
 #include <filesystem>
 
@@ -36,12 +37,28 @@ public:
     static PmLogger& getLogger();
     static void initLogger();
     static void releaseLogger();
+    
+    proxy::IProxyLogger& getProxyLogger();
 
 private:
-    FILE* printDummyFile_;
+    class ProxyLogger: public proxy::IProxyLogger
+    {
+    public:
+        explicit ProxyLogger(PmLogger* pLogger);
+        ProxyLogger(const ProxyLogger&) = delete;
+        ProxyLogger(ProxyLogger&&) = delete;
+        ProxyLogger& operator =(const ProxyLogger&) = delete;
+        ProxyLogger& operator =(ProxyLogger&&) = delete;
+        void Log( int severity, const char* msgFormatter, ... ) override;
+        void Log( int severity, const char* msgFormatter, va_list args ) override;
+    private:
+        PmLogger* pOrigLogger_;
+    };
     
+    FILE* printDummyFile_;
     Severity curSeverity_ = LOG_DEBUG;
     std::string loggerName_;
+    ProxyLogger proxyLogger_;
 
     void writeLog(Severity severity, const char* msgFormatter, va_list args);
     void writeLog(Severity severity, const wchar_t* msgFormatter, va_list args);

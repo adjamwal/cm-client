@@ -25,10 +25,6 @@ add_executable(
   ${TESTEE_DIR}/configuration/Config.hpp
   ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.cpp
-  ${TESTEE_DIR}/proxy/IProxyDiscoveryEngine.h
-  ${TESTEE_DIR}/proxy/ProxyDiscoveryEngine.h
-  ${TESTEE_DIR}/proxy/ProxyDiscoveryEngine.mm
-  ${TESTEE_DIR}/util/ScopedGuard.hpp
   ${TESTEE_DIR}/macOS/macOSUtilities.mm
   ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
 
@@ -69,6 +65,7 @@ add_dependencies(
 
 target_link_libraries(
   PackageManagerUnitTest
+  ProxyDiscovery
   cmidapi
   crypto
   jsoncpp
@@ -79,7 +76,6 @@ target_link_libraries(
   "-framework CoreServices"
   "-framework Security"
   "-framework Foundation"
-  "-framework SystemConfiguration"
   ${GTEST_LIBS}
 )
 
@@ -101,8 +97,8 @@ target_include_directories(
       ${cm-client_SOURCE_DIR}/OSPackageManager/macOS
       ${cm-client_SOURCE_DIR}/OSPackageManager/configuration
       ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
-      ${cm-client_SOURCE_DIR}/OSPackageManager/util
-      ${cm-client_SOURCE_DIR}/OSPackageManager/proxy
+      ${cm-client_SOURCE_DIR}/ProxyDiscovery/include
+      ${cm-client_SOURCE_DIR}/util
 )
 
 target_link_directories(

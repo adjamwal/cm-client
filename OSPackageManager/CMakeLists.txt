@@ -36,10 +36,6 @@ set(OS_PACKAGE_MANAGER_SRCS
     macOS/PmPlatformDiscovery.hpp
     macOS/PmPlatformDiscovery.cpp
     macOS/PmCodesignVerifierMac.cpp
-    proxy/IProxyDiscoveryEngine.h
-    proxy/ProxyDiscoveryEngine.h
-    proxy/ProxyDiscoveryEngine.mm
-    util/ScopedGuard.hpp
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
 )
@@ -63,6 +59,8 @@ target_include_directories(cmpackagemanager
     PUBLIC
     ${CM_THIRDPARTY_EXPORT}/include
     ${cm-client_SOURCE_DIR}
+    ${cm-client_SOURCE_DIR}/ProxyDiscovery/include
+    ${cm-client_SOURCE_DIR}/util
     # This include should be based on platform when we extend support for Linux
     ${CMAKE_CURRENT_SOURCE_DIR}/macOS
     ${CMAKE_CURRENT_SOURCE_DIR}/util
@@ -76,6 +74,7 @@ target_link_directories(cmpackagemanager BEFORE
 
 target_link_libraries(cmpackagemanager
     PUBLIC
+    ProxyDiscovery
     cmidapi
     pmclient
     pmcloud

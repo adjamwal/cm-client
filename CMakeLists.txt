@@ -74,6 +74,10 @@ include(ExternalProject_PackageManager)
 include(ExternalProject_EndpointIdentity)
 
 ##
+## ProxyDiscovery library
+add_subdirectory(ProxyDiscovery)
+
+##
 ## util library
 add_subdirectory(util)
 

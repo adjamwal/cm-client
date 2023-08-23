@@ -7,8 +7,7 @@
 #include <string>
 #include "PmPlatformConfiguration.hpp"
 #include "PmLogger.hpp"
-#include "ProxyDiscoveryEngine.h"
-#include "util/GuidUtil.hpp"
+#include "GuidUtil.hpp"
 
 namespace
 {
@@ -39,13 +38,24 @@ constexpr std::string_view kCmSharedLogPath{"/var/logs/cisco/secureclient/cloudm
 #endif
 
 constexpr std::string_view kHttpUserAgentPrefix{"PackageManager/"};
+
+std::list<PmProxy> convertProxyList(const std::list<ProxyRecord>& inputList)
+{
+    std::list<PmProxy> outputList;
+    for (auto&& rec: inputList)
+    {
+        outputList.push_back({rec.url, rec.port, rec.proxyType});
+    }
+    return outputList;
+}
+
 }
 
 PmPlatformConfiguration::PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
                                                  std::shared_ptr<PackageManager::PmCertManager> certmgr)
     :   cmidapi_(cmidapi),
         certmgr_(certmgr),
-        pProxyEngine_(std::make_unique<ProxyDiscoveryEngine>())
+        pProxyEngine_(proxy::createProxyEngine())
 {
     certmgr_->LoadSystemSslCertificates();
     pProxyEngine_->addObserver(this);
@@ -208,7 +218,7 @@ bool PmPlatformConfiguration::UpdateCertStoreForUrl(const std::string &url)
 
 std::list<PmProxy> PmPlatformConfiguration::StartProxyDiscovery(const std::string &testUrl, const std::string &pacUrl)
 {
-    return pProxyEngine_->getProxies(testUrl, pacUrl);
+    return convertProxyList(pProxyEngine_->getProxies(testUrl, pacUrl));
 }
 
 bool PmPlatformConfiguration::StartProxyDiscoveryAsync(const std::string &testUrl, const std::string &pacUrl, AsyncProxyDiscoveryCb cb, void *context)
@@ -220,7 +230,7 @@ bool PmPlatformConfiguration::StartProxyDiscoveryAsync(const std::string &testUr
     return true;
 }
 
-void PmPlatformConfiguration::updateProxyList(const std::list<PmProxy>& proxies, const std::string& guid)
+void PmPlatformConfiguration::updateProxyList(const std::list<ProxyRecord>& proxies, const std::string& guid)
 {
     auto it = proxyCallbacks_.find(guid);
     if (it == proxyCallbacks_.end())
@@ -242,5 +252,5 @@ void PmPlatformConfiguration::updateProxyList(const std::list<PmProxy>& proxies,
         PM_LOG_NOTICE("End of the proxy list.");
     }
     
-    p.second(p.first, proxies);
+    p.second(p.first, convertProxyList(proxies));
 }

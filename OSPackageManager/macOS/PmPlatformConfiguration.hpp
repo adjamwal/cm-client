@@ -15,7 +15,7 @@
 #include <memory>
 #include <unordered_map>
 
-class PmPlatformConfiguration : public IPmPlatformConfiguration, public IProxyObserver
+class PmPlatformConfiguration : public IPmPlatformConfiguration, public proxy::IProxyObserver
 {
 public:
     explicit PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
@@ -128,7 +128,7 @@ public:
      *
      * @return void
      */
-    void updateProxyList(const std::list<PmProxy>& proxies, const std::string& guid) override;
+    void updateProxyList(const std::list<ProxyRecord>& proxies, const std::string& guid) override;
     
 protected:
     cmid_result_t GetUrl( cmid_url_type_t urlType, std::string& url );
@@ -136,6 +136,6 @@ protected:
 private:
     std::shared_ptr<CMIDAPIProxyAbstract> cmidapi_;
     std::shared_ptr<PackageManager::PmCertManager> certmgr_;
-    std::unique_ptr<IProxyDiscoveryEngine> pProxyEngine_;
+    std::unique_ptr<proxy::IProxyDiscoveryEngine> pProxyEngine_;
     std::unordered_map<std::string, std::pair<void*, AsyncProxyDiscoveryCb>> proxyCallbacks_;
 };

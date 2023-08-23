@@ -6,7 +6,7 @@
 #include "ProxyDiscoveryEngine.h"
 
 #include "ScopedGuard.hpp"
-#include "PmLogger.hpp"
+#include "ProxyLoggerDef.hpp"
 #include "util/StringUtil.hpp"
 
 #include <limits>
@@ -58,7 +58,7 @@ void expandPACProxy(NSURL* testUrl, NSURL* scriptURL, NSMutableArray* retProxies
     
     if (rls == nullptr)
     {
-        PM_LOG_ERROR("Error occured during CFNetworkExecuteProxyAutoConfigurationURL call: returned CFRunLoopSourceRef is zero.");
+        PROXY_LOG_ERROR("Error occured during CFNetworkExecuteProxyAutoConfigurationURL call: returned CFRunLoopSourceRef is zero.");
         CFQRelease(result);
         return;
     }
@@ -70,7 +70,7 @@ void expandPACProxy(NSURL* testUrl, NSURL* scriptURL, NSMutableArray* retProxies
     
     if (result == nullptr)
     {
-        PM_LOG_ERROR("The result of the CFNetworkExecuteProxyAutoConfigurationURL call is zero.");
+        PROXY_LOG_ERROR("The result of the CFNetworkExecuteProxyAutoConfigurationURL call is zero.");
         return;
     }
     
@@ -80,7 +80,7 @@ void expandPACProxy(NSURL* testUrl, NSURL* scriptURL, NSMutableArray* retProxies
         long errorCode = [err code];
         std::string errDomain = util::convertNSStringToStdString([err domain]);
         std::string errDescr = util::convertNSStringToStdString([err localizedDescription]);
-        PM_LOG_ERROR("Error during CFNetworkExecuteProxyAutoConfigurationURL call occured: "
+        PROXY_LOG_ERROR("Error during CFNetworkExecuteProxyAutoConfigurationURL call occured: "
             "code: [%ld]. Domain: [%s]. Description: [%s].",
             errorCode, errDomain.c_str(), errDescr.c_str());
         return;
@@ -90,7 +90,7 @@ void expandPACProxy(NSURL* testUrl, NSURL* scriptURL, NSMutableArray* retProxies
             [retProxies addObject:dictionary];
         }
     } else {
-        PM_LOG_ERROR("Unknown error occured during CFNetworkExecuteProxyAutoConfigurationURL call.");
+        PROXY_LOG_ERROR("Unknown error occured during CFNetworkExecuteProxyAutoConfigurationURL call.");
         CFQRelease(result);
         return;
     }
@@ -118,16 +118,18 @@ NSArray* expandPACProxies(NSURL* testUrl, NSArray* inputProxies)
 }
 } //unnamed namespace
 
-std::list<PmProxy> ProxyDiscoveryEngine::getProxiesInternal(const std::string& testUrlStr, const std::string &pacUrlStr)
+namespace proxy
 {
-    std::list<PmProxy> proxyList;
+std::list<ProxyRecord> ProxyDiscoveryEngine::getProxiesInternal(const std::string& testUrlStr, const std::string &pacUrlStr)
+{
+    std::list<ProxyRecord> proxyList;
     
     NSDictionary* proxySettings =
-        (__bridge_transfer NSDictionary*)SCDynamicStoreCopyProxies(nullptr);
+    (__bridge_transfer NSDictionary*)SCDynamicStoreCopyProxies(nullptr);
     
     if (proxySettings == nullptr)
     {
-        PM_LOG_WARNING("The SCDynamicStoreCopyProxies call returned zero dictionary as a proxy settings.");
+        PROXY_LOG_WARNING("The SCDynamicStoreCopyProxies call returned zero dictionary as a proxy settings.");
         return proxyList;
     }
     
@@ -137,7 +139,7 @@ std::list<PmProxy> ProxyDiscoveryEngine::getProxiesInternal(const std::string& t
     NSMutableArray* proxies = [[NSMutableArray alloc] init];
     if (!pacUrlStr.empty())
     {
-        PM_LOG_DEBUG("Pac url is provided for the proxy discovery: %s", pacUrlStr.c_str());
+        PROXY_LOG_DEBUG("Pac url is provided for the proxy discovery: %s", pacUrlStr.c_str());
         NSString* nsPacUrlStr = [NSString stringWithUTF8String:pacUrlStr.c_str()];
         NSURL* pacUrl = [NSURL URLWithString: nsPacUrlStr];
         expandPACProxy(testUrl, pacUrl, proxies);
@@ -149,7 +151,7 @@ std::list<PmProxy> ProxyDiscoveryEngine::getProxiesInternal(const std::string& t
     [proxies addObjectsFromArray:expandedProxies];
     
     for (NSDictionary* dictionary in proxies) {
-        //TODO: We might need to extend PmProxy type to include
+        //TODO: We might need to extend ProxyRecord type to include
         //credentials fields: kCFProxyUsernameKey, kCFProxyPasswordKey.
         NSString* nsStrProxyType = [dictionary objectForKey:(__bridge NSString*)kCFProxyTypeKey];
         std::string proxyType = util::convertNSStringToStdString(nsStrProxyType);
@@ -167,7 +169,7 @@ std::list<PmProxy> ProxyDiscoveryEngine::getProxiesInternal(const std::string& t
             }
             else
             {
-                PM_LOG_DEBUG("Unable to determine proxy URL: both kCFProxyHostNameKey and kCFProxyHostNameKey are empty in the dictionary.");
+                PROXY_LOG_DEBUG("Unable to determine proxy URL: both kCFProxyHostNameKey and kCFProxyHostNameKey are empty in the dictionary.");
                 continue;
             }
         }
@@ -179,7 +181,7 @@ std::list<PmProxy> ProxyDiscoveryEngine::getProxiesInternal(const std::string& t
         NSNumber* nsPort = [dictionary objectForKey:(__bridge NSNumber*)kCFProxyPortNumberKey];
         uint32_t port = [nsPort intValue];
         
-        PmProxy proxy{url, port, proxyType};
+        ProxyRecord proxy{url, port, proxyType};
         proxyList.push_back(proxy);
     }
     
@@ -199,7 +201,7 @@ void ProxyDiscoveryEngine::requestProxiesAsync(const std::string& testUrl, const
         m_thread->join();
     }
     m_thread = std::make_shared<std::thread>([this, testUrl, pacUrlStr, guid](){
-        std::list<PmProxy> proxies = getProxiesInternal(testUrl, pacUrlStr);
+        std::list<ProxyRecord> proxies = getProxiesInternal(testUrl, pacUrlStr);
         notifyObservers(proxies, guid);
     });
 }
@@ -213,7 +215,7 @@ void ProxyDiscoveryEngine::waitPrevOpCompleted()
     }
 }
 
-void ProxyDiscoveryEngine::notifyObservers(const std::list<PmProxy>& proxies, const std::string& guid)
+void ProxyDiscoveryEngine::notifyObservers(const std::list<ProxyRecord>& proxies, const std::string& guid)
 {
     for(auto* pObserver: m_observers)
     {
@@ -224,7 +226,7 @@ void ProxyDiscoveryEngine::notifyObservers(const std::list<PmProxy>& proxies, co
     }
 }
 
-std::list<PmProxy> ProxyDiscoveryEngine::getProxies(const std::string& testUrl, const std::string &pacUrl)
+std::list<ProxyRecord> ProxyDiscoveryEngine::getProxies(const std::string& testUrl, const std::string &pacUrl)
 {
     //We need to call getProxiesInternal in a separate thread even for the
     //synchronous call since expandPACProxy function is running event loop.
@@ -235,7 +237,7 @@ std::list<PmProxy> ProxyDiscoveryEngine::getProxies(const std::string& testUrl, 
         //wait for the previous discovery completed.
         m_threadSync->join();
     }
-    std::list<PmProxy> proxies;
+    std::list<ProxyRecord> proxies;
     m_threadSync = std::make_shared<std::thread>([this, &testUrl, &pacUrl, &proxies](){
         proxies = getProxiesInternal(testUrl, pacUrl);
     });
@@ -253,3 +255,10 @@ ProxyDiscoveryEngine::~ProxyDiscoveryEngine()
     if (m_threadSync && m_threadSync->joinable())
         m_threadSync->join();
 }
+
+std::unique_ptr<IProxyDiscoveryEngine> createProxyEngine()
+{
+    return std::make_unique<ProxyDiscoveryEngine>();
+}
+
+} //proxy namespace

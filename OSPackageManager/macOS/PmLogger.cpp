@@ -54,7 +54,8 @@ struct deletable_facet : Facet
     ~deletable_facet() {}
 };
 
-PmLogger::PmLogger()
+PmLogger::PmLogger():
+        proxyLogger_(this)
 {
     initDevNullDummyFile();
     initConsoleLogging();
@@ -314,4 +315,27 @@ void PmLogger::initMessagePattern()
 void PmLogger::initDevNullDummyFile()
 {
     printDummyFile_ = fopen("/dev/null", "wb");
+}
+
+proxy::IProxyLogger& PmLogger::getProxyLogger()
+{
+    return proxyLogger_;
+}
+
+PmLogger::ProxyLogger::ProxyLogger(PmLogger* pLogger):
+    pOrigLogger_(pLogger)
+{
+}
+
+void PmLogger::ProxyLogger::Log( int severity, const char* msgFormatter, ... )
+{
+    va_list va_args;
+    va_start(va_args, msgFormatter);
+    pOrigLogger_->Log(static_cast<PmLogger::Severity>(severity), msgFormatter, va_args);
+    va_end(va_args);
+}
+
+void PmLogger::ProxyLogger::Log( int severity, const char* msgFormatter, va_list args )
+{
+    pOrigLogger_->Log(static_cast<PmLogger::Severity>(severity), msgFormatter, args);
 }
