@@ -15,7 +15,6 @@ set(CM_CLIENT_SRCS
     ComponentLoader/PMLoader.cpp
     Configuration/Config.hpp
     Configuration/Config.cpp
-    Configuration/ConfigWatchdog.hpp
     Logger/CMLogger.cpp
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
@@ -37,6 +36,7 @@ target_include_directories(csccloudmanagement
     PUBLIC
     ${cm-client_SOURCE_DIR}
     ${CM_THIRDPARTY_EXPORT}/include
+    ${cm-client_SOURCE_DIR}/bitsandpieces
 )
 
 target_link_directories(csccloudmanagement BEFORE
@@ -50,6 +50,7 @@ target_link_libraries(csccloudmanagement
     common
     pmcontrolplugin
     jsoncpp
+    bitsandpieces
     "-framework SystemConfiguration"
     "-framework IOKit"
     "-framework CoreServices"

@@ -71,6 +71,7 @@ target_link_libraries(
   jsoncpp
   ssl
   util
+  bitsandpieces
   "-framework CoreFoundation"
   "-framework IOKit"
   "-framework CoreServices"
@@ -99,6 +100,7 @@ target_include_directories(
       ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
       ${cm-client_SOURCE_DIR}/ProxyDiscovery/include
       ${cm-client_SOURCE_DIR}/util
+      ${cm-client_SOURCE_DIR}/bitsandpieces
 )
 
 target_link_directories(

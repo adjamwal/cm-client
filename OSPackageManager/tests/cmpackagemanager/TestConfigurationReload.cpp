@@ -75,7 +75,7 @@ public:
     {
         ASSERT_TRUE(createConfigFile(testData1_));
         pConfig_ = std::make_unique<Config>(configFilePath_.native());
-        ConfigWatchdog::getConfigWatchdog().addSubscriber(pConfig_->subscribeForConfigChanges());
+        bitsandpieces::ConfigWatchdog::getConfigWatchdog().addSubscriber(pConfig_->subscribeForConfigChanges());
         PmLogger::initLogger();
         PmLogger::getLogger().SetLogLevel(pConfig_->getLogLevel());
         PmLogger::getLogger().initFileLogging(std::filesystem::temp_directory_path(), static_cast<std::string>(kLogFile), 1048576 * 15, 5);
@@ -162,7 +162,7 @@ TEST_F(TestConfigurationReload, LogLevelChangedAfterReload)
     
     ASSERT_TRUE(reCreateConfigFile(testData2_));
 
-    ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();
+    bitsandpieces::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();
     
     logRecord = {
         "Set new log level: Error"
@@ -172,3 +172,4 @@ TEST_F(TestConfigurationReload, LogLevelChangedAfterReload)
     
     checkLogRecordsExists(logRecord);
 }
+

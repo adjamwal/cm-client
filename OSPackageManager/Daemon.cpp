@@ -9,7 +9,7 @@
 #include "agent/PackageManagerAgent.hpp"
 #include "configuration/Config.hpp"
 #include "PmLogger.hpp"
-#include "configuration/ConfigWatchdog.hpp"
+#include "ConfigWatchdog.hpp"
 #include "IProxyLogger.h"
 
 #include <sys/stat.h>
@@ -54,8 +54,8 @@ void Daemon::start()
 {
     isRunning_ = true;
     config_ = std::make_unique<Config>(configFile_);
-    fileWatcher_->add(config_->getPath(), []() {ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
-    ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
+    fileWatcher_->add(config_->getPath(), []() {bitsandpieces::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
+    bitsandpieces::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
     PmLogger::getLogger().SetLogLevel(config_->getLogLevel());
     PmLogger::getLogger().initFileLogging(loggerDir_, static_cast<std::string>(kLogFileName),
         kMaxSize, kMaxFiles);

@@ -13,7 +13,6 @@ set(OS_PACKAGE_MANAGER_SRCS
     agent/PackageManagerAgent.hpp
     configuration/Config.hpp
     configuration/Config.cpp
-    configuration/ConfigWatchdog.hpp
     macOS/IFileUtilities.hpp
     macOS/IPmCertRetriever.hpp
     macOS/FileUtilities.cpp
@@ -65,6 +64,7 @@ target_include_directories(cmpackagemanager
     ${CMAKE_CURRENT_SOURCE_DIR}/macOS
     ${CMAKE_CURRENT_SOURCE_DIR}/util
     ${CMAKE_CURRENT_SOURCE_DIR}/proxy
+    ${cm-client_SOURCE_DIR}/bitsandpieces
 )
 
 target_link_directories(cmpackagemanager BEFORE
@@ -85,6 +85,7 @@ target_link_libraries(cmpackagemanager
     crypto
     ssl
     util
+    bitsandpieces
     z
     "-framework SystemConfiguration"
     "-framework IOKit"

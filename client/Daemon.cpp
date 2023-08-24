@@ -9,7 +9,7 @@
 #include "ComponentLoader/PMLoader.hpp"
 #include "Configuration/Config.hpp"
 #include "Logger/CMLogger.hpp"
-#include "Configuration/ConfigWatchdog.hpp"
+#include "ConfigWatchdog.hpp"
 
 #include <sys/stat.h>
 #include <chrono>
@@ -32,14 +32,14 @@ Daemon::Daemon()
       fileWatcher_{std::make_unique<FileWatcher>(fileWatcherName)}
 {
     CMLogger::getInstance().setLogLevel(config_->getLogLevel());
-    ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
+    bitsandpieces::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
 }
 
 void Daemon::start()
 {
     CM_LOG_DEBUG("Starting cloud management");
  
-    fileWatcher_->add(config_->getPath(), []() {ConfigWatchdog::getConfigWatchdog().detectedСonfigСhanges();});
+    fileWatcher_->add(config_->getPath(), []() {bitsandpieces::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
     isRunning_ = true;
 
     task_ = std::thread(&Daemon::mainTask, this);

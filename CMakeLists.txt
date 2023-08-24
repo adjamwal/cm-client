@@ -82,6 +82,10 @@ add_subdirectory(ProxyDiscovery)
 add_subdirectory(util)
 
 ##
+## BitsAndPieces library (common staff for PM and CM)
+add_subdirectory(bitsandpieces)
+
+##
 ## Package Manager client
 add_subdirectory(OSPackageManager)
 
