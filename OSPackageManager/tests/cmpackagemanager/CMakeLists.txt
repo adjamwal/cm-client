@@ -25,7 +25,8 @@ add_executable(
   ${TESTEE_DIR}/configuration/Config.hpp
   ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.cpp
-  ${TESTEE_DIR}/macOS/macOSUtilities.mm
+  ${TESTEE_DIR}/macOS/FileUtilities.mm
+  ${TESTEE_DIR}/macOS/util/pkg_util.mm
   ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
 
   # Mocks
@@ -71,6 +72,7 @@ target_link_libraries(
   jsoncpp
   ssl
   util
+  xar
   bitsandpieces
   "-framework CoreFoundation"
   "-framework IOKit"

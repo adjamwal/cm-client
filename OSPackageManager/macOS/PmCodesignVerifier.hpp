@@ -16,7 +16,7 @@
 #include "IPmPkgUtil.hpp"
 
 #define SIGNER_CISCO_CN     "Cisco Systems, Inc."
-#define SIGNER_CISCO_ENT    "Cisco"
+#define SIGNER_CISCO_ENT    "Developer ID Installer: Cisco (DE8Y96K9QP)"
 #define SIGNER_MICROSOFT    "Microsoft Corporation"
 #define SIGNER_MOZILLA      "Mozilla Corporation"
 
@@ -31,6 +31,7 @@ public:
     CodeSignStatus ExecutableVerify( const std::filesystem::path& path, const std::string& strSigner, SigType sig_type ) override;
     CodeSignStatus ExecutableVerifyWithKilldate( const std::filesystem::path& path, const std::string& strSigner,
                                       SigType sig_type, uint64_t killdate ) override;
+    CodeSignStatus PackageVerify( const std::filesystem::path& path ) override;
     CodeSignStatus PackageVerify( const std::filesystem::path& path, const std::string& strSigner ) override;
     
 private:

@@ -121,7 +121,7 @@ TEST(FileUtilities, ResolvePath)
         }
     }
     
-EXPECT_THAT(expectedPaths, ::testing::ElementsAreArray(resolvedPaths));
+    EXPECT_THAT(expectedPaths, ::testing::ElementsAreArray(resolvedPaths));
     
     PmLogger::releaseLogger();
 }

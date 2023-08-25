@@ -16,7 +16,7 @@ set(OS_PACKAGE_MANAGER_SRCS
     macOS/IFileUtilities.hpp
     macOS/IPmCertRetriever.hpp
     macOS/FileUtilities.cpp
-    macOS/MacOSUtilities.mm
+    macOS/FileUtilities.mm
     macOS/FileUtilities.hpp
     macOS/PmCertManager.cpp
     macOS/PmCertManager.hpp
@@ -35,6 +35,7 @@ set(OS_PACKAGE_MANAGER_SRCS
     macOS/PmPlatformDiscovery.hpp
     macOS/PmPlatformDiscovery.cpp
     macOS/PmCodesignVerifierMac.cpp
+    macOS/util/pkg_util.mm
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
 )
@@ -87,6 +88,7 @@ target_link_libraries(cmpackagemanager
     util
     bitsandpieces
     z
+    xar
     "-framework SystemConfiguration"
     "-framework IOKit"
     "-framework CoreServices"

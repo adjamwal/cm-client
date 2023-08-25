@@ -25,5 +25,6 @@ public:
     virtual ~IPmCodesignVerifier() = default;
     virtual CodeSignStatus ExecutableVerify( const std::filesystem::path& path, const std::string& strSigner, SigType sig_type ) = 0;
     virtual CodeSignStatus ExecutableVerifyWithKilldate( const std::filesystem::path& path, const std::string& strSigner, SigType sig_type, uint64_t killdate ) = 0;
+    virtual CodeSignStatus PackageVerify( const std::filesystem::path& path ) = 0;
     virtual CodeSignStatus PackageVerify( const std::filesystem::path& path, const std::string& strSigner ) = 0;
 };

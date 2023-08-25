@@ -17,6 +17,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include "util/pkg_util.h"
 #include "PmCodesignVerifier.hpp"
 #include "PmLogger.hpp"
 #include "IPmPkgUtil.hpp"
@@ -709,18 +710,35 @@ CodeSignStatus CodesignVerifier::ExecutableVerify( const std::filesystem::path& 
     return ExecutableVerifyWithKilldate( path.string().c_str(), strSigner.c_str(), sig_type, KILLDATE );
 }
 
+CodeSignStatus CodesignVerifier::PackageVerify( const std::filesystem::path& path )
+{
+    bool has_valid_signature{true};
+    
+    const auto error_code = pkg_verify(path.string().c_str(), &has_valid_signature);
+    
+    if (error_code != PKG_SIGN_SUCCESS)
+        return CodeSignStatus::CODE_SIGN_FAIL;
+    
+    if (!has_valid_signature)
+        return CodeSignStatus::CODE_SIGN_VERIFICATION_FAILED;
+    
+    return CodeSignStatus::CODE_SIGN_OK;
+}
+
 CodeSignStatus CodesignVerifier::PackageVerify( const std::filesystem::path& path, const std::string& expectedSigner )
 {
-    assert(pkgUtil_);
-    
-    std::string signer;
-    if (pkgUtil_->verifyPackageCodesign(path, signer)) {
-        if (signer == expectedSigner) {
-            return CodeSignStatus::CODE_SIGN_OK;
-        }
+    PM_LOG_INFO("Verify package %s code signing", path.c_str());
+    const auto error_code = pkg_verify_trusted_signer(path.string().c_str(), expectedSigner.c_str());
+    switch (error_code) {
+    case PKG_SIGN_SUCCESS:
+        PM_LOG_INFO("Package %s has valid codesigning by %s", path.string().c_str(), expectedSigner.c_str());
+        return CodeSignStatus::CODE_SIGN_OK;
+    case PKG_SIGN_EDSIG:
+        PM_LOG_WARNING("Package %s has no valid codesigning", path.string().c_str());
         return CodeSignStatus::CODE_SIGN_VERIFICATION_FAILED;
+    default:
+        PM_LOG_ERROR("Failed to detect package %s codesigning", path.string().c_str());
+        return CodeSignStatus::CODE_SIGN_FAIL;
     }
-    
-    return CodeSignStatus::CODE_SIGN_FAIL;
 }
 
