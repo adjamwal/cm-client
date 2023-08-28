@@ -19,7 +19,10 @@ PackageInventory PmPlatformDiscovery::DiscoverInstalledPackages( const std::vect
             }
         }
     }
-    
+    //TODO: Add proper values once ready in https://jira-eng-rtp3.cisco.com/jira/browse/CM4E-291
+    packagesDiscovered.architecture = "x64";
+    packagesDiscovered.platform = "mac";
+
     lastDetectedPackages_ = packagesDiscovered;
     
     return packagesDiscovered;
