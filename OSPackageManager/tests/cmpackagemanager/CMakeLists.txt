@@ -26,7 +26,8 @@ add_executable(
   ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.mm
-  ${TESTEE_DIR}/macOS/util/pkg_util.mm
+  ${TESTEE_DIR}/macOS/util/codesign_pkg.mm
+  ${TESTEE_DIR}/macOS/util/codesign_bin.cpp
   ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
 
   # Mocks

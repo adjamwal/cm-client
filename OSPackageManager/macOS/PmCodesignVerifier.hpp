@@ -15,15 +15,6 @@
 #include "IPmCodesignVerifier.hpp"
 #include "IPmPkgUtil.hpp"
 
-#define SIGNER_CISCO_CN     "Cisco Systems, Inc."
-#define SIGNER_CISCO_ENT    "Developer ID Installer: Cisco (DE8Y96K9QP)"
-#define SIGNER_MICROSOFT    "Microsoft Corporation"
-#define SIGNER_MOZILLA      "Mozilla Corporation"
-
-#define SIGNER_CISCO_BIN SIGNER_CISCO_TEAMID
-#define SIGNER_CISCO_PKG SIGNER_CISCO_ENT
-#define SIGNER_CISCO_TEAMID "DE8Y96K9QP"
-
 class CodesignVerifier : public IPmCodesignVerifier
 {
 public:

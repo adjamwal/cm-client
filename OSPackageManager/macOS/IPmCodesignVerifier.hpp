@@ -1,8 +1,7 @@
 #pragma once
 #include <string>
 #include <filesystem>
-
-#define SIGTYPE_DEFAULT     SigType::SIGTYPE_NATIVE
+#include "util/codesign_bin.h"
 
 enum class CodeSignStatus {
     CODE_SIGN_OK = 0,
@@ -10,13 +9,6 @@ enum class CodeSignStatus {
     CODE_SIGN_EXPIRED = -14,  /* Codesign time expired */
     CODE_SIGNER_MISMATCH = -15, /* Untrusted signer disallowed */
     CODE_SIGN_VERIFICATION_FAILED = -16, /* Codesign verification failure */
-};
-
-enum class SigType
-{
-    SIGTYPE_AUTO = 0,
-    SIGTYPE_NATIVE,
-    SIGTYPE_CISCO
 };
 
 class IPmCodesignVerifier

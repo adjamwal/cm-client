@@ -6,7 +6,7 @@
 #include <Security/Security.h>
 
 #include "PmLogger.hpp"
-#include "pkg_util.h"
+#include "codesign_pkg.h"
 
 #define CERT_SUBJECT_SF         "Developer ID Installer: Sourcefire Inc. (B74XLY78T6)"
 #define CERT_SUBJECT_CISCO_ENT  "Developer ID Installer: Cisco Systems, Inc. (TDNYQP7VRK)"

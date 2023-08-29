@@ -35,7 +35,8 @@ set(OS_PACKAGE_MANAGER_SRCS
     macOS/PmPlatformDiscovery.hpp
     macOS/PmPlatformDiscovery.cpp
     macOS/PmCodesignVerifierMac.cpp
-    macOS/util/pkg_util.mm
+    macOS/util/codesign_pkg.mm
+    macOS/util/codesign_bin.cpp
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
 )
