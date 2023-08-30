@@ -71,9 +71,9 @@
     {
       "name": "Experimental Mac Test Stable",
       "product": "MacTest1",
-      "installer_sha256": "8040e40a7200cfb54656e705a446c003ab731b64b6709b6f39040144c6715536",
+      "installer_sha256": "8b165b2d9f38964c9979be278f4b056802e8ae867a3c7069dfd14e02eb6de090",
       "installer_type": "pkg",
-      "installer_uri":       "https://cisco.box.com/shared/static/7vzmsx2x6mkfa6hrxl87nl86g7v925h5.pkg",
+      "installer_uri":       "https://engci-maven.cisco.com/artifactory/ampcx-generic-thirdparty/sccm-cloudmanagement/cisco-secure-client-macos-cloudmanagement-testpackage1-1.0.pkg",
       "state": "stable",
       "version": "1.0.0.0"
     },

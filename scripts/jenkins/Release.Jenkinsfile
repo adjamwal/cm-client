@@ -72,6 +72,15 @@ pipeline {
         sh 'cp cm-client/Staging/cisco-secure-client-macos-cloudmanagement-*.pkg .'
         sh 'cp cm-client/Staging/cisco-secure-client-macos-cloudmanagement-*.dmg .'
         sh 'cp cm-client/Staging/GIT_FP.txt .'
+        
+        withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
+          withCredentials([string(credentialsId: 'ARTIFACTORY_TOKEN', variable: 'ARTIFACTORY_TOKEN')]) {
+            dir('cm-client/Staging') {
+              sh '../scripts/jenkins/artifactory_upload.sh "cisco-secure-client-macos-cloudmanagement-${CM_BUILD_VER}.pkg"'
+              sh '../scripts/jenkins/artifactory_upload.sh "cisco-secure-client-macos-cloudmanagement-testpackage1-${CM_BUILD_VER}.pkg"'
+            }
+          }
+        }
 
         stash includes: '\
           GIT_FP.txt, \

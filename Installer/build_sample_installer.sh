@@ -30,7 +30,7 @@ if [ $# -ne 2 ]; then
     echo "Usage: build_sample_installer.sh [debug|release] [staging_dir]"
 fi
 
-VER="1.0"
+VER=${CM_BUILD_VER}
 if [ "x$1" = "xdebug" ]; then
     BUILD_TYPE="debug"
 else
