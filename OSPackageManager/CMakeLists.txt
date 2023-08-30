@@ -53,14 +53,15 @@ add_dependencies(cmpackagemanager
     third-party-jsoncpp
     third-party-EndpointIdentity
     third-party-PackageManager
+    third-party-ProxyDiscovery-Mac
     third-party-spdlog
 )
 
 target_include_directories(cmpackagemanager
     PUBLIC
     ${CM_THIRDPARTY_EXPORT}/include
+    ${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery
     ${cm-client_SOURCE_DIR}
-    ${cm-client_SOURCE_DIR}/ProxyDiscovery/include
     ${cm-client_SOURCE_DIR}/util
     # This include should be based on platform when we extend support for Linux
     ${CMAKE_CURRENT_SOURCE_DIR}/macOS

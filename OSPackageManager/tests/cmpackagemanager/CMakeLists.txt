@@ -62,6 +62,7 @@ add_dependencies(
     third-party-gtest
     third-party-jsoncpp
     third-party-PackageManager
+    third-party-ProxyDiscovery-Mac
     third-party-spdlog
 )
 
@@ -80,6 +81,7 @@ target_link_libraries(
   "-framework CoreServices"
   "-framework Security"
   "-framework Foundation"
+  "-framework SystemConfiguration"
   ${GTEST_LIBS}
 )
 
@@ -94,6 +96,7 @@ target_include_directories(
   PackageManagerUnitTest
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
+      ${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery
       ${cm-client_SOURCE_DIR}
       ${cm-client_SOURCE_DIR}/client/Logger
       ${cm-client_SOURCE_DIR}/OSPackageManager/environment
@@ -101,7 +104,6 @@ target_include_directories(
       ${cm-client_SOURCE_DIR}/OSPackageManager/macOS
       ${cm-client_SOURCE_DIR}/OSPackageManager/configuration
       ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
-      ${cm-client_SOURCE_DIR}/ProxyDiscovery/include
       ${cm-client_SOURCE_DIR}/util
       ${cm-client_SOURCE_DIR}/bitsandpieces
 )

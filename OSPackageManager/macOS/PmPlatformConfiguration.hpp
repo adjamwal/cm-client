@@ -7,7 +7,7 @@
 
 #include "PackageManager/IPmPlatformConfiguration.h"
 #include "CMIDAPIProxyAbstract.hpp"
-#include "IProxyDiscoveryEngine.h"
+#include "ProxyDiscovery/IProxyDiscoveryEngine.h"
 
 #include "cmid/CMIDAPI.h"
 #include "PmCertManager.hpp"

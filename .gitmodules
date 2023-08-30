@@ -26,3 +26,6 @@
 	path = third-party/crashpad/crashpad
 	url = ../../Cloud/crashpad.git
 	shallow = true
+[submodule "ProxyDiscovery-Mac"]
+	path = ProxyDiscovery-Mac
+	url = ../../UnifiedConnector/ProxyDiscovery-Mac.git

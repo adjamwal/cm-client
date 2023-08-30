@@ -10,7 +10,7 @@
 #pragma once
 
 #include "PackageManager/IPmLogger.h"
-#include "IProxyLogger.h"
+#include "ProxyDiscovery/IProxyLogger.h"
 #include <string>
 #include <filesystem>
 

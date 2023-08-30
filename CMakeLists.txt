@@ -47,6 +47,7 @@ endif()
 set(BUILD_PACKAGE_MANAGER_THIRD_PARTY false)
 set(BUILD_ENDPOINT_IDENTITY_THIRD_PARTY false)
 set(BUILD_CRASHPAD false)
+set(BUILD_PROXY_DISCOVERY_THIRD_PARTY false)
 
 # config.h checks
 include(ConfigureChecks.cmake)
@@ -70,12 +71,9 @@ include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)
 include(ExternalProject_crashpad)
 include(ExternalProject_gtest)
+include(ExternalProject_ProxyDiscovery-Mac)
 include(ExternalProject_PackageManager)
 include(ExternalProject_EndpointIdentity)
-
-##
-## ProxyDiscovery library
-add_subdirectory(ProxyDiscovery)
 
 ##
 ## util library

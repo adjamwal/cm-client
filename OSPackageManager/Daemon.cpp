@@ -10,7 +10,7 @@
 #include "configuration/Config.hpp"
 #include "PmLogger.hpp"
 #include "ConfigWatchdog.hpp"
-#include "IProxyLogger.h"
+#include "ProxyDiscovery/IProxyLogger.h"
 
 #include <sys/stat.h>
 #include <chrono>
