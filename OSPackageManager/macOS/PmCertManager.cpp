@@ -4,6 +4,7 @@
  */
 
 #include "PmCertManager.hpp"
+#include "PmLogger.hpp"
 
 #include <CoreFoundation/CFArray.h>
 #include <Security/Security.h>
@@ -37,13 +38,12 @@ bool PmCertManager::FreeSystemSslCertificates()
 int32_t PmCertManager::GetSslCertificates( X509*** certificates, size_t& count )
 {
     int32_t result = -1;
-
     count = 0;
 
     std::vector<X509*> certVector;
     if (certRetriever_)
         certRetriever_->GetSslCertificates(certVector);
-    
+
     if (nullptr != certificates && !certVector.empty() ){
         *certificates = ( X509** )calloc( certVector.size(), sizeof( *certificates ) );
 
@@ -51,9 +51,11 @@ int32_t PmCertManager::GetSslCertificates( X509*** certificates, size_t& count )
             ( *certificates )[ count ] = cert;
             ( count )++;
         }
-        
+
         result = 0;
     }
+
+    PM_LOG_INFO("Returning %d certificates", count);
 
     return result;
 }
@@ -70,6 +72,8 @@ void PmCertManager::ReleaseSslCertificates(X509 **certificates, size_t count)
 
     free( certificates );
     certificates = nullptr;
+
+    PM_LOG_INFO("Released %d certificates", count);
 }
 
 PmCertManager::~PmCertManager()
