@@ -137,6 +137,8 @@ if [ "${clean}" = "true" ]; then
 	"EndpointIdentity export"
 	"third-party/crashpad export"
 	"third-party/crashpad/crashpad out"
+    "ProxyDiscovery-Mac export"
+    "ProxyDiscovery-Mac xcode_export"
 	# Add more folders if needed
     )
 

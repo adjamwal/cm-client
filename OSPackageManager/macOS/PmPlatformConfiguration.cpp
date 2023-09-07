@@ -39,7 +39,7 @@ constexpr std::string_view kCmSharedLogPath{"/var/logs/cisco/secureclient/cloudm
 
 constexpr std::string_view kHttpUserAgentPrefix{"PackageManager/"};
 
-std::list<PmProxy> convertProxyList(const std::list<ProxyRecord>& inputList)
+std::list<PmProxy> convertProxyList(const std::list<proxy::ProxyRecord>& inputList)
 {
     std::list<PmProxy> outputList;
     for (auto&& rec: inputList)
@@ -230,7 +230,7 @@ bool PmPlatformConfiguration::StartProxyDiscoveryAsync(const std::string &testUr
     return true;
 }
 
-void PmPlatformConfiguration::updateProxyList(const std::list<ProxyRecord>& proxies, const std::string& guid)
+void PmPlatformConfiguration::updateProxyList(const std::list<proxy::ProxyRecord>& proxies, const std::string& guid)
 {
     auto it = proxyCallbacks_.find(guid);
     if (it == proxyCallbacks_.end())

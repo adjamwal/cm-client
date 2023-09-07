@@ -128,7 +128,7 @@ public:
      *
      * @return void
      */
-    void updateProxyList(const std::list<ProxyRecord>& proxies, const std::string& guid) override;
+    void updateProxyList(const std::list<proxy::ProxyRecord>& proxies, const std::string& guid) override;
     
 protected:
     cmid_result_t GetUrl( cmid_url_type_t urlType, std::string& url );

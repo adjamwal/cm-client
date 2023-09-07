@@ -29,6 +29,7 @@ if(NOT TARGET "third-party-${component_name}")
             -Dgtest_INCLUDE_DIRS=${CM_THIRDPARTY_EXPORT}/include
             -Dgtest_LIBRARY=${CM_THIRDPARTY_EXPORT}/lib
             -DSKIP_TESTS=FALSE
+            -DUSE_DEBUG_TEST_LIBRARIES=TRUE
             -DCMAKE_INSTALL_PREFIX:PATH=${component_install_prefix}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES_}
