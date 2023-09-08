@@ -1282,6 +1282,14 @@
           "vendor": "TestPackageB"
         }
       ],
+    "configurables": [
+	{
+        "path": "<FOLDERID_ApplicationDirectory>/*.json",
+        "deploy_path": "<FOLDERID_ApplicationDirectory>/*.json",
+        "formats": [ "json" ],
+        "max_instances": 10
+	}
+    ],
       "description": "Mac Test Package 1.0 - Happy Path",
       "logo_dark": "https://brand-assets.security.cisco.com/secure/x-dark.svg",
       "logo_light": "https://brand-assets.security.cisco.com/secure/x-light.svg"
@@ -1829,6 +1837,13 @@
             "cm"
           ],
           "required": false
+        }
+      ],
+      "mac-test": [
+        {
+    	    "path": "<FOLDERID_ApplicationDirectory>/Cisco/Cisco Secure Client/CM/Configuration/test.json",
+    	    "formats": [ "json" ],
+    	    "required": false
         }
       ],
       "ac-core-vpn": [

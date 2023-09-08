@@ -157,3 +157,52 @@ Make sure to download and place test .pkg into webserver's folder, modifying the
 More detailed information can be found there:
 https://code.engine.sourcefire.com/UnifiedConnector/WindowsUnifiedConnector/blob/master/Docs/CM.md#workflow
 https://jira-eng-rtp3.cisco.com/jira/browse/CM4E-277
+
+# Mac-Specific Paths supported during path resolving
+
+The following is a list of Mac-specific paths to be used in an Identity catalog.
+
+#### FOLDERID_ApplicationDirectory
+- **Description**: The directory containing the application bundle for the system.
+
+#### FOLDERID_DemoApplicationDirectory
+- **Description**: The directory containing demo applications for the system.
+
+#### FOLDERID_DeveloperApplicationDirectory
+- **Description**: The directory containing developer applications for the system.
+
+#### FOLDERID_AdminApplicationDirectory
+- **Description**: The directory containing administrative applications for the system.
+
+#### FOLDERID_LibraryDirectory
+- **Description**: The system's Library directory.
+
+#### FOLDERID_DeveloperDirectory
+- **Description**: The developer's directory in the system.
+
+#### FOLDERID_DocumentationDirectory
+- **Description**: The directory containing system-wide documentation files.
+
+#### FOLDERID_CoreServiceDirectory
+- **Description**: The Core Services directory for the system.
+
+#### FOLDERID_CachesDirectory
+- **Description**: The directory for system-wide cached files.
+
+#### FOLDERID_InputMethodsDirectory
+- **Description**: The directory for system-wide input methods.
+
+#### FOLDERID_PrinterDescriptionDirectory
+- **Description**: The directory for printer description files on the system.
+
+#### FOLDERID_PreferencePanesDirectory
+- **Description**: The directory for preference panes on the system.
+
+#### FOLDERID_AllApplicationsDirectory
+- **Description**: The directory containing all applications for the system.
+
+#### FOLDERID_AllLibrariesDirectory
+- **Description**: The directory containing all libraries for the system.
+
+These `FOLDERID_` values represent Mac-specific paths for the `NSLocalDomainMask` domain and can be referenced in your code when working with file and directory operations in the system-wide context.
+
