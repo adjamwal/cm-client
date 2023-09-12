@@ -111,7 +111,7 @@ int32_t PmPlatformComponentManager::UninstallComponent(const PmComponent &packag
 int32_t PmPlatformComponentManager::DeployConfiguration(const PackageConfigInfo &config)
 {
     (void) config;
-    return -1;
+    return 0;
 }
 
 std::string PmPlatformComponentManager::ResolvePath(const std::string &basePath)

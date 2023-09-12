@@ -34,8 +34,8 @@ func main() {
         w.Header().Set("Content-Type", "application/json")
         w.Write(fileBytes)
     }) 
-    http.HandleFunc("/cisco-secure-client-macos-cloudmanagement-testpackage1-1.0.pkg", func(w http.ResponseWriter, r *http.Request) {
-        fileBytes, err := ioutil.ReadFile("cisco-secure-client-macos-cloudmanagement-testpackage1-1.0.pkg")
+    http.HandleFunc("/cisco-secure-client-macos-cloudmanagement-testpackage1-0.9.2.43.pkg", func(w http.ResponseWriter, r *http.Request) {
+        fileBytes, err := ioutil.ReadFile("cisco-secure-client-macos-cloudmanagement-testpackage1-0.9.2.43.pkg")
         if err != nil {
                 panic(err)
         }

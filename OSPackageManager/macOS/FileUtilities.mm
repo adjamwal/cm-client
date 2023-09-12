@@ -65,7 +65,7 @@ std::string ResolveKnownFolderIdForDomain(const std::string& knownFolderId, NSSe
 
 std::string FileUtilities::ResolveKnownFolderIdForDefaultUser(const std::string& knownFolderId)
 {
-    return ResolveKnownFolderIdForDomain(knownFolderId, NSSystemDomainMask);
+    return ResolveKnownFolderIdForDomain(knownFolderId, NSLocalDomainMask);
 }
     
 }

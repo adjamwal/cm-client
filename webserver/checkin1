@@ -2,10 +2,20 @@
   "deployment_id": "40f60118-a793-5f47-93bf-2f93f4140404",
   "packages": [
     {
-      "installer_sha256": "8b165b2d9f38964c9979be278f4b056802e8ae867a3c7069dfd14e02eb6de090",
+      "files": [
+        {
+          "path": "<FOLDERID_LibraryDirectory>/Cisco/testpackage/test_config1.json",
+          "contents": "ewogICByZWFzb246ICJ0ZXN0IGNvbnRlbnQiCn0="
+        },
+        {
+          "path": "<FOLDERID_LibraryDirectory>/Cisco/testpackage/test_config2.json",
+          "contents": "ewogICByZWFzb246ICJ0ZXN0IGNvbnRlbnQiLAogICBpbnN0YW5jZTogMgp9"
+        },
+      ],
+      "installer_sha256": "a42f04ea01836e726926fd858dea09e5ba4779691e60695be868d33b3c0c95eb",
       "installer_signer_name": "Developer ID Installer: Cisco (DE8Y96K9QP)",
       "installer_type": "pkg",
-      "installer_uri": "https://engci-maven.cisco.com/artifactory/ampcx-generic-thirdparty/sccm-cloudmanagement/cisco-secure-client-macos-cloudmanagement-testpackage1-1.0.pkg",
+      "installer_uri": "https://engci-maven.cisco.com/artifactory/ampcx-generic-thirdparty/sccm-cloudmanagement/cisco-secure-client-macos-cloudmanagement-testpackage1-0.9.2.43.pkg",
       "package": "MacTest1/1.0.0.0"
     }
   ]
