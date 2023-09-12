@@ -11,6 +11,7 @@
 
 #include "PackageManager/IPmLogger.h"
 #include "ProxyDiscovery/IProxyLogger.h"
+#include "IConfigLogger.hpp"
 #include <string>
 #include <filesystem>
 
@@ -39,6 +40,7 @@ public:
     static void releaseLogger();
     
     proxy::IProxyLogger& getProxyLogger();
+    ConfigShared::IConfigLogger& getConfigLogger();
 
 private:
     class ProxyLogger: public proxy::IProxyLogger
@@ -55,10 +57,26 @@ private:
         PmLogger* pOrigLogger_;
     };
     
-    FILE* printDummyFile_;
+    class ConfigLogger: public ConfigShared::IConfigLogger
+    {
+    public:
+        explicit ConfigLogger(PmLogger* pLogger);
+        ConfigLogger(const ConfigLogger&) = delete;
+        ConfigLogger(ConfigLogger&&) = delete;
+        ConfigLogger& operator =(const ConfigLogger&) = delete;
+        ConfigLogger& operator =(ConfigLogger&&) = delete;
+        void Log( int severity, const char* msgFormatter, const char *fileName, const char *funcName, long lineNumber,  ... ) override;
+        void Log( int severity, const char* msgFormatter, const char *fileName, const char *funcName, long lineNumber, va_list args ) override;
+        void SetLogLevel( int severity ) override;
+    private:
+        PmLogger* pOrigLogger_;
+    };
+    
+    FILE* printDummyFile_{nullptr};
     Severity curSeverity_ = LOG_DEBUG;
     std::string loggerName_;
     ProxyLogger proxyLogger_;
+    ConfigLogger configLogger_;
 
     void writeLog(Severity severity, const char* msgFormatter, va_list args);
     void writeLog(Severity severity, const wchar_t* msgFormatter, va_list args);

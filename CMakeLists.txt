@@ -80,8 +80,8 @@ include(ExternalProject_EndpointIdentity)
 add_subdirectory(util)
 
 ##
-## BitsAndPieces library (common staff for PM and CM)
-add_subdirectory(bitsandpieces)
+## configshared library (common staff for PM and CM)
+add_subdirectory(configshared)
 
 ##
 ## Package Manager client

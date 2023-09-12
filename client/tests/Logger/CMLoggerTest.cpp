@@ -29,7 +29,7 @@ public:
 
 TEST_F( CMLoggerTest, setLogLevel )
 {
-    CMLogger::getInstance().setLogLevel( CM_LOG_LVL_T::CM_LOG_ALERT );
+    CMLogger::getInstance().SetLogLevel( CM_LOG_LVL_T::CM_LOG_ALERT );
     CM_LOG_DEBUG( "DEBUG" );
     CM_LOG_ALERT( "ALERT" );
     std::string logString, line;
@@ -47,7 +47,7 @@ TEST_F( CMLoggerTest, setLogLevel )
 
 TEST_F( CMLoggerTest, logFromMultipleThreads )
 {
-    CMLogger::getInstance().setLogLevel( CM_LOG_LVL_T::CM_LOG_ERROR );
+    CMLogger::getInstance().SetLogLevel( CM_LOG_LVL_T::CM_LOG_ERROR );
     std::thread thread1([]() {
         CM_LOG_ERROR( "HELLO" );
         });

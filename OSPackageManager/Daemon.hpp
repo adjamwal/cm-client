@@ -8,15 +8,18 @@
 
 #include "PackageManager/IPmLogger.h"
 #include "common/macOS/FileWatcher.hpp"
+#include "Config.hpp"
+
 
 #include <atomic>
 #include <thread>
 #include <string>
 #include <memory>
 
+
+
 namespace PackageManager
 {
-class Config;
 
 class Daemon {
 public:
@@ -31,7 +34,7 @@ public:
     void setLoggerDir(const std::string& strLoggerDir);
 
 private:
-    std::unique_ptr<Config> config_;
+    std::unique_ptr<ConfigShared::Config> config_;
     std::atomic<bool> isRunning_;
     std::thread task_;
     std::string bootstrap_;

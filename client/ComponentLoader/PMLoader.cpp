@@ -5,7 +5,7 @@
  */
 
 #include "PMLoader.hpp"
-#include "Configuration/Config.hpp"
+#include "Config.hpp"
 #include "Logger/CMLogger.hpp"
 #include <memory>
 
@@ -16,9 +16,9 @@ PMLoader::PMLoader() : pm_module_context_{ 0 }
 {
     pm_module_context_.nVersion = PM_MODULE_INTERFACE_VERSION;
     CreatePMModuleInstance( &pm_module_context_ );
-    pm_module_context_.fpStart( Config::cmidExePath.c_str(),
-                                Config::cmConfigPath.c_str(),
-                                Config::cmConfigPath.c_str() );
+    pm_module_context_.fpStart(ConfigShared::Config::cmidExePath.c_str(),
+                               ConfigShared::Config::cmConfigPath.c_str(),
+                               ConfigShared::Config::cmConfigPath.c_str() );
 }
 
 PMLoader::~PMLoader()

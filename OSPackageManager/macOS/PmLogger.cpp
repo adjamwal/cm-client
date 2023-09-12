@@ -55,7 +55,8 @@ struct deletable_facet : Facet
 };
 
 PmLogger::PmLogger():
-        proxyLogger_(this)
+        proxyLogger_(this),
+        configLogger_(this)
 {
     initDevNullDummyFile();
     initConsoleLogging();
@@ -322,8 +323,18 @@ proxy::IProxyLogger& PmLogger::getProxyLogger()
     return proxyLogger_;
 }
 
+ConfigShared::IConfigLogger& PmLogger::getConfigLogger()
+{
+    return configLogger_;
+}
+
 PmLogger::ProxyLogger::ProxyLogger(PmLogger* pLogger):
     pOrigLogger_(pLogger)
+{
+}
+
+PmLogger::ConfigLogger::ConfigLogger(PmLogger* pLogger):
+pOrigLogger_(pLogger)
 {
 }
 
@@ -339,3 +350,22 @@ void PmLogger::ProxyLogger::Log( int severity, const char* msgFormatter, va_list
 {
     pOrigLogger_->Log(static_cast<PmLogger::Severity>(severity), msgFormatter, args);
 }
+
+void PmLogger::ConfigLogger::Log( int severity, const char* msgFormatter, const char *fileName, const char *funcName, long lineNumber, ... ) {
+    assert(pOrigLogger_);
+    va_list va_args;
+    va_start(va_args, lineNumber);
+    pOrigLogger_->Log(static_cast<PmLogger::Severity>(severity), msgFormatter, fileName, funcName, lineNumber, va_args);
+    va_end(va_args);
+}
+
+void PmLogger::ConfigLogger::Log( int severity, const char* msgFormatter, const char *fileName, const char *funcName, long lineNumber, va_list args ) {
+    assert(pOrigLogger_);
+    pOrigLogger_->Log(static_cast<PmLogger::Severity>(severity), msgFormatter, fileName, funcName, lineNumber, args);
+}
+
+void PmLogger::ConfigLogger::SetLogLevel( int severity ) {
+    assert(pOrigLogger_);
+    pOrigLogger_->SetLogLevel(static_cast<PmLogger::Severity>(severity));
+}
+

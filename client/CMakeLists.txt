@@ -5,6 +5,8 @@ include(TargetEnableWarnings)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(CM_KEY "uc")
+
 set(CM_CLIENT_SRCS
     Daemon.cpp
     Daemon.hpp
@@ -13,8 +15,6 @@ set(CM_CLIENT_SRCS
     ComponentLoader/CMIDLoader.cpp
     ComponentLoader/PMLoader.hpp
     ComponentLoader/PMLoader.cpp
-    Configuration/Config.hpp
-    Configuration/Config.cpp
     Logger/CMLogger.cpp
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
@@ -36,7 +36,7 @@ target_include_directories(csccloudmanagement
     PUBLIC
     ${cm-client_SOURCE_DIR}
     ${CM_THIRDPARTY_EXPORT}/include
-    ${cm-client_SOURCE_DIR}/bitsandpieces
+    ${cm-client_SOURCE_DIR}/configshared
 )
 
 target_link_directories(csccloudmanagement BEFORE
@@ -46,11 +46,11 @@ target_link_directories(csccloudmanagement BEFORE
 
 target_link_libraries(csccloudmanagement
     PUBLIC
+    configshared
     cmidcontrolplugin
     common
     pmcontrolplugin
     jsoncpp
-    bitsandpieces
     "-framework SystemConfiguration"
     "-framework IOKit"
     "-framework CoreServices"

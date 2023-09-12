@@ -19,6 +19,7 @@ add_dependencies(
 target_link_libraries(
   ControlPluginTest
   pmcontrolplugin
+  configshared
   ${GTEST_LIBS}
 )
 
@@ -36,6 +37,7 @@ target_include_directories(
   ControlPluginTest
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
+      ${cm-client_SOURCE_DIR}/configshared
       ${cm-client_SOURCE_DIR}/client/Logger
       ${cm-client_SOURCE_DIR}/OSPackageManager/controlplugin
 )

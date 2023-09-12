@@ -9,6 +9,7 @@
 #include "common/macOS/FileWatcher.hpp"
 #include <atomic>
 #include <thread>
+#include "Config.hpp"
 
 
 namespace CloudManagement
@@ -16,7 +17,6 @@ namespace CloudManagement
 
 class CMIDLoader;
 class PMLoader;
-class Config;
 
 class Daemon {
 public:
@@ -27,7 +27,7 @@ public:
     void stop();
 
 private:
-    std::unique_ptr<Config> config_;
+    std::unique_ptr<ConfigShared::Config> config_;
     std::unique_ptr<CMIDLoader> cmidLoader_;
     std::unique_ptr<PMLoader> pmLoader_;
     

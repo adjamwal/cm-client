@@ -2,30 +2,30 @@
 # Copyright 2022, Cisco Systems, Inc.
 
 add_executable(
-  ConfigTest
-  ${cm-client_SOURCE_DIR}/configshared/Config.hpp
-  ${cm-client_SOURCE_DIR}/configshared/IConfigLogger.hpp
+  PmConfigTest
   ${cm-client_SOURCE_DIR}/configshared/Config.cpp
-  ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
+  ${cm-client_SOURCE_DIR}/OSPackageManager/MacOS/PMLogger.cpp
   # Test files
   ConfigTest.cpp
 )
 
 add_dependencies(
-    ConfigTest
+    PmConfigTest
     third-party-spdlog
     third-party-jsoncpp
     third-party-gtest
+    third-party-ProxyDiscovery-Mac
 )
 
 target_link_libraries(
-  ConfigTest
+  PmConfigTest
   jsoncpp
+  ProxyDiscovery
   ${GTEST_LIBS}
 )
 
 target_compile_definitions(
-    ConfigTest
+    PmConfigTest
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
@@ -35,22 +35,23 @@ target_compile_definitions(
 )
 
 target_include_directories(
-  ConfigTest
+  PmConfigTest
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
-      ${cm-client_SOURCE_DIR}/client
+      ${cm-client_SOURCE_DIR}
+      ${cm-client_SOURCE_DIR}/OSPackageManager/MacOS
       ${cm-client_SOURCE_DIR}/configshared
 )
 
 target_link_directories(
-  ConfigTest BEFORE
+  PmConfigTest BEFORE
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/lib
   ${inherited}
 )
 
 include(GoogleTest)
-gtest_discover_tests(ConfigTest DISCOVERY_MODE PRE_TEST)
+gtest_discover_tests(PmConfigTest DISCOVERY_MODE PRE_TEST)
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")
     macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
@@ -58,6 +59,6 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
         ${XCODE_VALUE})
     endmacro (set_xcode_property)
 
-    set_xcode_property(ConfigTest CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
-    set_xcode_property(ConfigTest CLANG_CXX_LIBRARY "libc++")
+    set_xcode_property(PmConfigTest CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
+    set_xcode_property(PmConfigTest CLANG_CXX_LIBRARY "libc++")
 endif()

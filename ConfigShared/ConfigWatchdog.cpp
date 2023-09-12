@@ -2,7 +2,7 @@
 #include <list>
 #include "ConfigWatchdog.hpp"
 
-namespace bitsandpieces
+namespace ConfigShared
 {
 
 ConfigWatchdog& ConfigWatchdog::getConfigWatchdog()

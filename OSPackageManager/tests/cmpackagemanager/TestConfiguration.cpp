@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-using namespace PackageManager;
+using namespace ConfigShared;
 
 namespace
 {
@@ -138,21 +138,21 @@ operator <<(std::ostream& os, const ConfigData& sData)
 class TestConfiguration : public ::testing::TestWithParam<ConfigData>
 {
 public:
-    TestConfiguration()
+    void SetUp() override
     {
         filePath_ = std::filesystem::temp_directory_path() / kLogFile;
         testData_ = GetParam();
-    }
-    
-    void SetUp() override
-    {
+        PmLogger::initLogger();
+
         ASSERT_TRUE(createConfigFile());
-        pConfig_ = std::make_unique<Config>(filePath_.native());
+        pConfig_ = std::make_unique<ConfigShared::Config>(filePath_.native(), "pm", &PmLogger::getLogger().getConfigLogger());
+        pConfig_->subscribeForConfigChanges()();
     }
     
-    ~TestConfiguration()
+    void TearDown() override
     {
         clearConfigFile();
+        PmLogger::releaseLogger();
     }
     
 protected:
@@ -177,7 +177,7 @@ protected:
     }
     
     std::filesystem::path filePath_;
-    std::unique_ptr<Config> pConfig_;
+    std::unique_ptr<ConfigShared::Config> pConfig_;
     ConfigData testData_;
 };
 

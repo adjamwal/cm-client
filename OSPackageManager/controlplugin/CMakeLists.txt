@@ -28,6 +28,7 @@ target_include_directories(pmcontrolplugin
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CM_THIRDPARTY_EXPORT}/include
+        ${cm-client_SOURCE_DIR}/configshared
         ${cm-client_SOURCE_DIR}/client/Logger
 )
 

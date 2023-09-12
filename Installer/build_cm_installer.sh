@@ -72,7 +72,7 @@ STAGING_EXPORT_LIB="${STAGING_EXPORT}/lib"
 SCRIPTS_STAGING="cm_pkg_scripts"
 PAYLOAD_STAGING="cm_pkg_payload"
 
-CONFIG_RELATIVE_PATH="../client/config"
+CONFIG_RELATIVE_PATH="../ConfigShared/config"
 
 DSYM_STAGING="${CM_PREFIX}-${VER}-symbols"
 DSYM_TAR="${CM_PREFIX}-${VER}-symbols.tgz"

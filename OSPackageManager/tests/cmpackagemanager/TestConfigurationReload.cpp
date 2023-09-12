@@ -8,7 +8,7 @@
 #include <memory>
 
 
-using namespace PackageManager;
+using namespace ConfigShared;
 
 namespace
 {
@@ -74,11 +74,12 @@ public:
     void SetUp() override
     {
         ASSERT_TRUE(createConfigFile(testData1_));
-        pConfig_ = std::make_unique<Config>(configFilePath_.native());
-        bitsandpieces::ConfigWatchdog::getConfigWatchdog().addSubscriber(pConfig_->subscribeForConfigChanges());
+        pConfig_ = std::make_unique<ConfigShared::Config>(configFilePath_.native(), "pm", nullptr);
+        ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber(pConfig_->subscribeForConfigChanges());
         PmLogger::initLogger();
-        PmLogger::getLogger().SetLogLevel(pConfig_->getLogLevel());
+        PmLogger::getLogger().SetLogLevel(static_cast<IPMLogger::Severity>(pConfig_->getLogLevel()));
         PmLogger::getLogger().initFileLogging(std::filesystem::temp_directory_path(), static_cast<std::string>(kLogFile), 1048576 * 15, 5);
+        pConfig_->setConfigLogger(&PmLogger::getLogger().getConfigLogger());
     }
     
     ~TestConfigurationReload()
@@ -148,7 +149,7 @@ protected:
     
     std::filesystem::path configFilePath_;
     std::filesystem::path loggerFilePath_;
-    std::unique_ptr<Config> pConfig_;
+    std::unique_ptr<ConfigShared::Config> pConfig_;
 };
 
 TEST_F(TestConfigurationReload, LogLevelChangedAfterReload)
@@ -162,7 +163,7 @@ TEST_F(TestConfigurationReload, LogLevelChangedAfterReload)
     
     ASSERT_TRUE(reCreateConfigFile(testData2_));
 
-    bitsandpieces::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();
+    ConfigShared::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();
     
     logRecord = {
         "Set new log level: Error"

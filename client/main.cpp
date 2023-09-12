@@ -5,7 +5,7 @@
 
 #include "Daemon.hpp"
 #include "Logger/CMLogger.hpp"
-#include "Configuration/Config.hpp"
+#include "Config.hpp"
 #include <iostream>
 
 namespace
@@ -14,7 +14,7 @@ const std::string logFileName = "csc_cms.log";
 
 void initLogging()
 {
-    const std::filesystem::path logFilePath = std::filesystem::path(CloudManagement::Config::cmLogPath) / logFileName;
+    const std::filesystem::path logFilePath = std::filesystem::path(ConfigShared::Config::cmLogPath) / logFileName;
     //initialise Logger before anything else.
     CMLogger::getInstance(logFilePath);
 }

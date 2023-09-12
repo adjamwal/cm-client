@@ -7,7 +7,6 @@
 
 #include "PmPlatformDependencies.hpp"
 #include "agent/PackageManagerAgent.hpp"
-#include "configuration/Config.hpp"
 #include "PmLogger.hpp"
 #include "ConfigWatchdog.hpp"
 #include "ProxyDiscovery/IProxyLogger.h"
@@ -53,13 +52,18 @@ Daemon::Daemon()
 void Daemon::start()
 {
     isRunning_ = true;
-    config_ = std::make_unique<Config>(configFile_);
-    fileWatcher_->add(config_->getPath(), []() {bitsandpieces::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
-    bitsandpieces::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
-    PmLogger::getLogger().SetLogLevel(config_->getLogLevel());
+#ifdef PM_KEY
+    config_ = std::make_unique<ConfigShared::Config>(configFile_, PM_KEY);
+#else 
+    config_ = std::make_unique<ConfigShared::Config>(configFile_, "pm", &PmLogger::getLogger().getConfigLogger());
+#endif
+    fileWatcher_->add(config_->getPath(), []() {ConfigShared::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
+    ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
+    PmLogger::getLogger().SetLogLevel(static_cast<IPMLogger::Severity>(config_->getLogLevel()));
     PmLogger::getLogger().initFileLogging(loggerDir_, static_cast<std::string>(kLogFileName),
         kMaxSize, kMaxFiles);
     proxy::SetProxyLogger(&PmLogger::getLogger().getProxyLogger());
+    config_->setConfigLogger(&PmLogger::getLogger().getConfigLogger());
         
     task_ = std::thread(&Daemon::mainTask, this);
     task_.join();

@@ -3,13 +3,14 @@
  *
  * @copyright (c) 2022 Cisco Systems, Inc. All rights reserved
  */
-#include "CMLogger.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <chrono>
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/rotating_file_sink.h"
+
+#include "CMLogger.hpp"
 
 std::string LogLevelStr( const CM_LOG_LVL_T level )
 {
@@ -48,7 +49,8 @@ CMLogger::CMLogger( const std::string& fileName ) :
     logFileName_ ( fileName ),
     maxFileSize_ ( DEFAULT_MAX_FILE_SIZE ),
     maxLogFiles_ ( DEFAULT_MAX_LOGFILES ),
-    loggerName_ ( "rot_log" )  
+    loggerName_ ( "rot_log" ),
+    configLogger_(this)
 {
     if ( logFileName_.empty() ) {
         throw logger_exception( "Empty log filename" );
@@ -66,7 +68,7 @@ CMLogger::~CMLogger()
     spdlog::drop( loggerName_ );
 }
 
-void CMLogger::setLogLevel( CM_LOG_LVL_T logLevel )
+void CMLogger::SetLogLevel( CM_LOG_LVL_T logLevel )
 {
     if ( ( logLevel >= CM_LOG_LVL_T::CM_LOG_ALERT ) && ( logLevel <= CM_LOG_LVL_T::CM_LOG_DEBUG ) ) {
         if ( logLevel_ != logLevel ) {
@@ -78,8 +80,7 @@ void CMLogger::setLogLevel( CM_LOG_LVL_T logLevel )
     }
 }
 
-void CMLogger::logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, const char *fileName,
-    const char *funcName, long lineNumber, const char *message, ... )
+void CMLogger::Log(CM_LOG_LVL_T severity, bool bIsStrErr, const char *message, ... )
 {
     if( logLevel_ < severity ) {
         return;
@@ -104,11 +105,43 @@ void CMLogger::logMessage( const CM_LOG_LVL_T severity, const bool bIsStrErr, co
         }
     }
 
-    snprintf( logBuf, sizeof( logBuf ), "%s:%s:%ld: %s %s", fileName, funcName, lineNumber, message, errStr );
+    snprintf( logBuf, sizeof( logBuf ), "%s %s", message, errStr );
     va_start( va_args, message );
     vsnprintf( logLine, sizeof( logLine ), logBuf, va_args );
     writeLogLine( LogLevelStr( severity ), logLine );
     va_end( va_args );
+}
+
+void CMLogger::Log(CM_LOG_LVL_T severity, bool bIsStrErr, const char *message, va_list args)
+{
+    if( logLevel_ < severity ) {
+        return;
+    }
+    
+    char logBuf[2048] = { 0 };
+    char errStr[2048] = { 0 };
+    char logLine[4096] = { 0 };
+    va_list  va_args_copy;
+    
+    if ( bIsStrErr ) {
+        int rc = 0;
+        unsigned long lasterr = errno;
+#ifdef __USE_GNU
+        const char* errorString = strerror_r( errno, errStr, sizeof( errStr ) );
+        snprintf( errStr, sizeof( errStr ), "%s" , errorString );
+#else
+        rc = strerror_r( errno, errStr, sizeof( errStr ) );
+#endif
+        if ( 0 != rc ) {
+            snprintf( errStr,sizeof( errStr ),"Retrieving error string of %lu failed with error = %d",lasterr,rc );
+        }
+    }
+    
+    snprintf( logBuf, sizeof( logBuf ), "%s %s", message, errStr );
+    va_copy(va_args_copy, args);
+    vsnprintf( logLine, sizeof( logLine ), logBuf, va_args_copy );
+    writeLogLine( LogLevelStr( severity ), logLine );
+    va_end( va_args_copy );
 }
 
 void CMLogger::writeLogLine( const std::string& logLevel, const std::string& logLine )
@@ -177,4 +210,33 @@ bool CMLogger::createLogFile()
     }
 
     return ( NULL != logInstance ) ? true : false;
+}
+
+ConfigShared::IConfigLogger& CMLogger::getConfigLogger()
+{
+    return configLogger_;
+}
+
+CMLogger::ConfigLogger::ConfigLogger(CMLogger* cLogger):
+    cOrigLogger_(cLogger)
+{
+}
+
+void CMLogger::ConfigLogger::Log( int severity, const char* msgFormatter, const char *fileName,
+                                 const char *funcName, long lineNumber, ... )
+{
+    va_list va_args;
+    va_start(va_args, lineNumber);
+    cOrigLogger_->Log( static_cast<CM_LOG_LVL_T>(severity), false, msgFormatter, fileName, funcName, lineNumber, va_args);
+    va_end(va_args);
+}
+
+void CMLogger::ConfigLogger::Log( int severity, const char* msgFormatter, const char *fileName,
+                                 const char *funcName, long lineNumber, va_list args )
+{
+    cOrigLogger_->Log( static_cast<CM_LOG_LVL_T>(severity), false, msgFormatter, fileName, funcName, lineNumber, args);
+}
+
+void CMLogger::ConfigLogger::SetLogLevel( int severity ) {
+    cOrigLogger_->SetLogLevel(static_cast<CM_LOG_LVL_T>(severity));
 }

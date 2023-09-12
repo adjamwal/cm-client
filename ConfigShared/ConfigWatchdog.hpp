@@ -8,15 +8,15 @@
  * @desc  Class for spreading reloading configuration throught the system.
  ***************************************************************************/
 #pragma once
-#include "bitsandpieces.hpp"
+#include "config_shared.hpp"
 
 #include <functional>
 #include <list>
 
-namespace bitsandpieces
+namespace ConfigShared
 {
 
-class  BITSANDPIECES_MODULE_API ConfigWatchdog
+class  CONFIGSHARED_MODULE_API ConfigWatchdog
 {
 public:
     ConfigWatchdog(const ConfigWatchdog &) = delete;

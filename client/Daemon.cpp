@@ -7,7 +7,6 @@
 
 #include "ComponentLoader/CMIDLoader.hpp"
 #include "ComponentLoader/PMLoader.hpp"
-#include "Configuration/Config.hpp"
 #include "Logger/CMLogger.hpp"
 #include "ConfigWatchdog.hpp"
 
@@ -26,20 +25,24 @@ void configCallback()
 
 //! @todo creation of PM, should also load the process
 Daemon::Daemon()
-    : config_ { std::make_unique<Config>() },
+#ifdef CM_KEY
+    : config_ { std::make_unique<ConfigShared::Config>(CM_KEY) },
+#else 
+    : config_ { std::make_unique<ConfigShared::Config>("uc", &CMLogger::getInstance().getConfigLogger()) },
+#endif
       cmidLoader_ { std::make_unique<CMIDLoader>() },
       pmLoader_ { std::make_unique<PMLoader>() },
       fileWatcher_{std::make_unique<FileWatcher>(fileWatcherName)}
 {
-    CMLogger::getInstance().setLogLevel(config_->getLogLevel());
-    bitsandpieces::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
+    CMLogger::getInstance().SetLogLevel(static_cast<CM_LOG_LVL_T>(config_->getLogLevel()));
+    ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
 }
 
 void Daemon::start()
 {
     CM_LOG_DEBUG("Starting cloud management");
  
-    fileWatcher_->add(config_->getPath(), []() {bitsandpieces::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
+    fileWatcher_->add(config_->getPath(), []() {ConfigShared::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
     isRunning_ = true;
 
     task_ = std::thread(&Daemon::mainTask, this);

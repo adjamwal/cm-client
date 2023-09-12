@@ -4,6 +4,7 @@
 include(TargetEnableWarnings)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(PM_KEY "pm")
 
 set(OS_PACKAGE_MANAGER_SRCS
     Daemon.cpp
@@ -11,8 +12,6 @@ set(OS_PACKAGE_MANAGER_SRCS
     main.cpp
     agent/PackageManagerAgent.cpp
     agent/PackageManagerAgent.hpp
-    configuration/Config.hpp
-    configuration/Config.cpp
     macOS/IFileUtilities.hpp
     macOS/IPmCertRetriever.hpp
     macOS/FileUtilities.cpp
@@ -63,11 +62,11 @@ target_include_directories(cmpackagemanager
     ${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery
     ${cm-client_SOURCE_DIR}
     ${cm-client_SOURCE_DIR}/util
+    ${cm-client_SOURCE_DIR}/configshared
     # This include should be based on platform when we extend support for Linux
     ${CMAKE_CURRENT_SOURCE_DIR}/macOS
     ${CMAKE_CURRENT_SOURCE_DIR}/util
     ${CMAKE_CURRENT_SOURCE_DIR}/proxy
-    ${cm-client_SOURCE_DIR}/bitsandpieces
 )
 
 target_link_directories(cmpackagemanager BEFORE
@@ -88,7 +87,7 @@ target_link_libraries(cmpackagemanager
     crypto
     ssl
     util
-    bitsandpieces
+    configshared
     z
     xar
     "-framework SystemConfiguration"

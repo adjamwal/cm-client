@@ -5,6 +5,7 @@ add_executable(
   LoggerTest
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.hpp
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
+  ${cm-client_SOURCE_DIR}/configshared/IConfigLogger.hpp
 
   # Test files
   CMLoggerTest.cpp
@@ -18,6 +19,7 @@ add_dependencies(
 
 target_link_libraries(
   LoggerTest
+  configshared
   ${GTEST_LIBS}
 )
 
@@ -26,6 +28,7 @@ target_include_directories(
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
       ${cm-client_SOURCE_DIR}/client
+      ${cm-client_SOURCE_DIR}/configshared
 )
 
 target_link_directories(

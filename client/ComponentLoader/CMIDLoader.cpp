@@ -6,7 +6,7 @@
 
 #include "CMIDLoader.hpp"
 
-#include "Configuration/Config.hpp"
+#include "Config.hpp"
 
 #include <memory>
 
@@ -20,9 +20,9 @@ CMIDLoader::CMIDLoader()
     CreateModuleInstance(&cmid_module_context_);
 
     // Does this block?
-    cmid_module_context_.fpStart(Config::cmidExePath.c_str(),
-                                 Config::cmConfigPath.c_str(),
-                                 Config::cmConfigPath.c_str());
+    cmid_module_context_.fpStart(ConfigShared::Config::cmidExePath.c_str(),
+                                 ConfigShared::Config::cmConfigPath.c_str(),
+                                 ConfigShared::Config::cmConfigPath.c_str());
 }
 
 CMIDLoader::~CMIDLoader()

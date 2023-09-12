@@ -21,8 +21,6 @@ add_executable(
   ${TESTEE_DIR}/macOS/PmPlatformDiscovery.cpp
   ${TESTEE_DIR}/macOS/PmLogger.cpp
   ${TESTEE_DIR}/macOS/PmLogger.hpp
-  ${TESTEE_DIR}/configuration/Config.cpp
-  ${TESTEE_DIR}/configuration/Config.hpp
   ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.mm
@@ -75,7 +73,7 @@ target_link_libraries(
   ssl
   util
   xar
-  bitsandpieces
+  configshared
   "-framework CoreFoundation"
   "-framework IOKit"
   "-framework CoreServices"
@@ -105,7 +103,7 @@ target_include_directories(
       ${cm-client_SOURCE_DIR}/OSPackageManager/configuration
       ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
       ${cm-client_SOURCE_DIR}/util
-      ${cm-client_SOURCE_DIR}/bitsandpieces
+      ${cm-client_SOURCE_DIR}/configshared
 )
 
 target_link_directories(
