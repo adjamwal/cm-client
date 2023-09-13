@@ -145,7 +145,6 @@ protected:
 
         inputFile.close();
     }
-
     
     std::filesystem::path configFilePath_;
     std::filesystem::path loggerFilePath_;

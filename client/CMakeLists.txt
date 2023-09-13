@@ -36,7 +36,6 @@ target_include_directories(csccloudmanagement
     PUBLIC
     ${cm-client_SOURCE_DIR}
     ${CM_THIRDPARTY_EXPORT}/include
-    ${cm-client_SOURCE_DIR}/configshared
 )
 
 target_link_directories(csccloudmanagement BEFORE

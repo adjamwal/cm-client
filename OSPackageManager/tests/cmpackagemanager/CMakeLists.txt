@@ -103,7 +103,6 @@ target_include_directories(
       ${cm-client_SOURCE_DIR}/OSPackageManager/configuration
       ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
       ${cm-client_SOURCE_DIR}/util
-      ${cm-client_SOURCE_DIR}/configshared
 )
 
 target_link_directories(

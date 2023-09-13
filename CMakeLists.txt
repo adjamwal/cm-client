@@ -81,7 +81,7 @@ add_subdirectory(util)
 
 ##
 ## configshared library (common staff for PM and CM)
-add_subdirectory(configshared)
+add_subdirectory(ConfigShared)
 
 ##
 ## Package Manager client

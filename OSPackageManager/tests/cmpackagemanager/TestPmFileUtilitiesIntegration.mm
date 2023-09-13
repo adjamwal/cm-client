@@ -74,7 +74,7 @@ TEST(FileUtilities, ResolvePath)
     
     const auto getKnownFolderPath = [](NSSearchPathDirectory directory) -> std::string {
         std::string knownFolder;
-        NSArray* paths = NSSearchPathForDirectoriesInDomains(directory, NSSystemDomainMask, YES);
+        NSArray* paths = NSSearchPathForDirectoriesInDomains(directory, NSLocalDomainMask, YES);
         if (paths.count > 0) {
             NSString* path = [paths objectAtIndex:0];
             knownFolder = [path UTF8String];

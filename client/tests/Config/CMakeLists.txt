@@ -3,9 +3,6 @@
 
 add_executable(
   ConfigTest
-  ${cm-client_SOURCE_DIR}/configshared/Config.hpp
-  ${cm-client_SOURCE_DIR}/configshared/IConfigLogger.hpp
-  ${cm-client_SOURCE_DIR}/configshared/Config.cpp
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
   # Test files
   ConfigTest.cpp
@@ -21,6 +18,7 @@ add_dependencies(
 target_link_libraries(
   ConfigTest
   jsoncpp
+  configshared
   ${GTEST_LIBS}
 )
 
@@ -39,7 +37,6 @@ target_include_directories(
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
       ${cm-client_SOURCE_DIR}/client
-      ${cm-client_SOURCE_DIR}/configshared
 )
 
 target_link_directories(

@@ -40,8 +40,9 @@ target_compile_definitions(${lib}
 set_target_properties(${lib} PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(${lib}
-    PRIVATE
+    PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE
     ${CM_THIRDPARTY_EXPORT}/include
 
 )

@@ -62,7 +62,6 @@ target_include_directories(cmpackagemanager
     ${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery
     ${cm-client_SOURCE_DIR}
     ${cm-client_SOURCE_DIR}/util
-    ${cm-client_SOURCE_DIR}/configshared
     # This include should be based on platform when we extend support for Linux
     ${CMAKE_CURRENT_SOURCE_DIR}/macOS
     ${CMAKE_CURRENT_SOURCE_DIR}/util

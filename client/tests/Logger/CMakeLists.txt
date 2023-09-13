@@ -5,7 +5,7 @@ add_executable(
   LoggerTest
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.hpp
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
-  ${cm-client_SOURCE_DIR}/configshared/IConfigLogger.hpp
+  ${cm-client_SOURCE_DIR}/ConfigShared/IConfigLogger.hpp
 
   # Test files
   CMLoggerTest.cpp
@@ -28,7 +28,6 @@ target_include_directories(
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
       ${cm-client_SOURCE_DIR}/client
-      ${cm-client_SOURCE_DIR}/configshared
 )
 
 target_link_directories(
