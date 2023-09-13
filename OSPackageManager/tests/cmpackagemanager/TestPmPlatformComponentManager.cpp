@@ -33,7 +33,7 @@ protected:
 TEST_F(PmPlatformComponentManagerTest, GetInstalledPackages) {
     // Prepare test data
     std::vector<PmProductDiscoveryRules> catalogRules = {
-        { "ProductA", {}, {}, {}, {}, { {"com.test.Package1"}, {"com.test.Package2"} } }
+        { "ProductA", {}, {}, {}, {}, { {"com.test.Package1"}, {"com.test.Package2"}, {"com.test.Package2"} } }
     };
     PackageInventory packagesDiscovered;
     
@@ -49,7 +49,7 @@ TEST_F(PmPlatformComponentManagerTest, GetInstalledPackages) {
     EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package1", _))
         .WillOnce(Return(expectedPackageInfo[0]));
     EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package2", _))
-        .WillOnce(Return(expectedPackageInfo[1]));
+        .WillRepeatedly(Return(expectedPackageInfo[1]));
 
     // Invoke the function under test
     int32_t result = manager_->GetInstalledPackages(catalogRules, packagesDiscovered);

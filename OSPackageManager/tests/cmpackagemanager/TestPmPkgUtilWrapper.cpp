@@ -74,6 +74,22 @@ TEST_F(PkgUtilWrapperTest, InstallPackage_Success) {
     EXPECT_THAT(mockWrapper.installPackage(packagePath, volumePath), ::testing::IsTrue());
 }
 
+// Test case for successful package installation
+TEST_F(PkgUtilWrapperTest, UpgradePackage_Success) {
+    const std::string packagePath = "/path/to/package.pkg";
+    const std::string volumePath = "/Volumes/MountedVolume";
+
+    // Define the expected command and output
+    const std::string expectedCommand = "/usr/sbin/installer -pkg /path/to/package.pkg -target /Volumes/MountedVolume";
+    const std::string expectedOutput = "The upgrade was successful.";
+
+    // Set up the mock behavior
+    EXPECT_CALL(mockWrapper, executeCommand(expectedCommand)).WillOnce(::testing::Return(expectedOutput));
+
+    // Perform the installation
+    EXPECT_THAT(mockWrapper.installPackage(packagePath, volumePath), ::testing::IsTrue());
+}
+
 // Test case for failed package installation
 TEST_F(PkgUtilWrapperTest, InstallPackage_Failure) {
     const std::string packagePath = "/path/to/package.pkg";

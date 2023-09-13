@@ -1,0 +1,11 @@
+{
+  "deployment_id": "36efd528-d7ba-4670-bc48-f205367b4b72",
+  "packages": [
+    {
+      "installer_args": ["-verbose"],
+      "installer_sha256": "bbee2196eb5002434b3f2a2d447fcb0ddd79dd30178f50c15a20f422d999a38d",
+      "installer_type": "pkg",
+      "installer_uri": "https://upgrades.amp.cisco.com/fireAMP/osx/1.22.2.916/ciscoampmac_connector.pkg",
+      "package": "AMP_Mac_Test/1.22.2.916"
+    }
+}

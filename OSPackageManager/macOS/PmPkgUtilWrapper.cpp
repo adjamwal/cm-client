@@ -18,11 +18,21 @@ namespace { // anonymous namespace
     const std::regex kSpctlSignerIdPattern("origin=\\* \\(([A-Z0-9]+)\\)");
     const std::regex kPkgUtilSignerIdpattern("Certificate Chain:\n.*\\((\\w+)\\)");
     const std::regex kPkgUtilSignerNamePattern("Developer ID Installer: (\\w+) \\(\\w+\\)");
+
+    const std::vector<std::string> installResultsSuccess = {"The install was successful", "The upgrade was successful"};
     
     bool outputParser(const std::string& output, const std::string& textToFind) {
         return std::regex_search(output, std::regex{textToFind});
     };
-    
+
+    bool outputParser(const std::string& output, const std::vector<std::string>& texts) {
+        for (const auto &text : texts) {
+            if (outputParser(output, text))
+                return  true;
+        }
+        return false;
+    };
+
     bool extractSignerByPattern(const std::string& input, const std::regex& pattern, std::string& signer) {
         std::smatch matches;
         if (std::regex_search(input, matches, pattern)) {
@@ -165,7 +175,7 @@ bool PmPkgUtilWrapper::installPackage(const std::string& packagePath, const std:
     const std::string command{ pkgInstallerExecutable + " -pkg " + packagePath };
     const std::string output = executeCommand( decoratePkgInstallerVolumeOption(command, volumePath));
     
-    if (outputParser(output, "The install was successful")) {
+    if (outputParser(output, installResultsSuccess)) {
         // Installation successful
         return true;
     } else {
