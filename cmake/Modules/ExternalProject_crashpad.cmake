@@ -6,7 +6,12 @@ include(ExternalProject)
 set(component_name crashpad)
 set(component_dst_dir "${CMAKE_CURRENT_BINARY_DIR}/third-party-${component_name}-prefix/src/third-party-${component_name}")
 set(component_src_dir "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/${component_name}")
-set(component_install_prefix "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/export")
+if(CMAKE_GENERATOR STREQUAL Xcode)
+    set(component_build_folder_prefix "xcode_")
+else()
+    set(component_build_folder_prefix "")
+endif()
+set(component_install_prefix "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/${component_build_folder_prefix}export")
 
 if(NOT BUILD_ALL_THIRD_PARTY AND NOT BUILD_CRASHPAD)
     download_component(${component_name} ${component_dst_dir})
@@ -34,7 +39,6 @@ if(NOT TARGET "third-party-${component_name}")
             COMMAND echo "Installing Crashpad..."
             COMMAND mkdir -p ${component_install_prefix}/lib
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/client/libcommon.a ${component_install_prefix}/lib/libcrashpad_common.a
-            COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/third_party/mini_chromium/mini_chromium/base/libbase.a ${component_install_prefix}/lib/libcrashpad_base.a
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/client/libclient.a ${component_install_prefix}/lib/libcrashpad_client.a
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/util/libutil.a ${component_install_prefix}/lib/libcrashpad_util.a
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/util/libnet.a ${component_install_prefix}/lib/libcrashpad_net.a
@@ -42,12 +46,15 @@ if(NOT TARGET "third-party-${component_name}")
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/handler/libhandler.a ${component_install_prefix}/lib/libcrashpad_handler_lib.a
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/snapshot/libcontext.a ${component_install_prefix}/lib/libcrashpad_context.a
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/snapshot/libsnapshot.a ${component_install_prefix}/lib/libcrashpad_snapshot.a
+            COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/util/libmig_output.a ${component_install_prefix}/lib/libmig_output.a
+            COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/third_party/mini_chromium/mini_chromium/base/libbase.a ${component_install_prefix}/lib/libcrashpad_base.a
             COMMAND mkdir -p ${component_install_prefix}/bin
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/crashpad_handler ${component_install_prefix}/bin/crashpad_handler
             COMMAND mkdir -p ${component_install_prefix}/include/${component_name}/third_party
-            COMMAND cp -rf ${CRASHPAD_MINI_CHROMIUM} ${component_install_prefix}/include/${component_name}/third_party
             # Remove .git as copying it causes permissions errors
             COMMAND rm -rf ${CRASHPAD_MINI_CHROMIUM}/mini_chromium/.git
+            COMMAND cp -rf ${CRASHPAD_MINI_CHROMIUM} ${component_install_prefix}/include/${component_name}/third_party
+
     )
 
     add_custom_command(TARGET third-party-${component_name} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${component_install_prefix}")

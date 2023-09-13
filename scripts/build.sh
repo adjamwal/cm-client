@@ -133,10 +133,11 @@ if [ "${clean}" = "true" ]; then
     # Each entry contains two parts: root_folder and folder_to_delete
     # Separate them by a space like this: "<root_folder> <folder_to_delete>"
     COMPONENT_ROOT_FOLDERS=(
-	"PackageManager export"
-	"EndpointIdentity export"
-	"third-party/crashpad export"
-	"third-party/crashpad/crashpad out"
+    "PackageManager export"
+    "EndpointIdentity export"
+    "third-party/crashpad export"
+    "third-party/crashpad xcode_export"
+    "third-party/crashpad/crashpad out"
     "ProxyDiscovery-Mac export"
     "ProxyDiscovery-Mac xcode_export"
 	# Add more folders if needed

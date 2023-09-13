@@ -6,6 +6,8 @@
 #include "Daemon.hpp"
 #include "Logger/CMLogger.hpp"
 #include "Config.hpp"
+#include "crashpad/CrashpadTuner.h"
+#include "cmid/CMIDAPI.h"
 #include <iostream>
 
 namespace
@@ -19,12 +21,54 @@ void initLogging()
     CMLogger::getInstance(logFilePath);
 }
 
+bool GetUcIdentity(std::string& identity)
+{
+    int buflen = 0;
+    cmid_result_t result = cmid_get_id(nullptr, &buflen);
+    if (result != CMID_RES_INSUFFICIENT_LEN) {
+        return false;
+    }
+    
+    std::string cmid(buflen-1, '\0');
+    result = cmid_get_id(cmid.data(), &buflen);
+    if (result != CMID_RES_SUCCESS) {
+        return false;
+    }
+    
+    identity = cmid;
+    return true;
+}
+
+void initCrashpad()
+{
+    auto* pCrashpadTuner = CrashpadTuner::getInstance();
+    std::string clientId;
+    if (GetUcIdentity(clientId))
+    {
+        pCrashpadTuner->setAgentGuid(clientId);
+    }
+    else
+    {
+        CM_LOG_ERROR("Failed to get agent id");
+        return;
+    }
+    //TODO CM4E-294: read commented values from the config and set here.
+    //For now default values are used located at CrashpadTuner.cpp file.
+    //pCrashpadTuner->setPruneAge(uint32_t nDays);
+    //pCrashpadTuner->setPruneDatabaseSize(<#size_t nSize#>);
+    //pCrashpadTuner->setUploadUrl(<#const std::string &strUrl#>);
+    
+    pCrashpadTuner->setUploadEnabled(true);
+    pCrashpadTuner->init(ConfigShared::Config::cmidExePath);
+}
+
 }
 
 int main(int argc, char *argv[])
 {
     try {
         initLogging();
+        initCrashpad();
         // TODO:
         //
         // - Signal handlers

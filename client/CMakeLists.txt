@@ -18,6 +18,8 @@ set(CM_CLIENT_SRCS
     Logger/CMLogger.cpp
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
+    crashpad/CrashpadTuner.h
+    crashpad/CrashpadTuner.cpp
 )
 
 add_executable(csccloudmanagement ${CM_CLIENT_SRCS})
@@ -36,6 +38,8 @@ target_include_directories(csccloudmanagement
     PUBLIC
     ${cm-client_SOURCE_DIR}
     ${CM_THIRDPARTY_EXPORT}/include
+    ${CM_THIRDPARTY_EXPORT}/include/crashpad
+    ${CM_THIRDPARTY_EXPORT}/include/crashpad/third_party/mini_chromium/mini_chromium
 )
 
 target_link_directories(csccloudmanagement BEFORE
@@ -45,14 +49,29 @@ target_link_directories(csccloudmanagement BEFORE
 
 target_link_libraries(csccloudmanagement
     PUBLIC
+    cmidapi
     configshared
     cmidcontrolplugin
     common
     pmcontrolplugin
     jsoncpp
+    crashpad_client
+    crashpad_common
+    crashpad_context
+    crashpad_handler_lib
+    crashpad_minidump
+    crashpad_net
+    crashpad_snapshot
+    crashpad_util
+    mig_output
+    crashpad_base
+    bsm
+    util
     "-framework SystemConfiguration"
     "-framework IOKit"
     "-framework CoreServices"
+    "-framework CoreGraphics"
+    "-framework CoreText"
     "-framework Security"
     "-framework Foundation"
 )

@@ -44,3 +44,12 @@
 /xcode_debug/
 /xcode_release/
 /Staging/
+
+# Crashpad build artefacts
+/third-party/crashpad/.cipd/
+/third-party/crashpad/.gclient_previous_sync_commits
+/third-party/crashpad/_bad_scm/
+/third-party/crashpad/export/
+/third-party/crashpad/xcode_export/
+
+

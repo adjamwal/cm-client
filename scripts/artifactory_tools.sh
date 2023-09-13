@@ -69,6 +69,27 @@ get_prereq_dir(){
   done
 }
 
+get_prereq_cmake_file(){
+  local prereq="${1}"
+  echo "${WORKSPACE_ROOT}/cmake/Modules/ExternalProject_${prereq}.cmake"
+}
+
+get_prereq_cmake_file_last_commit_hash(){
+  local prepeq="${1}"
+  local prepeq_cmake
+  local interested_modules=(
+    "crashpad"
+  )
+  for mdl in "${interested_modules[@]}" ; do
+    if [ "${mdl}" == "${prepeq}" ]; then
+      prepeq_cmake=$(get_prereq_cmake_file "${prepeq}")
+      echo "$(git log -n 1 --pretty=format:%h -- "${prepeq_cmake}")_"
+      return
+    fi
+  done
+  echo ""
+}
+
 upload_prereq_to_artifactory(){
   local prereq="${1}"
   local prereq_dir
@@ -90,7 +111,9 @@ get_prereq_download_url(){
   local selection=""
   local head_commit_fullhash
   local search_url=""
+  local cmake_file_commit_hash
 
+  cmake_file_commit_hash=$(get_prereq_cmake_file_last_commit_hash "${prereq}")
   prereq_dir=$(get_prereq_dir "${prereq}")
   if [ -z "${prereq_dir}" ]; then
     echoerr "ERROR: Pre-req ${prereq} not found"
@@ -100,7 +123,7 @@ get_prereq_download_url(){
 
   head_commit_fullhash=$(git rev-parse HEAD | tr -d '\n')
 
-  search_url=$(build_artifactory_search_url "${prereq}" "${head_commit_fullhash}") || url_result=1
+  search_url=$(build_artifactory_search_url "${prereq}" "${head_commit_fullhash}" "${cmake_file_commit_hash}") || url_result=1
   if [[ ${url_result} -ne 0 ]]; then
     # Should never happen
     echoerr "Failed to build search URL for ${prereq} ${head_commit_fullhash}, aborting."
@@ -258,6 +281,7 @@ get_artifactory_filename(){
   local prereq_description
   local dependency_string
   local file_name_local
+  local cmake_file_commit_hash="${3}"
   prereq_description=$(get_prereq_description "${prereq}" "${head_commit_fullhash}")
   dependency_string=$(get_dependency_string "${prereq}")
   if [ $? -ne 0 ]; then
@@ -265,7 +289,7 @@ get_artifactory_filename(){
     exit 1
   fi
 
-  file_name_local="${prereq_description}_${PLATFORM}${dependency_string}.tar.gz"
+  file_name_local="${prereq_description}_${cmake_file_commit_hash}${PLATFORM}${dependency_string}.tar.gz"
 
   echo "${file_name_local}"
 }
@@ -277,6 +301,7 @@ get_artifactory_key(){
   local component="${1}"
   local head_commit_fullhash="${2}"
   local dependency_string
+  local cmake_file_commit_hash="${3}"
   local search_key
   dependency_string=$(get_dependency_string "${component}")
   if [ $? -ne 0 ]; then
@@ -284,7 +309,12 @@ get_artifactory_key(){
     exit 1
   fi
 
-  search_key="sccm_${component}_${PLATFORM}_${head_commit_fullhash}${dependency_string}"
+  if [ -z "$cmake_file_commit_hash" ];
+  then
+    search_key="sccm_${component}_${PLATFORM}_${head_commit_fullhash}${dependency_string}"
+  else
+    search_key="sccm_${component}_${PLATFORM}_${head_commit_fullhash}_${cmake_file_commit_hash}${dependency_string}"
+  fi
 
   echo "${search_key}"
 }
@@ -301,12 +331,14 @@ artifactory_upload(){
   local existing_filename=""
   local search_url=""
   local url_result=0
+  local cmake_file_commit_hash
 
+  cmake_file_commit_hash=$(get_prereq_cmake_file_last_commit_hash "${prereq}")
   exclude_pattern=$(get_exclude_patterns "${prereq}")
   pushd "${prereq_dir}" || exit 1
-    file_name=$(get_artifactory_filename "${prereq}" "${head_commit_fullhash}" "${prereq_dir}" "${prereq_dir}")
+    file_name=$(get_artifactory_filename "${prereq}" "${head_commit_fullhash}" "${cmake_file_commit_hash}" "${prereq_dir}" "${prereq_dir}")
   popd || exit 1
-  search_key=$(get_artifactory_key "${prereq}" "${head_commit_fullhash}")
+  search_key=$(get_artifactory_key "${prereq}" "${head_commit_fullhash}" "${cmake_file_commit_hash}")
 
   rm -f "${file_name}"
   pushd "${prereq_dir}" || exit 1
@@ -405,10 +437,11 @@ artifactory_upload(){
 build_artifactory_search_url(){
   local component="${1}"
   local head_commit_fullhash="${2}"
+  local cmake_file_commit_hash="${3}"
   local component_search_key=""
   local search_url=""
 
-  component_search_key=$(get_artifactory_key "${component}" "${head_commit_fullhash}")
+  component_search_key=$(get_artifactory_key "${component}" "${head_commit_fullhash}" "${cmake_file_commit_hash}")
   search_url=$(build_artifactory_search_url_using_key "${component_search_key}")
 
   echo "${search_url}"

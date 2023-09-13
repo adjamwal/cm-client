@@ -5,8 +5,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 list(APPEND UTIL_SOURCES
     util.hpp
     GuidUtil.hpp
+    PathUtil.hpp
     macOS/GuidUtil.mm
     macOS/StringUtil.mm
+    macOS/PathUtil.mm
 )
 
 add_library(util STATIC
