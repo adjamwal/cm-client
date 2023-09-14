@@ -50,6 +50,7 @@ if(NOT TARGET "third-party-${component_name}")
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/obj/third_party/mini_chromium/mini_chromium/base/libbase.a ${component_install_prefix}/lib/libcrashpad_base.a
             COMMAND mkdir -p ${component_install_prefix}/bin
             COMMAND mv -f ${CRASHPAD_BUILD_DIR}/crashpad_handler ${component_install_prefix}/bin/crashpad_handler
+            COMMAND mv -f ${CRASHPAD_BUILD_DIR}/crashpad_database_util ${component_install_prefix}/bin/crashpad_database_util
             COMMAND mkdir -p ${component_install_prefix}/include/${component_name}/third_party
             # Remove .git as copying it causes permissions errors
             COMMAND rm -rf ${CRASHPAD_MINI_CHROMIUM}/mini_chromium/.git
