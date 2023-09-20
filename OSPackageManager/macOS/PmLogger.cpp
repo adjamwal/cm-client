@@ -369,3 +369,7 @@ void PmLogger::ConfigLogger::SetLogLevel( int severity ) {
     pOrigLogger_->SetLogLevel(static_cast<PmLogger::Severity>(severity));
 }
 
+const char* PmLogger::ConfigLogger::getKey() const {
+    return "pm";
+}
+

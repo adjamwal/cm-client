@@ -2,8 +2,6 @@
 
 #include "config_shared.hpp"
 #include <cstdarg>
-
-
 #include <filesystem>
 #include <string>
 
@@ -17,6 +15,7 @@ public:
     virtual void Log( int severity, const char* msgFormatter, const char *fileName, const char *funcName, long lineNumber, ... ) = 0;
     virtual void Log( int severity, const char* msgFormatter, const char *fileName, const char *funcName, long lineNumber, va_list args ) = 0;
     virtual void SetLogLevel( int severity ) = 0;
+    virtual const char* getKey() const = 0;
 };
 } //namespace ConfigShared
 

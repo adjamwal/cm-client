@@ -68,6 +68,7 @@ private:
         void Log( int severity, const char* msgFormatter, const char *fileName, const char *funcName, long lineNumber,  ... ) override;
         void Log( int severity, const char* msgFormatter, const char *fileName, const char *funcName, long lineNumber, va_list args ) override;
         void SetLogLevel( int severity ) override;
+        const char* getKey() const override;
     private:
         PmLogger* pOrigLogger_;
     };

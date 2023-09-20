@@ -145,8 +145,8 @@ public:
         PmLogger::initLogger();
 
         ASSERT_TRUE(createConfigFile());
-        pConfig_ = std::make_unique<ConfigShared::Config>(filePath_.native(), "pm", &PmLogger::getLogger().getConfigLogger());
-        pConfig_->subscribeForConfigChanges()();
+        pConfig_ = std::make_unique<ConfigShared::Config>(filePath_.native(), &PmLogger::getLogger().getConfigLogger());
+//        pConfig_->subscribeForConfigChanges()();
     }
     
     void TearDown() override

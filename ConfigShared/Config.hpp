@@ -1,22 +1,40 @@
 #pragma once
 
-#include "config_shared.hpp"
 #include <string>
 #include <filesystem>
 #include <fstream>
 #include <shared_mutex>
-#include "IConfigLogger.hpp"
+#include <json/json.h>
 
+#include "config_shared.hpp"
+#include "IConfigLogger.hpp"
 
 namespace ConfigShared
 {
 
-#if defined (DEBUG)
-#define DEFAULT_LOG_LEVEL 7
+    namespace log {
+        const int kDefaultLevel =
+#if defined(DEBUG)
+        7
 #else
-#define DEFAULT_LOG_LEVEL 5
+        5
 #endif
+        ;
+    }
 
+    namespace crashpad {
+        constexpr uint32_t kPruneDays{14};
+        constexpr size_t kDatabaseDefaultPruneSizeKB{50000};
+        constexpr std::string_view kCrashpadUrl{"https://crash.qa1.immunet.com/crash"};
+    }
+
+    
+struct CrashpadConfig {
+    std::optional<int> pruneAge;
+    std::optional<int> pruneDbSize;
+    std::optional<std::string> uploadUrl;
+};
+    
 class CONFIGSHARED_MODULE_API Config
 {
 public:
@@ -31,37 +49,39 @@ public:
     static const std::string cmidLogPath;
 #endif
     
-    Config(const std::string& key, IConfigLogger* logger);
-    Config(const std::string& configPath, const std::string& key, IConfigLogger* logger);
+    Config(IConfigLogger* logger);
+    Config(const std::filesystem::path& configPath, IConfigLogger* logger);
     ~Config() = default;
     Config(const Config &other) = delete;
     Config &operator=(const Config &other) = delete;
     Config(Config &&other) = delete;
     Config &operator=(Config &&other) = delete;
     
-    std::string getPath() const;
-    int getLogLevel() const;
+    const std::filesystem::path& getPath() const;
 
     void onConfigChanged();
     std::function<void()> subscribeForConfigChanges();
     
-    IConfigLogger* getConfigLogger();
+    IConfigLogger* getConfigLogger() const;
     void setConfigLogger(IConfigLogger* loger);
+    
+    int getLogLevel() const;
+    const CrashpadConfig& getCrashpadConfig() const;
 
 private:
     bool reload(); // separate function to allow re-load.
     bool readConfig();
+    bool parseLogLevel();
+    bool parseCrashPadSettings();
 
-    const std::string logLevelKey = "loglevel";
-    const std::string configFileName = "cm_config.json";
-    
-    std::string key_; //= "uc";  = "pm";
     std::filesystem::path configPath_;
-
-    mutable std::shared_mutex mutex_;
-    int logLevel_ = DEFAULT_LOG_LEVEL;
     IConfigLogger* configLogger_{nullptr};
 
+    mutable std::shared_mutex mutex_;
+    std::unique_ptr<Json::Value> configJson_;
+    
+    int logLevel_{log::kDefaultLevel};
+    CrashpadConfig crashpadConfig_{};
 };
     
 } // namespace bitsandpieces

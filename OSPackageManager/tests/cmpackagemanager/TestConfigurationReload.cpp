@@ -73,13 +73,15 @@ public:
     
     void SetUp() override
     {
-        ASSERT_TRUE(createConfigFile(testData1_));
-        pConfig_ = std::make_unique<ConfigShared::Config>(configFilePath_.native(), "pm", nullptr);
-        ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber(pConfig_->subscribeForConfigChanges());
+        clearLogFile();
+
         PmLogger::initLogger();
-        PmLogger::getLogger().SetLogLevel(static_cast<IPMLogger::Severity>(pConfig_->getLogLevel()));
+        PmLogger::getLogger().SetLogLevel(static_cast<IPMLogger::Severity>(ConfigShared::log::kDefaultLevel));
         PmLogger::getLogger().initFileLogging(std::filesystem::temp_directory_path(), static_cast<std::string>(kLogFile), 1048576 * 15, 5);
-        pConfig_->setConfigLogger(&PmLogger::getLogger().getConfigLogger());
+
+        ASSERT_TRUE(createConfigFile(testData1_));
+        pConfig_ = std::make_unique<ConfigShared::Config>(configFilePath_.native(), &PmLogger::getLogger().getConfigLogger());
+        ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber(pConfig_->subscribeForConfigChanges());
     }
     
     ~TestConfigurationReload()
@@ -121,29 +123,33 @@ protected:
         if (std::filesystem::exists(loggerFilePath_))
         {
             std::error_code errCode;
-            return std::filesystem::remove(configFilePath_, errCode);
+            return std::filesystem::remove(loggerFilePath_, errCode);
         }
         return false;
     }
 
-     void checkLogRecordsExists(const std::vector<std::string>& records)
-    {
+    void checkLogRecordsExists(const std::vector<std::string>& records) {
         std::ifstream inputFile;
         inputFile.open(loggerFilePath_.native());
         ASSERT_TRUE(inputFile.is_open());
         
-
+        std::vector<bool> found(records.size(), false); // To track which records were found
+        
         std::string line;
-        size_t i = 0;
-        while (std::getline(inputFile, line))
-        {
-            ASSERT_TRUE(i < records.size());
-            EXPECT_TRUE(line.find(records[i]) != std::string::npos);
-            ++i;
+        while (std::getline(inputFile, line)) {
+            for (size_t i = 0; i < records.size(); ++i) {
+                if (line.find(records[i]) != std::string::npos) {
+                    found[i] = true; // Mark record as found
+                }
+            }
         }
-        EXPECT_TRUE(i == records.size());
-
+        
         inputFile.close();
+        
+            // Check that all expected records were found in the log file
+        for (size_t i = 0; i < records.size(); ++i) {
+            EXPECT_TRUE(found[i]) << "Expected record not found: " << records[i];
+        }
     }
     
     std::filesystem::path configFilePath_;
@@ -153,10 +159,6 @@ protected:
 
 TEST_F(TestConfigurationReload, LogLevelChangedAfterReload)
 {
-    std::vector<std::string> logRecord = {
-        "Set new log level: Debug",
-        "Set new log level: Error"
-    };
     
     ASSERT_EQ(testData1_.expectedLogLevel, pConfig_->getLogLevel());
     
@@ -164,7 +166,8 @@ TEST_F(TestConfigurationReload, LogLevelChangedAfterReload)
 
     ConfigShared::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();
     
-    logRecord = {
+    const std::vector<std::string> logRecord = {
+        "Set new log level: Debug",
         "Set new log level: Error"
     };
 

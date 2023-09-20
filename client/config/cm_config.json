@@ -3,14 +3,14 @@
     "enable_verbose_logs": true
   },
   "pm": {
-    "loglevel": 7,
+    "loglevel": 5,
     "CheckinInterval": 300000,
     "MaxStartupDelay": 2000,
     "maxFileCacheAge_s": 604800,
     "AllowPostInstallReboots": true
   },
   "uc": {
-    "loglevel": 7
+    "loglevel": 6
   },
   "crashpad": {
     "pruneAge": 3,

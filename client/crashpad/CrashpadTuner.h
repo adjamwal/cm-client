@@ -30,10 +30,14 @@ public:
     void setUploadEnabled(bool bVal);
     void setUploadUrl(const std::string& strUrl);
     void setAgentGuid(const std::string& strGuid);
-    //Prune period in days.
+    // Prune period in days.
     void setPruneAge(uint32_t nDays);
-    //Size of the crash database in KB.
+    // Size of the crash database in KB.
     void setPruneDatabaseSize(size_t nSize);
+    
+    uint32_t getPruneAge() const { return nPruneDays_; }
+    size_t getPruneDatabaseSize() const { return databasePruneSize_; }
+    std::string getUploadUrl() const { return uploadUrl_; }
 
 private:
     std::unique_ptr<crashpad::CrashReportDatabase> pDatabase_;

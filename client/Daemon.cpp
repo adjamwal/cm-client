@@ -14,28 +14,48 @@
 #include <chrono>
 #include <iostream>
 
+#include "crashpad/CrashpadTuner.h"
+
 namespace CloudManagement
 {
 const std::string fileWatcherName {"CloudManagement_FileWatcher"};
 
-void configCallback()
+void Daemon::configCallback()
 {
-//TODO: place for config update integration
+    applyLoggerSettings();
+    applyCrashpadSettings();
 }
-
+    
+void Daemon::applyLoggerSettings() {
+    CMLogger::getInstance().SetLogLevel(static_cast<CM_LOG_LVL_T>(config_->getLogLevel()));
+}
+    
+void Daemon::applyCrashpadSettings() {
+    auto *pCrashpadTuner = CrashpadTuner::getInstance();
+    const auto& crashpadConfig = config_->getCrashpadConfig();
+    if (crashpadConfig.pruneAge.has_value())
+        pCrashpadTuner->setPruneAge( crashpadConfig.pruneAge.value() );
+    
+    if (crashpadConfig.pruneDbSize.has_value())
+        pCrashpadTuner->setPruneDatabaseSize( crashpadConfig.pruneDbSize.value() );
+    
+    if (crashpadConfig.uploadUrl.has_value())
+        pCrashpadTuner->setUploadUrl( crashpadConfig.uploadUrl.value() );
+}
+    
+    
 //! @todo creation of PM, should also load the process
 Daemon::Daemon()
-#ifdef CM_KEY
-    : config_ { std::make_unique<ConfigShared::Config>(CM_KEY) },
-#else 
-    : config_ { std::make_unique<ConfigShared::Config>("uc", &CMLogger::getInstance().getConfigLogger()) },
-#endif
+    : config_ { std::make_unique<ConfigShared::Config>(&CMLogger::getInstance().getConfigLogger()) },
       cmidLoader_ { std::make_unique<CMIDLoader>() },
       pmLoader_ { std::make_unique<PMLoader>() },
       fileWatcher_{std::make_unique<FileWatcher>(fileWatcherName)}
 {
-    CMLogger::getInstance().SetLogLevel(static_cast<CM_LOG_LVL_T>(config_->getLogLevel()));
+    applyLoggerSettings();
+    applyCrashpadSettings();
+    
     ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
+    ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber([&](){ this->configCallback(); });
 }
 
 void Daemon::start()

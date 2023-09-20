@@ -5,6 +5,7 @@
 
 #include "crashpad/CrashpadTuner.h"
 
+#include "Config.hpp"
 #include "Logger/CMLogger.hpp"
 #include "util/PathUtil.hpp"
 
@@ -32,7 +33,7 @@ constexpr std::string_view kSecureClientCloudManagementMacClient{"sccm_mac"};
 constexpr uint32_t kPruneDays{14};
 constexpr size_t kDatabaseDefaultPruneSizeKB{50000};
 constexpr std::string_view kNotUsedUrl{"https://default.not.used.url/"};
-constexpr std::string_view kCrashpadUrl{"https://crash.qa1.immunet.com/crash"};
+constexpr std::string_view kCrashpadUrl{"https://crash.amp.cisco.com/crash"};
 
 } //unnamed namespace
 
@@ -201,6 +202,8 @@ void CrashpadTuner::setUploadUrl(const std::string& strUrl)
         return;
     if (!pSettings->SetUploadUrl(strUrl))
         CM_LOG_ERROR("Failed to set upload url.");
+    
+    CM_LOG_INFO("Applied crashpad upload url = %s", strUrl.c_str());
 }
 
 void CrashpadTuner::setAgentGuid(const std::string& strGuid)
@@ -259,8 +262,11 @@ void CrashpadTuner::setPruneAge(uint32_t nDays)
     if (pSettings->GetPruneAge(&curAge) && curAge == nPruneDays_)
         return;
 
-    if (!pSettings->SetPruneAge(nPruneDays_))
+    if (!pSettings->SetPruneAge(nPruneDays_)) {
         CM_LOG_ERROR("Failed to set prune age.");
+    }
+    
+    CM_LOG_INFO("Applied crashpad pruneAge = %d days", nDays);
 }
 
 void CrashpadTuner::setPruneDatabaseSize(size_t nSize)
@@ -284,6 +290,8 @@ void CrashpadTuner::setPruneDatabaseSize(size_t nSize)
         return;
     if (!pSettings->SetPruneDatabaseSize(nSize))
         CM_LOG_ERROR("Failed to set prune database size.");
+    
+    CM_LOG_INFO("Applied crashpad database prune size = %d kb", nSize);
 }
 
 void CrashpadTuner::setupSettings()

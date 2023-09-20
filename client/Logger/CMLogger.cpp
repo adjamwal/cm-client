@@ -240,3 +240,5 @@ void CMLogger::ConfigLogger::Log( int severity, const char* msgFormatter, const 
 void CMLogger::ConfigLogger::SetLogLevel( int severity ) {
     cOrigLogger_->SetLogLevel(static_cast<CM_LOG_LVL_T>(severity));
 }
+
+const char* CMLogger::ConfigLogger::getKey() const { return "uc"; }

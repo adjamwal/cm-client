@@ -36,6 +36,10 @@ private:
     std::thread task_;
 
     void mainTask();
+    void configCallback();
+    void applyLoggerSettings();
+    void applyCrashpadSettings();
+
 };
 
 } // namespace CloudManagementClient

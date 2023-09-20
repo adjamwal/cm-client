@@ -52,11 +52,6 @@ void initCrashpad()
         CM_LOG_ERROR("Failed to get agent id");
         return;
     }
-    //TODO CM4E-294: read commented values from the config and set here.
-    //For now default values are used located at CrashpadTuner.cpp file.
-    //pCrashpadTuner->setPruneAge(uint32_t nDays);
-    //pCrashpadTuner->setPruneDatabaseSize(<#size_t nSize#>);
-    //pCrashpadTuner->setUploadUrl(<#const std::string &strUrl#>);
     
     pCrashpadTuner->setUploadEnabled(true);
     pCrashpadTuner->init(ConfigShared::Config::cmidExePath);

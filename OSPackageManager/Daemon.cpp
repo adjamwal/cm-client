@@ -52,11 +52,7 @@ Daemon::Daemon()
 void Daemon::start()
 {
     isRunning_ = true;
-#ifdef PM_KEY
-    config_ = std::make_unique<ConfigShared::Config>(configFile_, PM_KEY);
-#else 
-    config_ = std::make_unique<ConfigShared::Config>(configFile_, "pm", &PmLogger::getLogger().getConfigLogger());
-#endif
+    config_ = std::make_unique<ConfigShared::Config>(configFile_, &PmLogger::getLogger().getConfigLogger());
     fileWatcher_->add(config_->getPath(), []() {ConfigShared::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
     ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
     PmLogger::getLogger().SetLogLevel(static_cast<IPMLogger::Severity>(config_->getLogLevel()));
