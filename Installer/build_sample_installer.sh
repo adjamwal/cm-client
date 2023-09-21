@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# Usage: build_cm_installer.sh [debug|release] [staging_dir]
+# Usage: build_sample_installer.sh [debug|release] [staging_dir]
 #
 # Optional User Environment Variables
 # ===================================

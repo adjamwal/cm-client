@@ -11,6 +11,7 @@ CM_BINARY="csccloudmanagement"
 LAUNCHD_DIR="/Library/LaunchDaemons"
 LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
 CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
+CM_CRASHPAD_DIR="/opt/cisco/secureclient/cloudmanagement/ch"
 
 echo "Uninstalling Cisco Secure Client CloudManagement ..."
 
@@ -32,6 +33,8 @@ if [ -e "${LAUNCHD_DIR}/${LAUNCHD_FILE}" ] ; then
 fi
 
 rm -rf "${CM_DIR}" || exit
+
+rm -rf "${CM_CRASHPAD_DIR}" || exit
 
 pkgutil --forget "${CM_PACKAGE_ID}"
 
