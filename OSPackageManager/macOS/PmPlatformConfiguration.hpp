@@ -136,6 +136,6 @@ protected:
 private:
     std::shared_ptr<CMIDAPIProxyAbstract> cmidapi_;
     std::shared_ptr<PackageManager::PmCertManager> certmgr_;
-    std::unique_ptr<proxy::IProxyDiscoveryEngine> pProxyEngine_;
+    std::shared_ptr<proxy::IProxyDiscoveryEngine> pProxyEngine_;
     std::unordered_map<std::string, std::pair<void*, AsyncProxyDiscoveryCb>> proxyCallbacks_;
 };

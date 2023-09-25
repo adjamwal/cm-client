@@ -38,13 +38,19 @@ constexpr std::string_view kCmSharedLogPath{"/var/logs/cisco/secureclient/cloudm
 #endif
 
 constexpr std::string_view kHttpUserAgentPrefix{"PackageManager/"};
+constexpr std::string_view kHttpProxyType{"http"};
+constexpr std::string_view kHttpsProxyType{"https"};
 
 std::list<PmProxy> convertProxyList(const std::list<proxy::ProxyRecord>& inputList)
 {
     std::list<PmProxy> outputList;
-    for (auto&& rec: inputList)
+    for (const auto& rec: inputList)
     {
-        outputList.push_back({rec.url, rec.port, rec.proxyType});
+        std::string strProxyType = rec.getProxyTypeName();
+        if (strProxyType == static_cast<std::string>(kHttpsProxyType)) {
+            strProxyType = static_cast<std::string>(kHttpProxyType);
+        }
+        outputList.push_back({rec.url, rec.port, strProxyType});
     }
     return outputList;
 }
@@ -244,10 +250,10 @@ void PmPlatformConfiguration::updateProxyList(const std::list<proxy::ProxyRecord
     {
         //Log output for verification.
         PM_LOG_NOTICE("Obtained proxy list: ");
-        for (auto&& p: proxies)
+        for (const auto& p: proxies)
         {
             PM_LOG_NOTICE("Proxy: URL: [%s], Type: [%s], Port: [%d].", p.url.c_str(),
-                          p.proxyType.c_str(), p.port);
+                          p.getProxyTypeName().c_str(), p.port);
         }
         PM_LOG_NOTICE("End of the proxy list.");
     }

@@ -29,6 +29,8 @@ if(NOT TARGET "third-party-${component_name}")
             -Dgtest_INCLUDE_DIRS=${CM_THIRDPARTY_EXPORT}/include
             -Dgtest_LIBRARY=${CM_THIRDPARTY_EXPORT}/lib
             -DSKIP_TESTS=FALSE
+            -DCMAKE_CXX_STANDARD=17
+            -DCMAKE_CXX_EXTENSIONS=OFF
             -DUSE_DEBUG_TEST_LIBRARIES=TRUE
             -DCMAKE_INSTALL_PREFIX:PATH=${component_install_prefix}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
