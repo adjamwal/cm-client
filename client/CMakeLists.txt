@@ -32,6 +32,7 @@ add_dependencies(csccloudmanagement
     third-party-PackageManager
     third-party-spdlog
     third-party-crashpad
+    third-party-ProxyDiscovery-Mac
 )
 
 target_include_directories(csccloudmanagement
@@ -40,6 +41,8 @@ target_include_directories(csccloudmanagement
     ${CM_THIRDPARTY_EXPORT}/include
     ${CM_THIRDPARTY_EXPORT}/include/crashpad
     ${CM_THIRDPARTY_EXPORT}/include/crashpad/third_party/mini_chromium/mini_chromium
+    ${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery
+    ${cm-client_SOURCE_DIR}/util
 )
 
 target_link_directories(csccloudmanagement BEFORE
@@ -54,6 +57,7 @@ target_link_libraries(csccloudmanagement
     cmidcontrolplugin
     common
     pmcontrolplugin
+    ProxyDiscovery
     jsoncpp
     crashpad_client
     crashpad_common

@@ -9,12 +9,12 @@
 #include "ComponentLoader/PMLoader.hpp"
 #include "Logger/CMLogger.hpp"
 #include "ConfigWatchdog.hpp"
+#include "crashpad/CrashpadTuner.h"
+#include "ThreadTimer.hpp"
 
 #include <sys/stat.h>
 #include <chrono>
 #include <iostream>
-
-#include "crashpad/CrashpadTuner.h"
 
 namespace CloudManagement
 {
@@ -45,11 +45,12 @@ void Daemon::applyCrashpadSettings() {
     
     
 //! @todo creation of PM, should also load the process
-Daemon::Daemon()
-    : config_ { std::make_unique<ConfigShared::Config>(&CMLogger::getInstance().getConfigLogger()) },
-      cmidLoader_ { std::make_unique<CMIDLoader>() },
-      pmLoader_ { std::make_unique<PMLoader>() },
-      fileWatcher_{std::make_unique<FileWatcher>(fileWatcherName)}
+Daemon::Daemon():
+    config_ { std::make_unique<ConfigShared::Config>(&CMLogger::getInstance().getConfigLogger()) },
+    cmidLoader_ { std::make_unique<CMIDLoader>() },
+    pmLoader_ { std::make_unique<PMLoader>() },
+    fileWatcher_{std::make_unique<FileWatcher>(fileWatcherName)},
+    pProxyTimer_{std::make_shared<util::ThreadTimer>()}
 {
     applyLoggerSettings();
     applyCrashpadSettings();
@@ -60,13 +61,19 @@ Daemon::Daemon()
 
 void Daemon::start()
 {
+    using namespace std::chrono_literals;
+    constexpr std::chrono::hours kProxyPollingInterval = 1h;
     CM_LOG_DEBUG("Starting cloud management");
  
     fileWatcher_->add(config_->getPath(), []() {ConfigShared::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
     isRunning_ = true;
-
+    pProxyTimer_->setExecuteImmediately(true);
+    pProxyTimer_->start([] {
+        CrashpadTuner::getInstance()->startProxyDiscoveryAsync();
+    }, kProxyPollingInterval);
     task_ = std::thread(&Daemon::mainTask, this);
     task_.join();
+    pProxyTimer_->stop();
 }
 
 void Daemon::stop()

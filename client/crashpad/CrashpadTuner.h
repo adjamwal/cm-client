@@ -9,19 +9,25 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <list>
+#include <mutex>
 #include <string>
 
+#include "ProxyDiscovery/IProxyDiscoveryEngine.h"
+
 #include "base/files/file_path.h"
+#include "util/net/http_proxy.h"
 
 namespace crashpad {
 class CrashpadClient;
 class CrashReportDatabase;
 }
 
-class CrashpadTuner
+class CrashpadTuner: public proxy::IProxyObserver
 {
 public:
     CrashpadTuner();
+    virtual ~CrashpadTuner() = default;
     void init(const std::string& strBinDirPath);
     
     static CrashpadTuner* getInstance();
@@ -34,15 +40,21 @@ public:
     void setPruneAge(uint32_t nDays);
     // Size of the crash database in KB.
     void setPruneDatabaseSize(size_t nSize);
+    bool setProxy(const crashpad::HTTPProxy& proxy);
+
+    std::string getUploadUrl() const;
+    crashpad::HTTPProxy getProxy() const;
     
-    uint32_t getPruneAge() const { return nPruneDays_; }
-    size_t getPruneDatabaseSize() const { return databasePruneSize_; }
-    std::string getUploadUrl() const { return uploadUrl_; }
+    void startProxyDiscoveryAsync();
+    
+    //IProxyObserver methods
+    void updateProxyList(const std::list<proxy::ProxyRecord>& proxies, const std::string& guid) override;
 
 private:
     std::unique_ptr<crashpad::CrashReportDatabase> pDatabase_;
     std::unique_ptr<crashpad::CrashpadClient> pClient_;
     static CrashpadTuner* instance_;
+    static std::mutex g_mutex;
     std::map<std::string, std::string> annotations_;
     std::vector<std::string> arguments_;
     std::vector<base::FilePath> attachments_;
@@ -54,10 +66,15 @@ private:
     std::string clientId_;
     int nPruneDays_;
     size_t databasePruneSize_;
+    crashpad::HTTPProxy proxy_;
+    
+    std::shared_ptr<proxy::IProxyDiscoveryEngine> pProxyEngine_;
+    mutable std::recursive_mutex mutex_;
     
     void fillAnnotations();
     void fillArguments();
     void fillAttachments();
     bool tuneReportDirectory(const std::string& strDir);
     void setupSettings();
+    bool setProxySettings(const crashpad::HTTPProxy& proxy);
 };

@@ -7,10 +7,16 @@
 #pragma once
 
 #include "common/macOS/FileWatcher.hpp"
-#include <atomic>
-#include <thread>
 #include "Config.hpp"
 
+#include <atomic>
+#include <thread>
+#include <memory>
+
+namespace util
+{
+class ThreadTimer;
+}
 
 namespace CloudManagement
 {
@@ -34,6 +40,7 @@ private:
     std::unique_ptr<FileWatcher> fileWatcher_;
     std::atomic<bool> isRunning_;
     std::thread task_;
+    std::shared_ptr<util::ThreadTimer> pProxyTimer_;
 
     void mainTask();
     void configCallback();
