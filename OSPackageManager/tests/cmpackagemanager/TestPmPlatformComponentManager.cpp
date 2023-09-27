@@ -125,7 +125,7 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_Positive) {
     EXPECT_CALL(*mockEnv_.pkgUtil_,
                 installPackage(
                    package.downloadedInstallerPath.u8string(),
-                   _
+                   _, _
                 ))
         .WillOnce(Return(true));
     
@@ -164,7 +164,7 @@ TEST_F(PmPlatformComponentManagerTest, UpdateComponent_Positive) {
     EXPECT_CALL(*mockEnv_.pkgUtil_,
                 installPackage(
                    package.downloadedInstallerPath.u8string(),
-                   _
+                   _, _
                 ))
         .WillOnce(Return(true));
     
@@ -255,7 +255,7 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_InstallFailed_Negative) 
     EXPECT_CALL(*mockEnv_.pkgUtil_,
                 installPackage(
                    package.downloadedInstallerPath.u8string(),
-                   _
+                   _, _
                ))
     .WillOnce(Return(false));
     

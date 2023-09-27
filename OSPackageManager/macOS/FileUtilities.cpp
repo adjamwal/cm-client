@@ -150,4 +150,17 @@ std::string FileUtilities::ResolvePath(const std::string &basePath)
     return basePath;
 }
 
+std::string FileUtilities::GenerateTemporaryFileName()
+{
+    std::string tempDir = std::filesystem::temp_directory_path();
+    std::string tempFilePath;
+    
+    std::time_t now = std::time(nullptr);
+    std::string timestamp = std::to_string(now);
+    
+    tempFilePath = tempDir + "/tempfile_" + timestamp;
+    
+    return tempFilePath;
+}
+
 }

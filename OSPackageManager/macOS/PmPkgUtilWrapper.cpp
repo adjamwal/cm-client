@@ -5,9 +5,11 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <regex>
+#include <filesystem>
 
 #include "PmLogger.hpp"
 #include "PmPkgUtilWrapper.hpp"
+#include "FileUtilities.hpp"
 
 namespace { // anonymous namespace
     
@@ -170,11 +172,44 @@ PmPackageInfo PmPkgUtilWrapper::parsePackageInfo(const std::string& output) cons
     return packageInfo;
 }
 
-bool PmPkgUtilWrapper::installPackage(const std::string& packagePath, const std::string& volumePath) const {
-    PM_LOG_INFO("Installing package %s", packagePath.c_str());
-    const std::string command{ pkgInstallerExecutable + " -pkg " + packagePath };
-    const std::string output = executeCommand( decoratePkgInstallerVolumeOption(command, volumePath));
+bool PmPkgUtilWrapper::installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions, const std::string& volumePath) const {
+    auto extractXmlPath = [&](const std::string& packagePath){
+        std::string sPath;
+        if (packagePath.empty())
+            return sPath;
+
+        PackageManager::FileUtilities fu;
+        sPath = fu.GenerateTemporaryFileName();
+        
+        const auto cmdRes = executeCommand(pkgInstallerExecutable + " -pkg " + packagePath + " -showChoiceChangesXML > " + sPath);
+        if (!cmdRes.empty())
+            sPath.clear();
+
+        return sPath;
+    };
     
+    const std::string sXmlPath = !installOptions.empty()
+                                    ? extractXmlPath(packagePath)
+                                    : "";
+    
+    const std::string applyCommand = !installOptions.empty() && !sXmlPath.empty() ?
+                                    " -applyChoiceChangesXML " + sXmlPath
+                                    : "";
+    if (!installOptions.empty() && !sXmlPath.empty()){
+        PackageManager::modifyXmlValues(sXmlPath, installOptions);
+    }
+    
+    PM_LOG_INFO("Installing package %s", packagePath.c_str());
+    const std::string command{ pkgInstallerExecutable + " -pkg " + packagePath + applyCommand };
+    
+    PM_LOG_INFO("Package install command: %s", command.c_str());
+    const std::string output = executeCommand( decoratePkgInstallerVolumeOption(command, volumePath));
+
+    if (!installOptions.empty() && std::filesystem::exists(sXmlPath)) {
+        std::error_code errCode;
+        std::filesystem::remove(sXmlPath, errCode);
+    }
+
     if (outputParser(output, installResultsSuccess)) {
         // Installation successful
         return true;

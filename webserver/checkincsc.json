@@ -1,0 +1,12 @@
+{
+  "deployment_id": "36efd528-d7ba-4670-bc48-f205367b4b72",
+  "packages": [
+    {
+      "installer_args": ["-installer_choices=\"choice_secure_umbrella=0\""],
+      "installer_sha256": "3e12cc81dd94d09e4a852773bc65950b8f689429481dcb62ec70858e6d01258c",
+      "installer_type": "pkg",
+      "installer_uri": "http://localhost:5000/csc.pkg",
+      "package": "CSC_Mac_Test/1.22.2.916"
+    }
+  ]
+}

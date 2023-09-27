@@ -8,6 +8,7 @@
 
 #include <unordered_map>
 #include "IFileUtilities.hpp"
+#include <map>
 
 namespace PackageManager
 {
@@ -28,6 +29,11 @@ public:
     int32_t FileSearchWithWildCard(const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results) override;
     std::string ResolvePath(const std::string& basePath) override;
     std::string ResolveKnownFolderIdForDefaultUser(const std::string& knownFolderId) override;
+    
+    //non-base class methods
+    std::string GenerateTemporaryFileName();
 };
+
+bool modifyXmlValues(const std::string& sFilePath, const std::map<std::string, int>&  installOptions);
 
 }

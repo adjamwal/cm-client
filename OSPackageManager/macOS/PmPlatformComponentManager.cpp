@@ -11,6 +11,45 @@
 #include "IPmCodesignVerifier.hpp"
 #include "IPmPkgUtil.hpp"
 
+#include <sstream>
+#include <map>
+
+
+namespace { // anonymous namespace
+
+std::map<std::string, int> sanitizeParamsXml (const std::string& args)
+{
+    std::map<std::string, int> resultArg;
+    const std::string enterName("installer_choices=\"");
+    auto firstOcc = args.find(enterName);
+    if ( std::string::npos == firstOcc )
+        return resultArg;
+    
+    auto secondOcc = args.find("\"", firstOcc+enterName.length());
+    if ( std::string::npos == secondOcc )
+        return resultArg;
+    
+    if (firstOcc+1 >= secondOcc)
+        return resultArg;
+
+    std::string theArgs(args, firstOcc+enterName.length(), secondOcc - (firstOcc+enterName.length()));
+    const char delim = ' ';
+    std::istringstream ss(theArgs);
+    std::string token;
+    std::vector<std::string> tokens;
+    while(std::getline(ss, token, delim)) {
+        std::istringstream ssInner(token);
+        std::string key, val;
+        std::getline(ssInner, key, '=');
+        std::getline(ssInner, val, '=');
+
+        resultArg[key] = std::stoi(val);
+    }
+    
+    return resultArg;
+};
+}
+
 PmPlatformComponentManager::PmPlatformComponentManager(
     std::shared_ptr<IPmPkgUtil> pkgUtil,
     std::shared_ptr<IPmCodesignVerifier> codesignVerifier,
@@ -68,7 +107,7 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
     {
         if( package.installerType == "pkg" )
         {
-            const auto success = pkgUtil_->installPackage(downloadedInstallerPath);
+            const auto success = pkgUtil_->installPackage(downloadedInstallerPath, sanitizeParamsXml(package.installerArgs));
             ret = success ? 0 : -1;
         }
         else

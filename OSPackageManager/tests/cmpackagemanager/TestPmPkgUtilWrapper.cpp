@@ -71,7 +71,7 @@ TEST_F(PkgUtilWrapperTest, InstallPackage_Success) {
     EXPECT_CALL(mockWrapper, executeCommand(expectedCommand)).WillOnce(::testing::Return(expectedOutput));
     
     // Perform the installation
-    EXPECT_THAT(mockWrapper.installPackage(packagePath, volumePath), ::testing::IsTrue());
+    EXPECT_THAT(mockWrapper.installPackage(packagePath, {}, volumePath), ::testing::IsTrue());
 }
 
 // Test case for successful package installation
@@ -87,7 +87,7 @@ TEST_F(PkgUtilWrapperTest, UpgradePackage_Success) {
     EXPECT_CALL(mockWrapper, executeCommand(expectedCommand)).WillOnce(::testing::Return(expectedOutput));
 
     // Perform the installation
-    EXPECT_THAT(mockWrapper.installPackage(packagePath, volumePath), ::testing::IsTrue());
+    EXPECT_THAT(mockWrapper.installPackage(packagePath, {}, volumePath), ::testing::IsTrue());
 }
 
 // Test case for failed package installation
@@ -103,7 +103,7 @@ TEST_F(PkgUtilWrapperTest, InstallPackage_Failure) {
     EXPECT_CALL(mockWrapper, executeCommand(expectedCommand)).WillOnce(::testing::Return(expectedOutput));
     
     // Perform the installation
-    EXPECT_THAT(mockWrapper.installPackage(packagePath, volumePath), ::testing::IsFalse());
+    EXPECT_THAT(mockWrapper.installPackage(packagePath, {}, volumePath), ::testing::IsFalse());
 }
 
 // Test case for successful package uninstallation

@@ -38,7 +38,7 @@ public:
      * @param volumePath The path to the volume where the package should be installed (optional).
      * @return True if the installation was successful, false otherwise.
      */
-    bool installPackage(const std::string& packagePath, const std::string& volumePath = std::string()) const override;
+    bool installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions = {}, const std::string& volumePath = std::string()) const override;
     
     /**
      * @brief Uninstalls a package with the specified identifier.

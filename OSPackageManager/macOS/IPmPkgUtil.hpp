@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 #include <filesystem>
 
 struct PmPackageInfo {
@@ -22,7 +23,7 @@ public:
     virtual std::vector<std::string> listPackages(const std::string& volumePath = std::string()) const = 0;
     virtual PmPackageInfo getPackageInfo(const std::string& packageIdentifier, const std::string& volumePath = std::string()) const = 0;
     virtual std::vector<std::string> listPackageFiles(const std::string& packageIdentifier, const std::string& volumePath = std::string()) const = 0;
-    virtual bool installPackage(const std::string& packagePath, const std::string& volumePath = std::string()) const = 0;
+    virtual bool installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions = {}, const std::string& volumePath = std::string()) const = 0;
     virtual bool uninstallPackage(const std::string& packageIdentifier) const = 0;
     virtual bool verifyPackageCodesign(const std::filesystem::path& packagePath, std::string& signer ) const = 0;
 };
