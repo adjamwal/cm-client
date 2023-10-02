@@ -15,6 +15,6 @@
   "crashpad": {
     "pruneAge": 3,
     "pruneDbSize": 50,
-    "uploadUrl": "https://crash.qa1.immunet.com/crash"
+    "uploadUrl": "https://crash1-int.qa1.immunet.com/crash"
   }
 }
