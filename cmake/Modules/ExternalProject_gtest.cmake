@@ -38,8 +38,8 @@ if(NOT TARGET "third-party-${component_name}")
         set(GTEST_LIBS
             gtest_main
             gtest
-            gmock_maind
-            gmockd
+            gmock_main
+            gmock
         )
     endif()
 endif()
