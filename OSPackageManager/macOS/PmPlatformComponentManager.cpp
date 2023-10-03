@@ -48,6 +48,18 @@ std::map<std::string, int> sanitizeParamsXml (const std::string& args)
     
     return resultArg;
 };
+
+bool containsRebootInstruction(const std::string& sArgs)
+{
+    static const std::vector<std::string> vRebootRestart = {"SR=true", "FR=true"};
+    for (auto& arg: vRebootRestart) {
+        if (std::string::npos != sArgs.find_first_of(arg))
+            return true;
+    }
+        
+    return  false;
+}
+
 }
 
 PmPlatformComponentManager::PmPlatformComponentManager(
@@ -128,13 +140,13 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
 
 IPmPlatformComponentManager::PmInstallResult PmPlatformComponentManager::UpdateComponent(const PmComponent &package, std::string &error)
 {
-    (void) package;
     (void) error;
+    const bool bRebootReq = containsRebootInstruction(package.installerArgs);
 
     IPmPlatformComponentManager::PmInstallResult result = {
         .pmResult = InstallComponent(package) == 0
-                    ? IPmPlatformComponentManager::PM_INSTALL_SUCCESS
-                    : IPmPlatformComponentManager::PM_INSTALL_FAILURE,
+                    ? (bRebootReq ? IPmPlatformComponentManager::PM_INSTALL_SUCCESS_REBOOT_REQUIRED: IPmPlatformComponentManager::PM_INSTALL_SUCCESS)
+                    : (bRebootReq ? IPmPlatformComponentManager::PM_INSTALL_FAILURE_REBOOT_REQUIRED :IPmPlatformComponentManager::PM_INSTALL_FAILURE),
         .platformResult = 0
     };
 

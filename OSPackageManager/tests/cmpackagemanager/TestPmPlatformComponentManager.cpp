@@ -282,3 +282,79 @@ TEST_F(PmPlatformComponentManagerTest, InstallComponent_InstallFailed_Negative) 
     // Verify the result and expectations
     EXPECT_EQ(result, -1);
 }
+
+// Test case for InstallComponent via Update
+TEST_F(PmPlatformComponentManagerTest, UpdateComponentRebootSR) {
+    // Prepare test data
+    const std::string volumePath = "/Volumes/MountedVolume";
+    PmComponent package;
+    package.downloadedInstallerPath = "/path/to/package.pkg";
+    package.signerName = "TestSigner";
+    package.installerType = "pkg";
+    package.installerArgs = "SR=true";
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.pkgUtil_,
+                installPackage(
+                   package.downloadedInstallerPath.u8string(),
+                   _, _
+                ))
+        .WillOnce(Return(true));
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.fileUtils_,
+                PathIsValid(
+                   package.downloadedInstallerPath
+                ))
+        .WillOnce(Return(true));
+
+    // Set up expectations on the codesignVerifier
+    EXPECT_CALL(*mockCodesignVerifier_,
+                PackageVerify(
+                    package.downloadedInstallerPath,
+                    package.signerName)
+                )
+        .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
+    
+        // Invoke the function under test
+    std::string errOut;
+    ASSERT_EQ(manager_->UpdateComponent(package, errOut).pmResult, IPmPlatformComponentManager::PM_INSTALL_SUCCESS_REBOOT_REQUIRED);
+}
+
+// Test case for InstallComponent via Update
+TEST_F(PmPlatformComponentManagerTest, UpdateComponentRebootFR) {
+    // Prepare test data
+    const std::string volumePath = "/Volumes/MountedVolume";
+    PmComponent package;
+    package.downloadedInstallerPath = "/path/to/package.pkg";
+    package.signerName = "TestSigner";
+    package.installerType = "pkg";
+    package.installerArgs = "FR=true";
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.pkgUtil_,
+                installPackage(
+                   package.downloadedInstallerPath.u8string(),
+                   _, _
+                ))
+        .WillOnce(Return(true));
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.fileUtils_,
+                PathIsValid(
+                   package.downloadedInstallerPath
+                ))
+        .WillOnce(Return(true));
+
+    // Set up expectations on the codesignVerifier
+    EXPECT_CALL(*mockCodesignVerifier_,
+                PackageVerify(
+                    package.downloadedInstallerPath,
+                    package.signerName)
+                )
+        .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
+    
+        // Invoke the function under test
+    std::string errOut;
+    ASSERT_EQ(manager_->UpdateComponent(package, errOut).pmResult, IPmPlatformComponentManager::PM_INSTALL_SUCCESS_REBOOT_REQUIRED);
+}
