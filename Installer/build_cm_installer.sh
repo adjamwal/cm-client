@@ -55,6 +55,7 @@ CRASHPAD_TARGET_BINARY="cmreport"
 UNINSTALL_SCRIPT="cm_uninstall.sh"
 CM_PLIST="com.cisco.secureclient.cloudmanagement.plist"
 CM_DISTRIBUTION="cm_distribution.xml"
+RELEASE_BOOTSTRAP_FILE="bs_release.json"
 BOOTSTRAP_FILE="bs.json"
 CONFIG_FILE="cm_config.json"
 
@@ -248,10 +249,19 @@ create_dmg_from_pkg_and_config()
 {
     rm -f "${CM_DMG}"
 
-    ./dmg_resources/mkdmg.sh "${CM_DMG}" \
-             "${CONFIG_RELATIVE_PATH}/${BOOTSTRAP_FILE}" \
-             "${CONFIG_RELATIVE_PATH}/${CONFIG_FILE}" \
-             "${CM_INSTALLER}"
+    #
+    # Use the Jenkins release bootstrap file if one was generated
+    if [ -f "${RELEASE_BOOTSTRAP_FILE}" ]; then
+        ./dmg_resources/mkdmg.sh "${CM_DMG}" \
+                 "${CONFIG_RELATIVE_PATH}/${RELEASE_BOOTSTRAP_FILE}" \
+                 "${CONFIG_RELATIVE_PATH}/${CONFIG_FILE}" \
+                 "${CM_INSTALLER}"
+    else
+        ./dmg_resources/mkdmg.sh "${CM_DMG}" \
+                 "${CONFIG_RELATIVE_PATH}/${BOOTSTRAP_FILE}" \
+                 "${CONFIG_RELATIVE_PATH}/${CONFIG_FILE}" \
+                 "${CM_INSTALLER}"
+    fi
 
     rm -f "${CM_INSTALLER}"
 }
