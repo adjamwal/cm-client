@@ -1,6 +1,8 @@
 #!/bin/sh -e
 # Copyright 2022 Cisco Systems, Inc.
 
+# set -x
+
 SYSTEM="$(uname -s)"
 clean=false
 development_only=false
@@ -87,6 +89,11 @@ if [ "${release}" = "true"  ]; then
 fi
 if [ "${BUILD_SUBMODULES_FROM_SRC}" = "YES" ]; then
     CMAKE_EXTRA_ARGS="-DBUILD_ALL_THIRD_PARTY:BOOL=ON ${CMAKE_EXTRA_ARGS}"
+fi
+
+if [ "${development_only}" = "true" ]; then
+    CMAKE_EXTRA_ARGS="-DBUILD_WITH_HTTP_ENABLED:BOOL=ON ${CMAKE_EXTRA_ARGS}"
+    CMAKE_EXTRA_ARGS="-DBUILD_PACKAGE_MANAGER_THIRD_PARTY:BOOL=ON ${CMAKE_EXTRA_ARGS}"
 fi
 
 if [ "${sign}" = "true" ]; then

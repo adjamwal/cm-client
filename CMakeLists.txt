@@ -38,16 +38,19 @@ endif()
 # remove ZERO_CHECK target from xcode
 set(CMAKE_SUPPRESS_REGENERATION true)
 
+set(BUILD_WITH_HTTP_ENABLED ${BUILD_WITH_HTTP_ENABLED} CACHE STRING INTERNAL FORCE)
+
 if(DEFINED BUILD_ALL_THIRD_PARTY AND BUILD_ALL_THIRD_PARTY)
     set(BUILD_ALL_THIRD_PARTY true)
 else()
     set(BUILD_ALL_THIRD_PARTY false)
 endif()
+
 # Change manually to force an individual library to be built instead
-set(BUILD_PACKAGE_MANAGER_THIRD_PARTY false)
-set(BUILD_ENDPOINT_IDENTITY_THIRD_PARTY false)
-set(BUILD_CRASHPAD false)
-set(BUILD_PROXY_DISCOVERY_THIRD_PARTY false)
+option(BUILD_PACKAGE_MANAGER_THIRD_PARTY "" OFF)
+option(BUILD_ENDPOINT_IDENTITY_THIRD_PARTY "" OFF)
+option(BUILD_CRASHPAD "" OFF)
+option(BUILD_PROXY_DISCOVERY_THIRD_PARTY "" OFF)
 
 # config.h checks
 include(ConfigureChecks.cmake)
@@ -74,6 +77,13 @@ include(ExternalProject_gtest)
 include(ExternalProject_ProxyDiscovery-Mac)
 include(ExternalProject_PackageManager)
 include(ExternalProject_EndpointIdentity)
+
+# Check if BUILD_WITH_HTTP_ENABLED is set to ON in the PackageManager
+if(BUILD_WITH_HTTP_ENABLED)
+    message(STATUS "Building with HTTP support")
+else()
+    message(STATUS "Building without HTTP support")
+endif()
 
 ##
 ## util library
