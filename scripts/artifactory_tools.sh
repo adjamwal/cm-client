@@ -474,7 +474,7 @@ get_artifactory_download_url(){
 
   # Examine the response to locate the Artifactory download URL for the item
   # that matched the search key
-  local regex_for_download_url="(\"uri\" : \"https://engci-maven.cisco.com/artifactory/api/storage)/(ampcx-generic-thirdparty/[^\"/]+)/([^\"]+)\""
+  local regex_for_download_url="(\"uri\" : \"https://engci-maven.*.cisco.com/artifactory/api/storage)/(ampcx-generic-thirdparty/[^\"/]+)/([^\"]+)\""
   if [[ ${response} =~ ${regex_for_download_url} ]]; then
     local artifact_repo_dir="${BASH_REMATCH[2]}"
     local artifact_filename="${BASH_REMATCH[3]}"
