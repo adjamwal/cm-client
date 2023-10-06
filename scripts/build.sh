@@ -92,8 +92,7 @@ if [ "${BUILD_SUBMODULES_FROM_SRC}" = "YES" ]; then
 fi
 
 if [ "${development_only}" = "true" ]; then
-    CMAKE_EXTRA_ARGS="-DBUILD_WITH_HTTP_ENABLED:BOOL=ON ${CMAKE_EXTRA_ARGS}"
-    CMAKE_EXTRA_ARGS="-DBUILD_PACKAGE_MANAGER_THIRD_PARTY:BOOL=ON ${CMAKE_EXTRA_ARGS}"
+    CMAKE_EXTRA_ARGS="-DBUILD_DEV_ONLY:BOOL=ON ${CMAKE_EXTRA_ARGS}"
 fi
 
 if [ "${sign}" = "true" ]; then
