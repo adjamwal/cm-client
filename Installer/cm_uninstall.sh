@@ -8,6 +8,9 @@ fi
 CM_DIR="/opt/cisco/secureclient/cloudmanagement"
 BIN_DIR="${CM_DIR}/bin"
 CM_BINARY="csccloudmanagement"
+CMID_BINARY="csc_cmid"
+PM_BINARY="cmpackagemanager"
+CMREPORT_BINARY="cmreport"
 LAUNCHD_DIR="/Library/LaunchDaemons"
 LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
 CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
@@ -20,6 +23,27 @@ launchctl bootout system ${LAUNCHD_DIR}/${LAUNCHD_FILE}
 
 # ensure that CM is not running
 CMPROC=`ps -A -o pid,command | grep '(${BIN_DIR}/${CM_BINARY})' | egrep -v 'grep|cm_uninstall' | awk '{print $1}'`
+if [ ! "x${CMPROC}" = "x" ] ; then
+    echo Killing `ps -A -o pid,command -p ${CMPROC} | grep ${CMPROC} | egrep -v 'ps|grep'`
+    kill -KILL ${CMPROC}
+fi
+
+# ensure that CP is not running
+CMPROC=`ps -A -o pid,command | grep '(${BIN_DIR}/${CMREPORT_BINARY})' | egrep -v 'grep|cm_uninstall' | awk '{print $1}'`
+if [ ! "x${CMPROC}" = "x" ] ; then
+    echo Killing `ps -A -o pid,command -p ${CMPROC} | grep ${CMPROC} | egrep -v 'ps|grep'`
+    kill -KILL ${CMPROC}
+fi
+
+# ensure that PM is not running
+CMPROC=`ps -A -o pid,command | grep '(${BIN_DIR}/${PM_BINARY})' | egrep -v 'grep|cm_uninstall' | awk '{print $1}'`
+if [ ! "x${CMPROC}" = "x" ] ; then
+    echo Killing `ps -A -o pid,command -p ${CMPROC} | grep ${CMPROC} | egrep -v 'ps|grep'`
+    kill -KILL ${CMPROC}
+fi
+
+# ensure that CMID is not running
+CMPROC=`ps -A -o pid,command | grep '(${BIN_DIR}/${CMID_BINARY})' | egrep -v 'grep|cm_uninstall' | awk '{print $1}'`
 if [ ! "x${CMPROC}" = "x" ] ; then
     echo Killing `ps -A -o pid,command -p ${CMPROC} | grep ${CMPROC} | egrep -v 'ps|grep'`
     kill -KILL ${CMPROC}
