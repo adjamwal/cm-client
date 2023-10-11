@@ -78,6 +78,7 @@ pipeline {
           withCredentials([string(credentialsId: 'ARTIFACTORY_TOKEN', variable: 'ARTIFACTORY_TOKEN')]) {
             dir('cm-client/Staging') {
               sh '../scripts/jenkins/artifactory_upload.sh "cisco-secure-client-macos-cloudmanagement-${CM_BUILD_VER}.pkg"'
+              sh '../scripts/jenkins/artifactory_upload.sh "cisco-secure-client-macos-cloudmanagement-${CM_BUILD_VER}-symbols.tgz"'
               sh '../scripts/jenkins/artifactory_upload.sh "cisco-secure-client-macos-cloudmanagement-testpackage1-${CM_BUILD_VER}.pkg"'
             }
           }

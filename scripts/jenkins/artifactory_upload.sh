@@ -1,11 +1,13 @@
 /bin/bash -e
 #
 # Usage: artifactory_upload.sh cisco-secure-client-macos-cloudmanagement-1.2.3.4.pkg
+# Usage: artifactory_upload.sh cisco-secure-client-macos-cloudmanagement-1.2.3.4-symbols.tgz
 
 ARTIFACTORY_UPLOAD_URL=https://engci-maven.cisco.com/artifactory
 
 REL_FILENAME=$1
-SEARCH_KEY=${REL_FILENAME%.pkg}
+# SEARCH_KEY will get everything after last dot appears
+SEARCH_KEY=${REL_FILENAME%.*}
 
 if [ "${ARTIFACTORY_UPLOAD}" != "YES" ]; then
   echo "NOTE: Skipping Artifactory upload..."
