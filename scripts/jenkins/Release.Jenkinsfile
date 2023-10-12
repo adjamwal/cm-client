@@ -63,6 +63,7 @@ pipeline {
                          passwordVariable: 'NOTARIZATION_PASS', usernameVariable: 'NOTARIZATION_USER') ]) {
           dir('cm-client') {
             withEnv(['PATH+=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/build/go/bin:/Users/build/bin']) {
+                sh 'security -v unlock-keychain -p "$BUILD_PASS"'
                 sh 'scripts/jenkins/create_bs_json.sh "$CM_BUSINESS_ID" "$CM_EVENT_URL" "$CM_IDENTIFY_URL" "$CM_INSTALLER_KEY" client/config/bs_release.json'
                 sh 'scripts/build.sh -r'
             }
