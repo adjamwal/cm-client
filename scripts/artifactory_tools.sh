@@ -51,6 +51,7 @@ echoerr() {
 get_prereq_dir(){
   local prereq="${1}"
   local prereq_dirs=(
+    "ProxyDiscovery-Mac:ProxyDiscovery-Mac"
     "EndpointIdentity:EndpointIdentity"
     "PackageManager:PackageManager"
     "ciscossl:third-party/ciscossl"
@@ -201,6 +202,7 @@ get_exclude_patterns(){
     "PackageManager:*.la"
     "EndpointIdentity:*.la"
     "crashpad:"
+    "ProxyDiscovery-Mac:"
   )
   for exclude_pattern_relation in "${exclude_pattern_relations[@]}" ; do
     local component="${exclude_pattern_relation%%:*}"
