@@ -28,7 +28,7 @@ constexpr std::string_view kCrashpadPath{"/opt/cisco/secureclient/cloudmanagemen
 constexpr std::string_view kNoRateLimit{"--no-rate-limit"};
 constexpr std::string_view kNoUploadGZip{"--no-upload-gzip"};
 constexpr std::string_view kMinidumpFormat{"minidump"};
-constexpr std::string_view kCrashPadExecutable{"crashpad_handler"};
+constexpr std::string_view kCrashPadExecutable{"cmreport_handler"};
 constexpr std::string_view kSecureClientCloudManagementMacClient{"sccm_mac"};
 constexpr uint32_t kPruneDays{14};
 constexpr size_t kDatabaseDefaultPruneSizeKB{50000};

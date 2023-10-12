@@ -50,8 +50,7 @@ CM_BINARY="csccloudmanagement"
 CMID_BINARY="csc_cmid"
 CMID_LIBRARY="libcmidapi.dylib"
 PM_BINARY="cmpackagemanager"
-CRASHPAD_BINARY="crashpad_handler"
-CRASHPAD_TARGET_BINARY="cmreport"
+CRASHPAD_BINARY="cmreport_handler"
 UNINSTALL_SCRIPT="cm_uninstall.sh"
 CM_PLIST="com.cisco.secureclient.cloudmanagement.plist"
 CM_DISTRIBUTION="cm_distribution.xml"
@@ -184,14 +183,11 @@ copy_and_prepare_staging()
     done
     cp -f "${STAGING_EXPORT_LIB}/${CMID_LIBRARY}" "${PAYLOAD_STAGING}/${LIB_DIR}"
 
-    # Rename crashpad binary into the target naming
-    mv "${PAYLOAD_STAGING}${BIN_DIR}/${CRASHPAD_BINARY}" "${PAYLOAD_STAGING}${BIN_DIR}/${CRASHPAD_TARGET_BINARY}"
-
     if [ -n "${DEV_ID_APP_CERT}" ]; then
         echo "codesigning ${CMID_LIBRARY} with ${DEV_ID_APP_CERT}"
         codesign --timestamp --verbose --force --deep --options runtime --sign "${DEV_ID_APP_CERT}" "${PAYLOAD_STAGING}/${LIB_DIR}/${CMID_LIBRARY}"
         echo "codesigning cmreport with ${DEV_ID_APP_CERT}"
-        codesign --timestamp --verbose --force --deep --options runtime --sign "${DEV_ID_APP_CERT}" "${PAYLOAD_STAGING}/${BIN_DIR}/cmreport"
+        codesign --timestamp --verbose --force --deep --options runtime --sign "${DEV_ID_APP_CERT}" "${PAYLOAD_STAGING}/${BIN_DIR}/${CRASHPAD_BINARY}"
     fi
 
     cp -f "${UNINSTALL_SCRIPT}" "${PAYLOAD_STAGING}/${BIN_DIR}"
