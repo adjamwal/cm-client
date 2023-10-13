@@ -9,15 +9,17 @@ set(component_install_prefix "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${componen
 
 if(NOT BUILD_ALL_THIRD_PARTY)
     download_component(${component_name} ${component_dst_dir})
-    
-    # Added here because download_component() does not do a copy_exports step
-    ExternalProject_Add_Step(
-        third-party-${component_name}
-        copy_exports
-        COMMENT "-- Nothing to do adding copy_exports for post_install_symlink_fix"
-        COMMAND ${COMMAND} echo "nil"
-        DEPENDEES install
-    )
+
+    if(TARGET "third-party-${component_name}")
+        # Added here because download_component() does not do a copy_exports step
+        ExternalProject_Add_Step(
+            third-party-${component_name}
+            copy_exports
+            COMMENT "-- Nothing to do adding copy_exports for post_install_symlink_fix"
+            COMMAND ${COMMAND} echo "nil"
+            DEPENDEES install
+        )
+    endif()
 endif()
 
 if(NOT TARGET "third-party-${component_name}")
