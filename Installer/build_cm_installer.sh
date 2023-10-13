@@ -173,7 +173,7 @@ copy_and_prepare_staging()
 
     for exe in "${CM_BINARIES[@]}"; do
         cp -f "${STAGING_EXPORT_BIN}/${exe}" "${PAYLOAD_STAGING}${BIN_DIR}"
-        if [ "${exe}" = "${PM_BINARY}" ]; then
+        if [ "${exe}" = "${PM_BINARY}" ] || [ "${exe}" = "${CM_BINARY}" ]; then
             install_name_tool -change "@rpath/${CMID_LIBRARY}" "@executable_path/../lib/${CMID_LIBRARY}" "${PAYLOAD_STAGING}/${BIN_DIR}/${exe}"
         fi
         if [ -n "${DEV_ID_APP_CERT}" ]; then
