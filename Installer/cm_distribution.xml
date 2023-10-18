@@ -20,10 +20,13 @@
     <!-- Define each choice above -->
     <choice id="choice_cm" visible="true" title="CM" description="Installs the Cloud Management" selected="true">
         <pkg-ref id="com.cisco.secureclient.cloudmanagement"/>
+        <pkg-ref id="com.cisco.secureclient.cloudmanagement-uninstaller" auth="Root"/>
     </choice>
 
     <!-- List all component packages -->
     <pkg-ref id="com.cisco.secureclient.cloudmanagement" auth="root">cisco-secure-client-macos-cloudmanagement.pkg</pkg-ref>
+    <pkg-ref id="com.cisco.secureclient.cloudmanagement-uninstaller" auth="root">cisco-secure-client-macos-cloudmanagement-uninstaller.pkg</pkg-ref>
+        
     <volume-check script='VolumeCheck()'/>
     <script>
     function VolumeCheck()

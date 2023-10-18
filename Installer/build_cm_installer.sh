@@ -74,6 +74,9 @@ STAGING_EXPORT_LIB="${STAGING_EXPORT}/lib"
 SCRIPTS_STAGING="cm_pkg_scripts"
 PAYLOAD_STAGING="cm_pkg_payload"
 
+UNINSTALL_PAYLOAD_STAGING="cm_uninstall_pkg_payload"
+UNINSTALL_APP_DIR="/Applications/Cisco/Cloud Management"
+
 CONFIG_RELATIVE_PATH="../ConfigShared/config"
 
 DSYM_STAGING="${CM_PREFIX}-${VER}-symbols"
@@ -98,6 +101,14 @@ clear_and_recreate_payload_staging()
     mkdir -p "${PAYLOAD_STAGING}${BIN_DIR}"
     mkdir -p "${PAYLOAD_STAGING}${CONFIG_DIR}"
     mkdir -p "${PAYLOAD_STAGING}${LAUNCHD_DIR}"
+}
+
+clear_and_recreate_uninstall_payload_staging()
+{
+    echo "creating CM uninstaller package Payload Staging Area"
+
+    rm -rf "${UNINSTALL_PAYLOAD_STAGING}"
+    mkdir -p "${UNINSTALL_PAYLOAD_STAGING}${UNINSTALL_APP_DIR}"
 }
 
 strip_and_archive_symbols()
@@ -200,7 +211,7 @@ copy_and_prepare_staging()
     chmod 744 "${PAYLOAD_STAGING}/${BIN_DIR}/${UNINSTALL_SCRIPT}"
 }
 
-create_pkg_from_staging()
+create_installer_from_staging()
 {
     rm -fr "${CM_PKG_PATH}"
     mkdir -p "${CM_PKG_PATH}"
@@ -212,6 +223,43 @@ create_pkg_from_staging()
                 --install-location "/" \
                 --ownership recommended \
                 "${CM_PKG}"
+}
+
+create_uninstaller_from_staging() {
+
+    clear_and_recreate_uninstall_payload_staging
+
+    # Define variables for the uninstall package
+    UNINSTALL_PACKAGE_ID="com.cisco.secureclient.cloudmanagement-uninstaller"
+    UNINSTALL_PKG_NAME="cisco-secure-client-macos-cloudmanagement-uninstaller.pkg"
+    UNINSTALL_PKG="${CM_PKG_PATH}/${UNINSTALL_PKG_NAME}"
+    UNINSTALL_BUNDLE="Uninstall CloudManagement.app"
+    
+    # Copy the cm_uninstall bundle to the new staging area
+    cp -R "${STAGING_EXPORT_BIN}/${UNINSTALL_BUNDLE}" "${UNINSTALL_PAYLOAD_STAGING}${UNINSTALL_APP_DIR}"
+
+    # Set the necessary permissions for the uninstall bundle
+    chmod 755 "${UNINSTALL_PAYLOAD_STAGING}${UNINSTALL_APP_DIR}/${UNINSTALL_BUNDLE}"
+
+    if [ -n "${DEV_ID_APP_CERT}" ]; then
+        echo "codesigning Uninstall CloudManagement with ${DEV_ID_APP_CERT}"
+	codesign --timestamp --verbose --force --deep --options runtime --sign "${DEV_ID_APP_CERT}" "${UNINSTALL_PAYLOAD_STAGING}${UNINSTALL_APP_DIR}/${UNINSTALL_BUNDLE}"
+    fi
+
+    # Create the uninstall package
+    pkgbuild    --root "${UNINSTALL_PAYLOAD_STAGING}" \
+                --identifier "${UNINSTALL_PACKAGE_ID}" \
+                --version "${VER}" \
+                --install-location "/" \
+                --ownership recommended \
+                "${UNINSTALL_PKG}"
+}
+
+create_pkg_from_staging() {
+
+    create_installer_from_staging
+    
+    create_uninstaller_from_staging
 
     productbuild    --distribution "${CM_DISTRIBUTION}" \
                     --package-path "${CM_PKG_PATH}" \
@@ -219,7 +267,9 @@ create_pkg_from_staging()
                     "${CM_PKG_UNSIGNED}"
 
     rm -rf "${PAYLOAD_STAGING}"
+    rm -rf "${UNINSTALL_PAYLOAD_STAGING}"
     rm -rf "${CM_PKG_PATH}"
+    
     # Resides in CM_PKG_PATH (should be removed by line above)
     #rm -f "${CM_PKG}"
 
@@ -261,6 +311,7 @@ create_dmg_from_pkg_and_config()
 
     rm -f "${CM_INSTALLER}"
 }
+
 
 #
 # ---------------------------------------
