@@ -9,6 +9,8 @@
 #                               of signed pkg files
 #
 
+MAX_WAIT_TIME=28800
+
 #
 # Log an error to stderr and quit.
 #
@@ -31,40 +33,6 @@ function log_msg() {
 }
 
 #
-# Wait for notarization to complete.
-# Sleeps for 90 seconds, then polls for an update every 30 seconds. Function
-# will abort on error or exit on success.
-#
-# $1 - Notarization UUID to poll an update for
-#
-function wait_for_notarization_complete() {
-  local UUID="${1}"
-
-  # Time represented in seconds (8 hours)
-  local MAX_WAIT_TIME=28800
-  local TIME_WAITED=0
-
-  log_msg "UUID=${UUID}"
-
-  # Wait for the UUID to update on Apple's side before getting notarization info
-  sleep 90
-  TIME_WAITED=90
-
-  while true; do
-    STATUS=$(xcrun altool --notarization-info "${UUID}" -u "${NOTARIZATION_USER}" -p "${NOTARIZATION_PASS}" 2>&1)
-    if [[ ${STATUS} = *"Status: success"* ]]; then log_msg "Notarization Passed"; break; fi
-    if [[ ${STATUS} = *"Status: invalid"* ]]; then log_error_and_die "${STATUS}"; fi
-    if [ ${TIME_WAITED} -ge ${MAX_WAIT_TIME} ]; then log_error_and_die "Notarization Timed out, waited ${MAX_WAIT_TIME}s"; fi
-
-    log_msg "Waiting for notarization confirmation, waited ${TIME_WAITED}s, remaining $((MAX_WAIT_TIME - TIME_WAITED))s for ${UUID}..."
-
-    TIME_WAITED=$((TIME_WAITED + 30))
-    sleep 30
-  done
-  log_msg "Notarization completed, elapsed time ${TIME_WAITED}s"
-}
-
-#
 # Notarize a given installer pkg
 #
 # $1 - Notarization UUID to poll an update for
@@ -76,12 +44,15 @@ function notarize_pkg_in_dir() {
   log_msg "Notarize pkg with args $*"
 
   log_msg "Uploading ${SIGNED_PKG} to be notarized..."
-  STATUS=$( xcrun altool --notarize-app -f "${SIGNED_PKG}" --primary-bundle-id "${PRIMARY_BUNDLE_ID}" --asc-provider Cisco -u "${NOTARIZATION_USER}" -p "${NOTARIZATION_PASS}" 2>&1)
+  STATUS=$(xcrun notarytool submit --wait --timeout "${MAX_WAIT_TIME}" --apple-id "${NOTARIZATION_USER}" --password "${NOTARIZATION_PASS}" --team-id "${TEAM_ID}" "${SIGNED_PKG}" 2>&1)
   RETVAL=$?
+  
+  if [[ ${STATUS} = *"Timeout"* ]]; then log_error_and_die "Notarization Timed out, waited ${MAX_WAIT_TIME}s"; fi
 
   if [ $RETVAL -eq 0 ]; then
-    wait_for_notarization_complete ${STATUS#*RequestUUID = }
-
+    if [[ ${STATUS} = *"status: Accepted"* ]]; then log_msg "Notarization Passed"; fi
+    if [[ ${STATUS} = *"status: Invalid"* ]]; then log_error_and_die "${STATUS}"; fi
+     
     STATUS=$( xcrun stapler staple "${SIGNED_PKG}" 2>&1)
     RETVAL=$?
     if [ $RETVAL -eq 0 ]; then
