@@ -7,6 +7,7 @@
 #pragma once
 
 #include "common/macOS/FileWatcher.hpp"
+#include "common/macOS/ProxyWatcher.hpp"
 #include "Config.hpp"
 
 #include <atomic>
@@ -38,9 +39,10 @@ private:
     std::unique_ptr<PMLoader> pmLoader_;
     
     std::unique_ptr<FileWatcher> fileWatcher_;
+    std::unique_ptr<ProxyWatcher> proxyWatcher_;
+
     std::atomic<bool> isRunning_;
     std::thread task_;
-    std::shared_ptr<util::ThreadTimer> pProxyTimer_;
 
     void mainTask();
     void configCallback();

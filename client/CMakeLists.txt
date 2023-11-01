@@ -18,6 +18,8 @@ set(CM_CLIENT_SRCS
     Logger/CMLogger.cpp
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
+    ${cm-client_SOURCE_DIR}/common/macOS/ProxyWatcher.cpp
+    ${cm-client_SOURCE_DIR}/common/macOS/ProxyWatcher.hpp
     crashpad/CrashpadTuner.h
     crashpad/CrashpadTuner.cpp
 )
