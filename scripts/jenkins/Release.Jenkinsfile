@@ -26,6 +26,7 @@ pipeline {
           echo "VERSION_BUILD: $VERSION_BUILD"
           echo "CM_CLIENT_OWNER: $CM_CLIENT_OWNER"
           echo "CM_CLIENT_TAG: $CM_CLIENT_TAG"
+          echo "COVERITY_ENABLE: $COVERITY_ENABLE"
         }
       }
     }
@@ -60,7 +61,10 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'mac-build-slave-10.12-xcode9-build',\
                          passwordVariable: 'BUILD_PASS', usernameVariable: 'BUILD_USER'),\
                          usernamePassword(credentialsId: 'notarization_ampcxi_credentials',\
-                         passwordVariable: 'NOTARIZATION_PASS', usernameVariable: 'NOTARIZATION_USER') ]) {
+                         passwordVariable: 'NOTARIZATION_PASS', usernameVariable: 'NOTARIZATION_USER'),\
+                         usernamePassword(credentialsId: 'cm-engit-cov-platform',\
+                         passwordVariable: 'COV_PASSWORD', usernameVariable: 'COV_USER')
+                         ]) {
           dir('cm-client') {
             withEnv(['PATH+=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/build/go/bin:/Users/build/bin']) {
                 sh 'security -v unlock-keychain -p "$BUILD_PASS"'
@@ -112,6 +116,41 @@ pipeline {
         }
         dir(env.ARCHIVE_NAME) {
           archiveArtifacts artifacts: '**'
+        }
+      }
+    }
+    stage('Coverity') {
+      when {
+        expression {
+          env.COVERITY_ENABLE == 'true'
+        }
+      }
+      agent {
+        node {
+          label BUILD_SLAVE
+        }
+      }
+      steps {
+        cleanWs()
+        checkout([$class: 'GitSCM',\
+          branches: [[name: '*/$CM_CLIENT_TAG']],\
+          doGenerateSubmoduleConfigurations: false,\
+          extensions: [[$class: 'SubmoduleOption',\
+            disableSubmodules: false,\
+            parentCredentials: true,\
+            recursiveSubmodules: true, reference: '',\
+            trackingSubmodules: false],\
+            [$class: 'RelativeTargetDirectory',\
+              relativeTargetDir: 'cm-client']],\
+          submoduleCfg: [],\
+          userRemoteConfigs: scm.userRemoteConfigs])
+
+        withEnv(['PATH+=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/build/go/bin:/Users/build/bin']) {
+          withCredentials([usernamePassword(credentialsId: 'cm-engit-cov-platform', usernameVariable: 'COV_USER', passwordVariable: 'COV_PASSWORD')]) {
+            dir('cm-client') {
+              sh 'scripts/jenkins/ci_cov_analyze.sh'
+            }
+          }
         }
       }
     }
