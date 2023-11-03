@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configure xmlns="http://schemas.xmlsoap.org/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://schemas.xmlsoap.org/encoding/ ConfigXMLSchema.xsd">
+  <fileGroup treeRootName="Cisco Secure Client" directoryName="Cisco Secure Client\Cloud Management">
+  <title>Cloud Management</title>
+  <file id="csc-cm-logs" directoryName="Logs">
+    <default>true</default>
+    <description>Cloud Management logs</description>
+    <gui>
+      <label>_tr("Cloud Management logs")</label>
+      <file_type>log</file_type>
+    </gui>
+    <dart>
+      <required>false</required>
+      <os opsys="win">
+        <use_extern_action>
+          <action>
+            <regis64>HKEY_LOCAL_MACHINE\SOFTWARE\Cisco\SecureClient\Cloud Management\CMSERVICE\Path</regis64>
+            <args replace_args="true">csc_cmdt.exe -u -d "[BUNDLE_DIR]"</args>
+            <admin_args replace_args="true">csc_cmdt.exe -d "[BUNDLE_DIR]"</admin_args>
+            <clear_log apply="false"></clear_log>
+            <temp_out>%TEMP%\CM_Diagnostics.zip</temp_out>
+          </action>
+        </use_extern_action>
+      </os>
+      <os opsys="mac">
+        <file_copy_action>
+          <action>
+            <loc>/Library/Logs/Cisco/SecureClient/CloudManagement/*</loc>
+            <clear_log apply="false"/>
+          </action>
+        </file_copy_action>
+      </os>
+    </dart>
+  </file>
+  <file id="csc-cm-config" directoryName="CM Config">
+    <default>true</default>
+    <description>Cloud Management Config</description>
+    <gui>
+      <label>_tr("Cloud Management configuration")</label>
+      <file_type>log</file_type>
+    </gui>
+    <dart>
+      <required>false</required>
+      <os opsys="mac">
+        <file_copy_action>
+          <action>
+            <loc>/opt/cisco/secureclient/cloudmanagement/etc/bs.json</loc>
+            <clear_log apply="false"/>
+          </action>
+          <action>
+            <loc>/opt/cisco/secureclient/cloudmanagement/etc/cm_config.json</loc>
+            <clear_log apply="false"/>
+          </action>
+          <action>
+            <loc>/opt/cisco/secureclient/cloudmanagement/etc/cmidstore.json</loc>
+            <clear_log apply="false"/>
+          </action>
+        </file_copy_action>
+      </os>
+    </dart>
+  </file>
+  <file id="csc-cm-reports" directoryName="CM crash reports">
+    <default>true</default>
+    <description>All Cloud Management modules crash reports</description>
+    <gui>
+      <label>_tr("Cloud Management reports")</label>
+      <file_type>log</file_type>
+    </gui>
+    <dart>
+      <required>false</required>
+      <os opsys="mac">
+        <file_copy_action>
+          <action>
+            <loc>/Library/Logs/DiagnosticReports/csccloudmanagement-*</loc>
+            <clear_log apply="false"/>
+          </action>
+          <action>
+            <loc>/Library/Logs/DiagnosticReports/Retired/csccloudmanagement-*</loc>
+            <clear_log apply="false"/>
+          </action>
+          <action>
+            <loc>/Library/Logs/DiagnosticReports/cmpackagemanager-*</loc>
+            <clear_log apply="false"/>
+          </action>
+          <action>
+            <loc>/Library/Logs/DiagnosticReports/Retired/cmpackagemanager-*</loc>
+            <clear_log apply="false"/>
+          </action>
+          <action>
+            <loc>/Library/Logs/DiagnosticReports/csc_cmid-*</loc>
+            <clear_log apply="false"/>
+          </action>
+          <action>
+            <loc>/Library/Logs/DiagnosticReports/Retired/csc_cmid-*</loc>
+            <clear_log apply="false"/>
+          </action>
+          <action>
+            <loc>/Library/Logs/DiagnosticReports/cmreport_handler-*</loc>
+            <clear_log apply="false"/>
+          </action>
+          <action>
+            <loc>/Library/Logs/DiagnosticReports/Retired/cmreport_handler-*</loc>
+            <clear_log apply="false"/>
+          </action>
+        </file_copy_action>
+      </os>
+    </dart>
+  </file>
+  </fileGroup>
+</configure>

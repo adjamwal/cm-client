@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configure xmlns="http://schemas.xmlsoap.org/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://schemas.xmlsoap.org/encoding/ ConfigXMLSchema.xsd">
+    <fileGroup treeRootName="General Information" directoryName="General Information">
+    <title>General Information</title>
+    <file id="sysinfo">
+        <default>true</default>
+        <description>System Information</description>
+        <gui>
+            <label>_tr("System Information (extensive)")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <use_extern_action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>systeminfo.exe</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>MSInfo32.exe /nfo %TEMP%\msinfo.nfo</args>
+                        <clear_log apply="false"></clear_log>
+                        <temp_out>%TEMP%\msinfo.nfo</temp_out>
+                    </action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>netstat.exe -anob</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+            <os opsys="mac">
+                <use_extern_action>
+                    <action>
+                        <path>/usr/sbin</path>
+                        <args>system_profiler SPUniversalAccessDataType SPBluetoothDataType SPDisabledSoftwareDataType SPEthernetDataType SPFirewallDataType SPHardwareDataType SPInternationalDataType SPNetworkLocationDataType SPNetworkDataType SPConfigurationProfileDataType SPSmartCardsDataType SPThunderboltDataType SPUSBDataType SPDisplaysDataType SPAirPortDataType SPModemDataType SPExtensionsDataType SPStartupItemDataType SPInstallHistoryDataType SPLegacySoftwareDataType SPFrameworksDataType</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <args>kextstat</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>/usr/sbin</path>
+                        <args>lsof -n -i -P +c 20</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>/usr/bin</path>
+                        <args>systemextensionsctl list</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>/usr/bin</path>
+                        <args>sw_vers</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>/bin</path>
+                        <args>ps aux</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>/usr/bin</path>
+                        <args>profiles show -all</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <args>uname -a</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>/bin</path>
+                        <args>date</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>timestamp.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/bin</path>
+                        <args>hostname</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>hostname.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/bin</path>
+                        <args>df</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>disk.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/sbin</path>
+                        <args>mount</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>mounts.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/usr/sbin</path>
+                        <args>sysctl -a</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>sysctl.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/usr/sbin</path>
+                        <args>sysctl -n machdep.cpu.brand_string</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>cpuinfo.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/usr/sbin</path>
+                        <args>pkgutil --regexp --pkg-info com.cisco.*</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>pkgutil_info.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/usr/sbin</path>
+                        <args>pkgutil --regexp --export-plist com.cisco.*</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>pkgutil_export.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/usr/bin</path>
+                        <args>profiles status -type enrollment</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>mdm_info.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/usr/bin</path>
+                        <args>csrutil status</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>sip_status.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/usr/bin</path>
+                        <args>top -l 1 </args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>top-all.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>/usr/bin</path>
+                        <args>hostinfo</args>
+                        <clear_log apply="false"/>
+                        <stdout/>
+                        <temp_out>hostinfo.txt</temp_out>
+                    </action>
+                    <action>
+                      <path>/usr/bin</path>
+                      <args>last -20000</args>
+                      <clear_log apply="false"/>
+                      <stdout/>
+                      <temp_out>last.txt</temp_out>
+                    </action>
+                </use_extern_action>
+            </os>
+            <os opsys="linux">
+                <use_extern_action>
+                    <action>
+                        <args>uname -a</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+        </dart>
+    </file>
+    <file id="route">
+        <default>true</default>
+        <description>Route Information</description>
+        <gui>
+            <label>_tr("Route Information")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <use_extern_action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>route.exe print</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>%WINDIR%\System32</path>
+                        <args>netsh.exe int ipv6 show route level=verbose</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>%WINDIR%\System32</path>
+                        <args>netsh.exe int ipv6 show interface level=verbose</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>%WINDIR%\System32</path>
+                        <args>netsh.exe int ipv6 show addresses level=verbose</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>%WINDIR%\System32</path>
+                        <args>netsh.exe int ipv6 show neighbors level=verbose</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <path>%WINDIR%\System32</path>
+                        <args>netsh.exe int ipv6 show prefixpolicies</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+            <os opsys="mac">
+                <use_extern_action>
+                    <action>
+                        <args>netstat -rln</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <args>scutil --dns</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <args>scutil --proxy</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                  <action>
+                        <args>scutil &lt;&lt;&lt; &quot;show State:/Network/Interface&quot; &amp;&amp; scutil &lt;&lt;&lt; &quot;show State:/Network/Global/IPv4&quot; &amp;&amp; scutil &lt;&lt;&lt; &quot;show State:/Network/Global/IPv6&quot; &amp;&amp; scutil &lt;&lt;&lt; &quot;show State:/Network/Global/DNS&quot; &amp;&amp; scutil &lt;&lt;&lt; &quot;show State:/Network/Global/Proxies&quot;</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                  </action>
+                  <action>
+                        <args>scutil &lt;&lt;&lt; &quot;show State:/Network/Service/com.cisco.anyconnect/IPv4&quot; &amp;&amp; scutil &lt;&lt;&lt; &quot;show State:/Network/Service/com.cisco.anyconnect/IPv6&quot; &amp;&amp; scutil &lt;&lt;&lt; &quot;show State:/Network/Service/com.cisco.anyconnect/DNS&quot; &amp;&amp; scutil &lt;&lt;&lt; &quot;show State:/Network/Service/com.cisco.anyconnect/Proxies&quot;</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                  </action>                  
+                </use_extern_action>
+            </os>
+            <os opsys="linux">
+                <use_extern_action>
+                    <action>
+                        <args>ip route; echo; ip -6 route</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                        <temp_out>route.txt</temp_out>
+                    </action>
+                </use_extern_action>
+            </os>
+        </dart>
+    </file>
+    <file id="filter">
+        <default>true</default>
+        <description>Filter Configuration</description>
+        <gui>
+            <label>_tr("Filter Configuration")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="linux">
+                <use_extern_action>
+                    <action>
+                        <args>iptables -L -n -v</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <args>ip6tables -L -n -v</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+            <os opsys="mac">
+                <file_copy_action>
+                    <action>
+                        <loc>/etc/pf.conf</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                </file_copy_action>
+                <file_copy_action>
+                    <action>
+                        <loc>/etc/resolv.conf</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                </file_copy_action>
+              <use_extern_action>
+                    <action>
+                        <args>pfctl -sa</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <args>pfctl -a cisco.anyconnect.vpn -sr</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                    <action>
+                        <args>pfctl -sR</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+        </dart>
+    </file>    
+    <file id="ipconfig">
+        <default>true</default>
+        <description>Interface Configuration</description>
+        <gui>
+            <label>_tr("Interface Configuration")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <use_extern_action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>ipconfig.exe /all</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+                <use_extern_action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>reg.exe export HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Adapters %TEMP%\RegTcpipParametersAdapters.txt /y</args>
+                        <clear_log apply="false"></clear_log>
+                        <temp_out>%TEMP%\RegTcpipParametersAdapters.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>reg.exe export HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces %TEMP%\RegTcpipParametersInterfaces.txt /y</args>
+                        <clear_log apply="false"></clear_log>
+                        <temp_out>%TEMP%\RegTcpipParametersInterfaces.txt</temp_out>
+                    </action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>reg.exe export HKLM\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces %TEMP%\RegNetBTParametersInterfaces.txt /y</args>
+                        <clear_log apply="false"></clear_log>
+                        <temp_out>%TEMP%\RegNetBTParametersInterfaces.txt</temp_out>
+                    </action>
+                </use_extern_action>
+            </os>
+            <os opsys="mac">
+                <use_extern_action>
+                    <action>
+                        <args>ifconfig -vv</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+            <os opsys="linux">
+                <use_extern_action>
+                    <action>
+                        <args>ip addr</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                        <temp_out>interfaces.txt</temp_out>
+                    </action>
+                </use_extern_action>
+            </os>
+        </dart>
+    </file>
+    <file id="Network Connectivity Test">
+        <default>false</default>
+        <description>Network Connectivity Test</description>
+        <gui>
+            <label>_tr("Network Connectivity Test")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <use_extern_action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>ping.exe /n 1 www.cisco.com</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+            <os opsys="mac">
+                <use_extern_action>
+                    <action>
+                        <args>ping -c 1 www.cisco.com</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+            <os opsys="linux">
+                <use_extern_action>
+                    <action>
+                        <args>ping -c 1 www.cisco.com</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+        </dart>
+    </file>
+    <file id="system-logs">
+        <default>true</default>
+        <description>System logs</description>
+        <gui>
+            <label>_tr("System logs")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <use_extern_action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>wevtutil.exe epl System %TEMP%\System.evtx</args>
+                        <clear_log apply="false"></clear_log>
+                        <temp_out>%TEMP%\System.evtx</temp_out>
+                    </action>
+               </use_extern_action>
+            </os>
+            <os opsys="linux">
+                <file_copy_action>
+                    <action>
+                        <loc>/var/log/messages</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                    <action>
+                        <loc>/var/log/syslog</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                    <action>
+                        <loc>/var/log/kern.log</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                </file_copy_action>
+            </os>
+            <os opsys="mac">
+                <file_copy_action>
+                    <action>
+                        <loc>/var/log/system.log</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                    <action>
+                        <loc>/var/log/kernel.log</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                    <action>
+                        <loc>/var/log/install.log</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                    <action>
+                      <loc>/private/var/log/com.apple.xpc.launchd/*</loc>
+                      <clear_log apply="false"/>
+                    </action>
+                    <action>
+                      <loc>/Library/Receipts/InstallHistory.plist</loc>
+                      <clear_log apply="false"/>
+                    </action>
+                </file_copy_action>
+                <use_extern_action>
+                    <action>
+                        <path>/usr/bin</path>
+                        <args>log show --predicate 'eventType == logEvent' --last 1d</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                        <temp_out>unified_log.log</temp_out>
+                    </action>
+                    <action>
+                        <path>/usr/sbin</path>
+                        <args>system_profiler SPSoftwareDataType SPApplicationsDataType</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+        </dart>
+    </file>
+    <file id="system-log-hist">
+        <default>true</default>
+        <description>Old system logs (Linux/macOS only)</description>
+        <gui>
+            <label>_tr("Old system logs (Linux/macOS only)")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="linux">
+                <file_copy_action>
+                    <action>
+                        <loc>/var/log/messages.*</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                    <action>
+                        <loc>/var/log/syslog.*</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                    <action>
+                        <loc>/var/log/kern.log.*</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                </file_copy_action>
+            </os>
+            <os opsys="mac">
+                <file_copy_action>
+                    <action>
+                        <loc>/var/log/system.log.*</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                    <action>
+                        <loc>/var/log/kernel.log.*</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                    <action>
+                        <loc>/var/log/install.log.*</loc>
+                        <clear_log apply="false"></clear_log>
+                    </action>
+                </file_copy_action>
+            </os>
+        </dart>
+    </file>
+    <file id="application-logs">
+        <default>true</default>
+        <description>Application logs</description>
+        <gui>
+            <label>_tr("Application logs")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <use_extern_action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>wevtutil.exe epl Application %TEMP%\Application.evtx</args>
+                        <clear_log apply="false"></clear_log>
+                        <temp_out>%TEMP%\Application.evtx</temp_out>
+                    </action>
+                </use_extern_action>
+            </os>
+        </dart>
+    </file>
+    <file id="dart-event-logs">
+        <default>true</default>
+        <description>DART Logs</description>
+        <gui>
+            <label>_tr("DART Logs")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <use_extern_action>
+                    <action>
+                        <path>%WINDIR%\system32</path>
+                        <args>wevtutil.exe epl "Cisco AnyConnect Diagnostics and Reporting Tool" %TEMP%\DART.evtx</args>
+                        <clear_log apply="false"></clear_log>
+                        <temp_out>%TEMP%\DART.evtx</temp_out>
+                    </action>
+                </use_extern_action>
+            </os>
+        </dart>
+    </file>
+    <file id="va-runtime">
+        <default>true</default>
+        <description>Virtual Adapter runtime logs</description>
+        <gui>
+            <label>_tr("Virtual Adapter runtime logs")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <file_copy_action>
+                    <action>
+                        <loc>%WINDIR%\inf\setupapi.app.log</loc>
+                        <clear_log apply="false"/>
+                    </action>
+                    <action>
+                        <loc>%WINDIR%\inf\setupapi.dev.log</loc>
+                        <clear_log apply="false"/>
+                    </action>
+                </file_copy_action>
+            </os>
+        </dart>
+    </file>
+    <file id="hosts">
+        <default>true</default>
+        <description>Host Files</description>
+        <gui>
+            <label>_tr("Host Files")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <file_copy_action>
+                    <action>
+                        <loc>%WINDIR%\System32\drivers\etc\hosts</loc>
+                        <clear_log apply="false"/>
+                    </action>
+                    <action>
+                        <loc>%WINDIR%\System32\drivers\etc\hosts.ac</loc>
+                        <clear_log apply="false"/>
+                    </action>
+                </file_copy_action>
+            </os>
+            <os opsys="linux">
+                <file_copy_action>
+                    <action>
+                        <loc>/etc/hosts</loc>
+                        <clear_log apply="false"/>
+                    </action>
+                    <action>
+                        <loc>/etc/hosts.ac</loc>
+                        <clear_log apply="false"/>
+                    </action>
+                </file_copy_action>
+            </os>
+            <os opsys="mac">
+                <file_copy_action>
+                    <action>
+                        <loc>/etc/hosts</loc>
+                        <clear_log apply="false"/>
+                    </action>
+                    <action>
+                        <loc>/etc/hosts.ac</loc>
+                        <clear_log apply="false"/>
+                    </action>
+                    <action>
+                        <loc>/opt/cisco/secureclient/vpn/ac_pf*.conf</loc>
+                        <clear_log apply="false"/>
+                    </action>
+                </file_copy_action>
+            </os>
+        </dart>
+    </file>
+    <file id="winreg">
+        <default>false</default>
+        <description>Registry Keys</description>
+        <gui>
+            <label>_tr("Registry Keys")</label>
+            <file_type>log</file_type>
+        </gui>
+        <dart>
+            <required>false</required>
+            <os opsys="win">
+                <use_extern_action>
+                    <action>
+                        <path>%PROGRAMFILES(X86)%\Cisco\Cisco Secure Client\DART</path>
+                        <args replace_args="true">CollectRegistries.bat</args>
+                        <clear_log apply="false"></clear_log>
+                        <stdout/>
+                    </action>
+                </use_extern_action>
+            </os>
+        </dart>
+    </file>
+    </fileGroup>
+</configure>

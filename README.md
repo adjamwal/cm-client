@@ -206,3 +206,10 @@ The following is a list of Mac-specific paths to be used in an Identity catalog.
 
 These `FOLDERID_` values represent Mac-specific paths for the `NSLocalDomainMask` domain and can be referenced in your code when working with file and directory operations in the system-wide context.
 
+# DART integration
+
+XML files from './diagnostics' directory can be placed into "/Applications/Cisco/Cisco\ Secure\ Client\ -\ DART.app/Contents/Resources/xml/config" folder used as is, together with other XML files for other products.
+
+Invoking DART app then generates archive with bunch of data, placed on Desktop. The ones that we are interested are inside CloudManagement folder inside of archive.
+
+Changes to bring them in have been applied to "./ngc/Quicksilver/vpn/tools/DART/DART.xcodeproj" in SecureClient Perforce codebase by adding into copy files build phase.
