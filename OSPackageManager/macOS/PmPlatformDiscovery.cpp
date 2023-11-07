@@ -1,5 +1,26 @@
 #include "PmPlatformDiscovery.hpp"
 #include <set>
+#include <sys/utsname.h>
+
+namespace
+{
+    auto determineArch = [](){
+        std::string sPath;
+        constexpr std::string_view x64{"x64"};
+        constexpr std::string_view aarch64{"aarch64"};
+        constexpr std::string_view arm64{"arm64"};
+        struct utsname sysinfo{};
+        uname(&sysinfo);
+        sPath =  std::string(sysinfo.machine) == arm64
+                                            ? aarch64
+                                            : x64;
+        
+        return sPath;
+    };
+
+    static std::string sArchForDiscovery = determineArch();
+}
+
 
 PackageInventory PmPlatformDiscovery::DiscoverInstalledPackages( const std::vector<PmProductDiscoveryRules> &catalogRules ) {
     
@@ -26,8 +47,8 @@ PackageInventory PmPlatformDiscovery::DiscoverInstalledPackages( const std::vect
             packagesDiscovered.packages.push_back({ pkgId, pkgInfo.version });
         }
     }
-    //TODO: Add proper values once ready in https://jira-eng-rtp3.cisco.com/jira/browse/CM4E-291
-    packagesDiscovered.architecture = "x64";
+
+    packagesDiscovered.architecture = sArchForDiscovery;
     packagesDiscovered.platform = "mac";
 
     lastDetectedPackages_ = packagesDiscovered;
