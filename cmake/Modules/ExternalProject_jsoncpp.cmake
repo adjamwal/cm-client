@@ -24,6 +24,7 @@ if(NOT TARGET "third-party-${component_name}")
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES_}
             -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+            -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF
     )
 
     upload_component(${component_name} not_used)
