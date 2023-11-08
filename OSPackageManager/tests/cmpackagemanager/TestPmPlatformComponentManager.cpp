@@ -358,3 +358,64 @@ TEST_F(PmPlatformComponentManagerTest, UpdateComponentRebootFR) {
     std::string errOut;
     ASSERT_EQ(manager_->UpdateComponent(package, errOut).pmResult, IPmPlatformComponentManager::PM_INSTALL_SUCCESS_REBOOT_REQUIRED);
 }
+
+// Test case for UninstallComponent with Pkg uninstaller
+TEST_F(PmPlatformComponentManagerTest, UninstallComponentPkg) {
+    // Prepare test data
+    const std::string volumePath = "/Volumes/MountedVolume";
+    PmComponent package;
+    package.uninstallerLocation = "/path/to/package.pkg";
+    package.uninstallerSignerName = "TestSigner";
+    package.installerType = "pkg";
+
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.pkgUtil_,
+                installPackage(
+                   package.uninstallerLocation.u8string(),
+                   _, _
+                ))
+        .WillOnce(Return(true));
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.fileUtils_,
+                PathIsValid(
+                   package.uninstallerLocation
+                ))
+        .WillOnce(Return(true));
+
+    // Set up expectations on the codesignVerifier
+    EXPECT_CALL(*mockCodesignVerifier_,
+                PackageVerify(
+                    package.uninstallerLocation,
+                    package.uninstallerSignerName)
+                )
+        .WillOnce(Return(CodeSignStatus::CODE_SIGN_OK));
+
+        // Invoke the function under test
+    EXPECT_THAT(manager_->UninstallComponent(package), 0);
+}
+
+// Test case for UninstallComponent with .shuninstaller
+TEST_F(PmPlatformComponentManagerTest, UninstallComponentSh) {
+    // Prepare test data
+    const std::string volumePath = "/Volumes/MountedVolume";
+    PmComponent package;
+    package.uninstallerLocation = "/path/to/package.sh";
+    package.uninstallerSignerName = "";
+
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.fileUtils_,
+                PathIsValid( package.uninstallerLocation ))
+        .WillOnce(Return(true));
+
+    EXPECT_CALL(*mockEnv_.pkgUtil_,
+                invokeShell( _, _ ))
+        .WillOnce(Return(true));
+    // Set up expectations on the codesignVerifier
+    EXPECT_CALL(*mockCodesignVerifier_,
+                PackageVerify( _, _) )
+        .Times(0);
+
+        // Invoke the function under test
+    EXPECT_THAT(manager_->UninstallComponent(package), 0);
+}

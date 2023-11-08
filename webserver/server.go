@@ -26,7 +26,7 @@ func main() {
     w.Write(fileBytes)
     })
     http.HandleFunc("/checkin", func(w http.ResponseWriter, r *http.Request) {
-        fileBytes, err := ioutil.ReadFile("checkin1")
+        fileBytes, err := ioutil.ReadFile("checkinuninstall.json")
         if err != nil {
                 panic(err)
         }

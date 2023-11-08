@@ -26,4 +26,5 @@ public:
     virtual bool installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions = {}, const std::string& volumePath = std::string()) const = 0;
     virtual bool uninstallPackage(const std::string& packageIdentifier) const = 0;
     virtual bool verifyPackageCodesign(const std::filesystem::path& packagePath, std::string& signer ) const = 0;
+    virtual bool invokeShell(const std::filesystem::path& filePath, const std::string& args) const  = 0;
 };

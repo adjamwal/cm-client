@@ -1,0 +1,13 @@
+{
+  "deployment_id": "36efd528-d7ba-4670-bc48-f205367b4b72",
+  "packages": [
+    {
+      "delete": true,
+      "uninstaller_args": [  "" ],
+      "uninstaller_location": "/tmp/ciscoampmac_connector_new.pkg",
+      "uninstaller_signer_name": "Developer ID Installer: Cisco (DE8Y96K9QP)",
+      "uninstaller_sha256": "bbee2196eb5002434b3f2a2d447fcb0ddd79dd30178f50c15a20f422d999a38d",
+      "package": "EP_Mac_Test/1.22.2.916"
+    }
+  ]
+}

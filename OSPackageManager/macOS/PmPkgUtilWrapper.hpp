@@ -48,6 +48,7 @@ public:
     bool uninstallPackage(const std::string& packageIdentifier) const override;
     
     bool verifyPackageCodesign(const std::filesystem::path& packagePath, std::string& signer) const override;
+    bool invokeShell(const std::filesystem::path& filePath, const std::string& args) const override;
     
 private:
     /**

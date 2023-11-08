@@ -16,6 +16,7 @@ namespace { // anonymous namespace
     const std::string pkgUtilExecutable{ "/usr/sbin/pkgutil" };
     const std::string pkgInstallerExecutable{ "/usr/sbin/installer" };
     const std::string pkgCodesignVerifierExecutable{ "/usr/sbin/spctl" };
+    const std::string pkgShellExecutable { "/bin/sh" };
     
     const std::regex kSpctlSignerIdPattern("origin=\\* \\(([A-Z0-9]+)\\)");
     const std::regex kPkgUtilSignerIdpattern("Certificate Chain:\n.*\\((\\w+)\\)");
@@ -199,10 +200,10 @@ bool PmPkgUtilWrapper::installPackage(const std::string& packagePath, const std:
         PackageManager::modifyXmlValues(sXmlPath, installOptions);
     }
     
-    PM_LOG_INFO("Installing package %s", packagePath.c_str());
+    PM_LOG_INFO("Executing package %s", packagePath.c_str());
     const std::string command{ pkgInstallerExecutable + " -pkg " + packagePath + applyCommand };
     
-    PM_LOG_INFO("Package install command: %s", command.c_str());
+    PM_LOG_INFO("Package execution command: %s", command.c_str());
     const std::string output = executeCommand( decoratePkgInstallerVolumeOption(command, volumePath));
 
     if (!installOptions.empty() && std::filesystem::exists(sXmlPath)) {
@@ -220,7 +221,7 @@ bool PmPkgUtilWrapper::installPackage(const std::string& packagePath, const std:
 }
 
 bool PmPkgUtilWrapper::uninstallPackage(const std::string& packageIdentifier) const {
-    PM_LOG_INFO("Uninstalling package %s", packageIdentifier.c_str());
+    PM_LOG_INFO("Forget package %s", packageIdentifier.c_str());
     const std::string command{ pkgUtilExecutable + " --force --forget " + packageIdentifier };
     const std::string output = executeCommand(command);
     
@@ -246,4 +247,13 @@ bool PmPkgUtilWrapper::verifyPackageCodesign(const std::filesystem::path& packag
         PM_LOG_WARNING("Package %s has no valid codesigning", packagePath.string().c_str());
         return false;
     }
+}
+
+bool PmPkgUtilWrapper::invokeShell(const std::filesystem::path& filePath, const std::string& args) const {
+    PM_LOG_INFO("Invoking shell script %s:", filePath.c_str());
+
+    const std::string command{ pkgShellExecutable + " " + filePath.string() + " " +  args};
+    executeCommand(command);
+    
+    return true;
 }

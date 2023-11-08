@@ -134,7 +134,7 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
         ret = static_cast<int32_t>( status );
     }
     
-    PM_LOG_DEBUG("Package installation status %d", ret);
+    PM_LOG_INFO("Package installation status %d", ret);
     return ret;
 }
 
@@ -155,8 +155,48 @@ IPmPlatformComponentManager::PmInstallResult PmPlatformComponentManager::UpdateC
 
 int32_t PmPlatformComponentManager::UninstallComponent(const PmComponent &package)
 {
-    (void) package;
-    return -1;
+    if (!fileUtils_->PathIsValid(package.uninstallerLocation))
+        return -1;
+ 
+    assert(codesignVerifier_);
+    if (!codesignVerifier_) {
+        PM_LOG_ERROR("No valid codesign verifier");
+        return -1;
+    }
+    
+    assert(pkgUtil_);
+    if (!pkgUtil_) {
+        PM_LOG_ERROR("No valid pkgUtil");
+        return -1;
+    }
+
+    int32_t ret = 0;
+    CodeSignStatus status = CodeSignStatus::CODE_SIGN_VERIFICATION_FAILED;
+    
+    std::filesystem::path UnInstallerPath = package.uninstallerLocation;
+    UnInstallerPath.make_preferred();
+    if( !package.uninstallerSignerName.empty() ) {
+        status = codesignVerifier_->PackageVerify(
+            UnInstallerPath,
+            package.uninstallerSignerName
+        );
+    }
+
+    if( status == CodeSignStatus::CODE_SIGN_OK ) {
+            const auto success = pkgUtil_->installPackage(package.uninstallerLocation);
+            ret = success ? 0 : -1;
+    }
+    else {
+        const auto bShellResult = pkgUtil_->invokeShell(package.uninstallerLocation, package.uninstallerArgs);
+        ret = bShellResult ? 0 : -1;
+        if ( -1 == ret ) {
+            PM_LOG_ERROR("Invoking %s with args '%s' failed: ",
+                         package.uninstallerLocation.string().c_str(), package.uninstallerArgs.c_str() );
+        }
+    }
+    
+    PM_LOG_INFO("Package uninstallation status %d", ret);
+    return ret;
 }
 
 int32_t PmPlatformComponentManager::DeployConfiguration(const PackageConfigInfo &config)
