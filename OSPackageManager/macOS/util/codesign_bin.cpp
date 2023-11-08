@@ -262,7 +262,7 @@ exit_gracefully:
     munmap( addr_base, s.st_size );
     addr_base = NULL;
 
-    if ( fd > 0 )
+    if ( fd >= 0 )
     {
         close(fd);
     }
