@@ -243,14 +243,14 @@ static int get_timestamp( const char *path, uint64_t *ts )
 
     offset = find_ts_offset( arch_base, magic, const_cast<char*>(TIMESTAMP_SEGMENT), const_cast<char*>(TIMESTAMP_SECTION) );
 
-    if ( offset > s.st_size )
+    if ( offset + uint32(sizeof(uint64_t)) > s.st_size )
     {
         goto exit_gracefully;
     }
 
     /* read ts value. */
 
-    memcpy( ts, (static_cast<char*>(arch_base)+offset), sizeof(uint64_t ) );
+    memcpy( ts, (static_cast<char*>(arch_base)+offset), sizeof(uint64_t) );
 
     if ( ts != 0 )
     {
@@ -259,8 +259,10 @@ static int get_timestamp( const char *path, uint64_t *ts )
 
 exit_gracefully:
 
-    munmap( addr_base, s.st_size );
-    addr_base = NULL;
+    if ( addr_base != NULL ) {
+        munmap( addr_base, s.st_size );
+        addr_base = NULL;
+    }
 
     if ( fd >= 0 )
     {
