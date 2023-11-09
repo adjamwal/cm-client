@@ -39,7 +39,6 @@ namespace
         default:
             return "Debug";
         }
-        return "Debug";
     }
 
     static PmLogger* g_pLogger;

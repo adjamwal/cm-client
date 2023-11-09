@@ -14,7 +14,7 @@
 namespace PackageManager
 {
 PmCertManager::PmCertManager(std::shared_ptr<IPmCertRetriever> certRetriever)
-    :certRetriever_(certRetriever){}
+    :certRetriever_(std::move(certRetriever)){}
 
 bool PmCertManager::LoadSystemSslCertificates()
 {
@@ -45,7 +45,7 @@ int32_t PmCertManager::GetSslCertificates( X509*** certificates, size_t& count )
         certRetriever_->GetSslCertificates(certVector);
 
     if (nullptr != certificates && !certVector.empty() ){
-        *certificates = ( X509** )calloc( certVector.size(), sizeof( *certificates ) );
+        *certificates = ( X509** )calloc( certVector.size(), sizeof(decltype(certVector)::value_type) );
 
         for (auto cert: certVector) {
             ( *certificates )[ count ] = cert;
@@ -62,7 +62,7 @@ int32_t PmCertManager::GetSslCertificates( X509*** certificates, size_t& count )
 
 void PmCertManager::ReleaseSslCertificates(X509 **certificates, size_t count)
 {
-    if( !certificates)
+    if( !certificates ) 
         return;
     
     for( size_t i = 0; i < count; ++i ) {
