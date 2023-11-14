@@ -70,7 +70,7 @@ PmControlPlugin::startPmAgent( const TCHAR* basePath,
         if ( ctrlPlugin.bIsProcessStarted_ ) {
             return PM_MODULE_ALREADY_STARTED;
         }
-
+        
         PM_STATUS retStatus = ctrlPlugin.agentCtrlInst_.start();
         if ( PM_STATUS::PM_OK == retStatus ) {
             ctrlPlugin.bIsProcessStarted_ = true;
@@ -80,12 +80,9 @@ PmControlPlugin::startPmAgent( const TCHAR* basePath,
             CM_LOG_ERROR( "Failed to start agent with return code [%d]", retStatus );
             return to_pm_result( retStatus );
         }
+    } catch ( const std::exception &rLogEx ) {
+        std::cerr << "Fatal error: " << rLogEx.what() << std::endl;
     }
-    catch ( const std::exception& rExcep ) {
-        // handle exception
-        CM_LOG_ERROR( "Exception : [%s] ", rExcep.what() );
-    }
-
     return PM_MODULE_GENERAL_ERROR;
 }
 

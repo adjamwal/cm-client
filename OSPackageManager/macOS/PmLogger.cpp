@@ -16,6 +16,7 @@
 #include <cwchar>
 #include <locale>
 #include <memory>
+#include <iostream>
 
 namespace
 {
@@ -65,16 +66,20 @@ PmLogger::PmLogger():
 
 PmLogger::~PmLogger()
 {
-    auto logger = spdlog::get(loggerName_);
-    if (logger)
-    {
-        logger->flush();
-        spdlog::drop(loggerName_);
-    }
-    
-    if (loggerName_ != kConsoleLogName) {
-        spdlog::get(kConsoleLogName)->flush();
-        spdlog::drop(kConsoleLogName);
+    try {
+        auto logger = spdlog::get(loggerName_);
+        if (logger)
+        {
+            logger->flush();
+            spdlog::drop(loggerName_);
+        }
+        
+        if (loggerName_ != kConsoleLogName) {
+            spdlog::get(kConsoleLogName)->flush();
+            spdlog::drop(kConsoleLogName);
+        }
+    } catch (std::exception& ex) {
+        std::cerr << "Fatal error: " << ex.what() << std::endl;
     }
     fclose(printDummyFile_);
 }
@@ -192,69 +197,77 @@ void PmLogger::SetLogLevel(Severity severity)
 
 void PmLogger::writeLog(Severity severity, const char* msgFormatter, va_list args)
 {
-    std::string strLog = "[";
-    strLog += severityToString(severity);
-    strLog += "]: ";
-    
-    va_list copy_args;
-    va_copy(copy_args, args);
-    int nBufSize = vsnprintf(nullptr, 0, msgFormatter, copy_args);
-    va_end(copy_args);
-    if (nBufSize <= 0)
-    {
-        spdlog::get(loggerName_)->info("{}", "Unable to determine buffer size in PmLogger::writeLog");
+    try {
+        std::string strLog = "[";
+        strLog += severityToString(severity);
+        strLog += "]: ";
+        
+        va_list copy_args;
+        va_copy(copy_args, args);
+        int nBufSize = vsnprintf(nullptr, 0, msgFormatter, copy_args);
+        va_end(copy_args);
+        if (nBufSize <= 0)
+        {
+            spdlog::get(loggerName_)->info("{}", "Unable to determine buffer size in PmLogger::writeLog");
+            spdlog::get(loggerName_)->flush();
+            return;
+        }
+        
+        nBufSize += 1;
+
+        std::vector<char> strBuf(static_cast<size_t>(nBufSize), '\0');
+
+        vsnprintf(strBuf.data(), nBufSize, msgFormatter, args);
+
+        strLog += strBuf.data();
+
+        spdlog::get(loggerName_)->info("{}", strLog);
         spdlog::get(loggerName_)->flush();
-        return;
+    } catch (const std::exception& ex) {
+        std::cerr << "Fatal error: " << ex.what() << std::endl;
     }
-    
-    nBufSize += 1;
-
-    std::vector<char> strBuf(static_cast<size_t>(nBufSize), '\0');
-
-    vsnprintf(strBuf.data(), nBufSize, msgFormatter, args);
-
-    strLog += strBuf.data();
-
-    spdlog::get(loggerName_)->info("{}", strLog);
-    spdlog::get(loggerName_)->flush();
 }
 
 void PmLogger::writeLog(Severity severity, const wchar_t* msgFormatter, va_list args)
 {
-    std::string strSeverinity = severityToString(severity);
-    std::wstring strLog = L"[";
-    std::wstring strWSeverinity(strSeverinity.begin(), strSeverinity.end());
-    strLog += strWSeverinity;
-    strLog += L"]: ";
-    
-    va_list copy_args;
-    va_copy(copy_args, args);
-    int nBufSize = vfwprintf(printDummyFile_, msgFormatter, copy_args);
-    va_end(copy_args);
-    if (nBufSize <= 0)
-    {
-        spdlog::get(loggerName_)->error("Unable to determine buffer size in PmLogger::writeLog, system error: {}", std::strerror(errno));
-        if (ferror (printDummyFile_))
+    try {
+        std::string strSeverinity = severityToString(severity);
+        std::wstring strLog = L"[";
+        std::wstring strWSeverinity(strSeverinity.begin(), strSeverinity.end());
+        strLog += strWSeverinity;
+        strLog += L"]: ";
+        
+        va_list copy_args;
+        va_copy(copy_args, args);
+        int nBufSize = vfwprintf(printDummyFile_, msgFormatter, copy_args);
+        va_end(copy_args);
+        if (nBufSize <= 0)
         {
-            spdlog::get(loggerName_)->error("{}", "error writing to the temp file.");
+            spdlog::get(loggerName_)->error("Unable to determine buffer size in PmLogger::writeLog, system error: {}", std::strerror(errno));
+            if (ferror (printDummyFile_))
+            {
+                spdlog::get(loggerName_)->error("{}", "error writing to the temp file.");
+            }
+            spdlog::get(loggerName_)->flush();
+            return;
         }
-        spdlog::get(loggerName_)->flush();
-        return;
-    }
 
-    nBufSize += 1;
-    std::vector<wchar_t> strBuf(nBufSize, L'\0');
-    int nRet = vswprintf(strBuf.data(), nBufSize, msgFormatter, args);
-    if (nRet < 0)
-    {
-        spdlog::get(loggerName_)->error("Some error occured during call of the vswprintf in PmLogger::writeLog, system error: {}", std::strerror(errno));
-        spdlog::get(loggerName_)->flush();
-        return;
-    }
+        nBufSize += 1;
+        std::vector<wchar_t> strBuf(nBufSize, L'\0');
+        int nRet = vswprintf(strBuf.data(), nBufSize, msgFormatter, args);
+        if (nRet < 0)
+        {
+            spdlog::get(loggerName_)->error("Some error occured during call of the vswprintf in PmLogger::writeLog, system error: {}", std::strerror(errno));
+            spdlog::get(loggerName_)->flush();
+            return;
+        }
 
-    strLog += strBuf.data();
-    spdlog::get(loggerName_)->info("{}", convertToUtf8(strLog));
-    spdlog::get(loggerName_)->flush();
+        strLog += strBuf.data();
+        spdlog::get(loggerName_)->info("{}", convertToUtf8(strLog));
+        spdlog::get(loggerName_)->flush();
+    } catch (const std::exception& ex) {
+        std::cerr << "Fatal error: " << ex.what() << std::endl;
+    }
 }
 
 PmLogger& PmLogger::getLogger()
@@ -265,7 +278,11 @@ PmLogger& PmLogger::getLogger()
 
 void PmLogger::initLogger()
 {
-    g_pLogger = new PmLogger();
+    try {
+        g_pLogger = new PmLogger();
+    } catch (const std::exception& ex) {
+        throw logger_exception("Failed to create/open logger");
+    }
 }
 
 void PmLogger::releaseLogger()
@@ -303,8 +320,12 @@ void PmLogger::initGlobalLogErrorHandler()
 
 void PmLogger::initConsoleLogging()
 {
-    loggerName_ = kConsoleLogName;
-    auto console = spdlog::stdout_color_mt(kConsoleLogName);
+    try {
+        loggerName_ = kConsoleLogName;
+        auto console = spdlog::stdout_color_mt(kConsoleLogName);
+    } catch (spdlog::spdlog_ex& ex) {
+        throw logger_exception("Failed to create/open console logger");
+    }
 }
 
 void PmLogger::initMessagePattern()

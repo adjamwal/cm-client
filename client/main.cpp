@@ -72,19 +72,12 @@ int main(int argc, char *argv[])
         (void) argc;
         (void) argv;
         auto service = CloudManagement::Daemon();
-
+        
         // This blocks till we're stopped
         service.start();
-    }
-    catch ( const CMLogger::logger_exception &rLogEx ) {
-        //Do not log on logger exception
-        std::cerr << "Fatal error: " << rLogEx.what() << std::endl;
+    } catch ( const std::exception &rEx ) {
+        std::cerr << "Fatal error: " << rEx.what() << std::endl;
         return 1;
-    }
-    catch ( const std::exception &rEx )
-    {
-        CM_LOG_ERROR("Fatal error [%s]", rEx.what());
-        return 2;
     }
 
     return 0;

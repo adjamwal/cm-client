@@ -18,6 +18,14 @@
 class PmLogger : public IPMLogger
 {
 public:
+    
+    //Exception class to differentiate with standard exceptions
+    class logger_exception : public std::runtime_error
+    {
+    public:
+        logger_exception(const std::string& msg) : std::runtime_error(msg) {}
+    };
+
     PmLogger();
     PmLogger(const PmLogger&) = delete;
     PmLogger(PmLogger&&) = delete;

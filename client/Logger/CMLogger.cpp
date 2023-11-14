@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <chrono>
+#include <iostream>
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 
@@ -146,8 +147,15 @@ void CMLogger::Log(CM_LOG_LVL_T severity, bool bIsStrErr, const char *message, v
 
 void CMLogger::writeLogLine( const std::string& logLevel, const std::string& logLine )
 {
-    spdlog::get(loggerName_)->info(logLevel + ": " + logLine);
-    spdlog::get( loggerName_ )->flush();
+    try {
+        const auto& logger = spdlog::get(loggerName_);
+        if (logger) {
+            logger->info(logLevel + ": " + logLine);
+            logger->flush();
+        }
+    } catch (const std::exception& ex) {
+        std::cerr << "Fatal error: " << ex.what() << std::endl;
+    }
 }
 
 bool CMLogger::setLogConfig( uint32_t fileSize, uint32_t logFiles )
