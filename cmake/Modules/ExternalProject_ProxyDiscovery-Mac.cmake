@@ -31,7 +31,7 @@ if(NOT TARGET "third-party-${component_name}")
             -DSKIP_TESTS=FALSE
             -DCMAKE_CXX_STANDARD=17
             -DCMAKE_CXX_EXTENSIONS=OFF
-            -DUSE_DEBUG_TEST_LIBRARIES=TRUE
+            -DUSE_DEBUG_TEST_LIBRARIES=OFF
             -DCMAKE_INSTALL_PREFIX:PATH=${component_install_prefix}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES_}
