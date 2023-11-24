@@ -13,7 +13,7 @@
 
 #include <sstream>
 #include <map>
-
+#include <cassert>
 
 namespace { // anonymous namespace
 

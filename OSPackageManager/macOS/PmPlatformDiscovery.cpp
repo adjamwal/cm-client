@@ -1,6 +1,7 @@
 #include "PmPlatformDiscovery.hpp"
 #include <set>
 #include <sys/utsname.h>
+#include <cassert>
 
 namespace
 {

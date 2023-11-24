@@ -5,6 +5,7 @@
  */
 
 #include <string>
+#include <cassert>
 #include "PmPlatformConfiguration.hpp"
 #include "PmLogger.hpp"
 #include "GuidUtil.hpp"
