@@ -53,7 +53,14 @@ namespace { // anonymous namespace
         command + " --volume " + volumePath :
         command;
     }
-    
+
+    std::string wrapLongPath(const std::string& sPath) {
+        if (sPath.find(' ') == std::string::npos)
+            return sPath;
+
+        return "\"" + sPath + "\"";
+    }
+
     std::string decoratePkgInstallerVolumeOption(const std::string& command, const std::string& volumePath) {
         const std::string target{ volumePath.length() ? volumePath : "/" };
         return command + " -target " + target;
@@ -201,7 +208,7 @@ bool PmPkgUtilWrapper::installPackage(const std::string& packagePath, const std:
     }
     
     PM_LOG_INFO("Executing package %s", packagePath.c_str());
-    const std::string command{ pkgInstallerExecutable + " -pkg " + packagePath + applyCommand };
+    const std::string command{ pkgInstallerExecutable + " -pkg " + wrapLongPath(packagePath) + applyCommand };
     
     PM_LOG_INFO("Package execution command: %s", command.c_str());
     const std::string output = executeCommand( decoratePkgInstallerVolumeOption(command, volumePath));
@@ -252,7 +259,7 @@ bool PmPkgUtilWrapper::verifyPackageCodesign(const std::filesystem::path& packag
 bool PmPkgUtilWrapper::invokeShell(const std::filesystem::path& filePath, const std::string& args) const {
     PM_LOG_INFO("Invoking shell script %s:", filePath.c_str());
 
-    const std::string command{ pkgShellExecutable + " " + filePath.string() + " " +  args};
+    const std::string command{ pkgShellExecutable + " " + wrapLongPath(filePath.string()) + " " +  args};
     executeCommand(command);
     
     return true;
