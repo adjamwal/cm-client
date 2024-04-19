@@ -22,6 +22,8 @@ class MockPmPlatformConfiguration : public IPmPlatformConfiguration
     MOCK_METHOD(std::string, GetDataDirectory, (), (override));
     MOCK_METHOD(std::string, GetPmVersion, (), (override));
     MOCK_METHOD(bool, GetPmUrls, (PmUrlList& urls), (override));
+    MOCK_METHOD(std::string, GetPmPlatform, (), (override));
+    MOCK_METHOD(std::string, GetPmArchitecture, (), (override));
     MOCK_METHOD(bool, UpdateCertStoreForUrl, (const std::string& url), (override));
     MOCK_METHOD(std::list<PmProxy>, StartProxyDiscovery, (const std::string& testUrl, const std::string& pacUrl), (override));
     MOCK_METHOD(bool, StartProxyDiscoveryAsync, (const std::string& testUrl, const std::string& pacUrl, AsyncProxyDiscoveryCb cb, void* context), (override));

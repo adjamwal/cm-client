@@ -6,6 +6,7 @@
 
 #include <string>
 #include <cassert>
+#include <sys/utsname.h>
 #include "PmPlatformConfiguration.hpp"
 #include "PmLogger.hpp"
 #include "GuidUtil.hpp"
@@ -41,6 +42,23 @@ constexpr std::string_view kCmSharedLogPath{"/var/logs/cisco/secureclient/cloudm
 constexpr std::string_view kHttpUserAgentPrefix{"PackageManager/"};
 constexpr std::string_view kHttpProxyType{"http"};
 constexpr std::string_view kHttpsProxyType{"https"};
+
+const std::string darwin{"darwin"}; 
+const std::string amd64{"amd64"};
+const std::string arm64{"arm64"};
+
+auto determineArch = [](){
+    std::string sPath;
+    struct utsname sysinfo{};
+    uname(&sysinfo);
+    sPath =  std::string(sysinfo.machine) == arm64
+                                        ? arm64
+                                        : amd64;
+    
+    return sPath;
+};
+
+static std::string sArchForConfig = determineArch();
 
 std::list<PmProxy> convertProxyList(const std::list<proxy::ProxyRecord>& inputList)
 {
@@ -261,3 +279,14 @@ void PmPlatformConfiguration::updateProxyList(const std::list<proxy::ProxyRecord
     
     p.second(p.first, convertProxyList(proxies));
 }
+
+std::string PmPlatformConfiguration::GetPmPlatform()
+{
+    return darwin;
+}
+
+std::string PmPlatformConfiguration::GetPmArchitecture()
+{
+    return sArchForConfig;
+}
+

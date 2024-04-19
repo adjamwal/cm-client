@@ -92,6 +92,16 @@ public:
     bool GetPmUrls(PmUrlList &urls) override;
 
     /**
+     * @brief Retrieve the PM platform name, accepted by backend
+     */
+    virtual std::string GetPmPlatform() override;
+
+    /**
+     * @brief Retrieve the PM architecture name, accepted by backend
+     */
+    virtual std::string GetPmArchitecture() override;
+    
+    /**
      * @brief (Optional) On windows this triggers the Windows AIA mechanism to
      *   build out the certificate chain for the given URL
      *
