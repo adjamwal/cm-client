@@ -40,8 +40,7 @@ TEST_F(PmPlatformComponentManagerTest, GetInstalledPackages) {
     // Define expected results
     std::vector<std::string> expectedPackageList = {"com.test.Package1", "com.test.Package2"};
     PmPackageInfo expectedPackageInfo[] = {
-        { "com.test.Package1", "1.0", "/path/to/package"},
-        { "com.test.Package2", "2.0", "/path/to/package"},
+        { "ProductA", "2.0", "/path/to/package"},
     };
     // Set up expectations on the mock object
     EXPECT_CALL(*mockEnv_.pkgUtil_, listPackages(_))
@@ -49,19 +48,16 @@ TEST_F(PmPlatformComponentManagerTest, GetInstalledPackages) {
     EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package1", _))
         .WillOnce(Return(expectedPackageInfo[0]));
     EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package2", _))
-        .WillRepeatedly(Return(expectedPackageInfo[1]));
+        .WillRepeatedly(Return(expectedPackageInfo[0]));
 
     // Invoke the function under test
     int32_t result = manager_->GetInstalledPackages(catalogRules, packagesDiscovered);
     
     // Verify the result and expectations
     EXPECT_EQ(result, 0);
-    EXPECT_EQ(packagesDiscovered.packages.size(), 2);
+    EXPECT_EQ(packagesDiscovered.packages.size(), 1);
     EXPECT_EQ(packagesDiscovered.packages[0].product, expectedPackageInfo[0].packageIdentifier);
     EXPECT_EQ(packagesDiscovered.packages[0].version, expectedPackageInfo[0].version);
-    EXPECT_EQ(packagesDiscovered.packages[1].product, expectedPackageInfo[1].packageIdentifier);
-    EXPECT_EQ(packagesDiscovered.packages[1].version, expectedPackageInfo[1].version);
-//    EXPECT_EQ(packagesDiscovered.packages[0].installationPath, expectedPackageInfo.installationPath);
 }
 
 // Test case for CachedInventory
@@ -75,8 +71,7 @@ TEST_F(PmPlatformComponentManagerTest, FilledCachedInventory) {
         // Define expected results
     std::vector<std::string> expectedPackageList = {"com.test.Package1", "com.test.Package2"};
     PmPackageInfo expectedPackageInfo[] = {
-        { "com.test.Package1", "1.0", "/path/to/package"},
-        { "com.test.Package2", "2.0", "/path/to/package"},
+        { "ProductA", "2.0", "/path/to/package"},
     };
         // Set up expectations on the mock object
     EXPECT_CALL(*mockEnv_.pkgUtil_, listPackages(_))
@@ -84,7 +79,7 @@ TEST_F(PmPlatformComponentManagerTest, FilledCachedInventory) {
     EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package1", _))
         .WillOnce(Return(expectedPackageInfo[0]));
     EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package2", _))
-        .WillOnce(Return(expectedPackageInfo[1]));
+        .WillOnce(Return(expectedPackageInfo[0]));
     
         // Invoke the function under test
     int32_t result = manager_->GetInstalledPackages(catalogRules, packagesDiscovered);
@@ -94,11 +89,9 @@ TEST_F(PmPlatformComponentManagerTest, FilledCachedInventory) {
     
     // Verify the result and expectations
     EXPECT_EQ(resultCached, 0);
-    EXPECT_EQ(cachedInventory.packages.size(), 2);
+    EXPECT_EQ(cachedInventory.packages.size(), 1);
     EXPECT_EQ(cachedInventory.packages[0].product, expectedPackageInfo[0].packageIdentifier);
     EXPECT_EQ(cachedInventory.packages[0].version, expectedPackageInfo[0].version);
-    EXPECT_EQ(cachedInventory.packages[1].product, expectedPackageInfo[1].packageIdentifier);
-    EXPECT_EQ(cachedInventory.packages[1].version, expectedPackageInfo[1].version);
 }
 
 // Test case for CachedInventory

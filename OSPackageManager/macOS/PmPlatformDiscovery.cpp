@@ -41,11 +41,11 @@ PackageInventory PmPlatformDiscovery::DiscoverInstalledPackages( const std::vect
             
             const auto& pkgInfo = pkgUtilManager_->getPackageInfo(pkgId);
             //Backend requires strictly only single instace in checking request
-            if ( uniquePks.end() != uniquePks.find(pkgId) )
+            if ( uniquePks.end() != uniquePks.find(rule.product) )
                 continue;
-
-            uniquePks.insert(pkgId);
-            packagesDiscovered.packages.push_back({ pkgId, pkgInfo.version });
+                
+            uniquePks.insert(rule.product);
+            packagesDiscovered.packages.push_back({ rule.product, pkgInfo.version });
         }
     }
 
