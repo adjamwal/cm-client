@@ -5,6 +5,9 @@
 #include "UnitTestBase.h"
 
 using namespace testing;
+using testing::SizeIs;
+using testing::IsTrue;
+
 
 // Test fixture for PmPlatformComponentManager tests
 class PmPlatformComponentManagerTest : public TestEnv::UnitTestBase {
@@ -27,71 +30,153 @@ protected:
     
     // Instance of PmPlatformComponentManager to be tested
     std::shared_ptr<PmPlatformComponentManager> manager_;
+    
+    //Data
+    const std::string testPack1_{"com.test.Package1"};
+    const std::string testPack2_{"com.test.Package2"};
+    const std::vector<std::string> expectedPackageList_{testPack1_, testPack2_};
+    
+    const std::vector<PmPackageInfo> expectedPackageInfo_{
+        { "ProductA", "2.0", "/path/to/package"}
+    };
+
+    const std::vector<PmProductDiscoveryRules> catalogRules_ = {
+        { "ProductA", {}, {}, {}, {}, { {testPack1_}, {testPack2_}, {testPack2_} } }
+    };
+
+    const std::string scm_json_{"/opt/cisco/secureclient/cloudmanagement/etc/cm_config.json"};
+    const std::filesystem::path json_path_{scm_json_};
+    const std::vector<std::filesystem::path> jsonarray_ {scm_json_};
 };
 
-// Test case for GetInstalledPackages
-TEST_F(PmPlatformComponentManagerTest, GetInstalledPackages) {
+// Test case for GetDeplInstalledPackages
+TEST_F(PmPlatformComponentManagerTest, GetDeployPaths) {
     // Prepare test data
-    std::vector<PmProductDiscoveryRules> catalogRules = {
-        { "ProductA", {}, {}, {}, {}, { {"com.test.Package1"}, {"com.test.Package2"}, {"com.test.Package2"} } }
+    PmProductDiscoveryConfigurable config = {
+        {}, {}, 
+        scm_json_, 
+        scm_json_, 1, true, {"json", "cm"}
     };
+    
+    std::vector<PmProductDiscoveryRules> catalogRules(catalogRules_);
+    catalogRules[0].configurables.push_back(config);
     PackageInventory packagesDiscovered;
     
-    // Define expected results
-    std::vector<std::string> expectedPackageList = {"com.test.Package1", "com.test.Package2"};
-    PmPackageInfo expectedPackageInfo[] = {
-        { "ProductA", "2.0", "/path/to/package"},
-    };
     // Set up expectations on the mock object
     EXPECT_CALL(*mockEnv_.pkgUtil_, listPackages(_))
-        .WillOnce(Return(expectedPackageList));
-    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package1", _))
-        .WillOnce(Return(expectedPackageInfo[0]));
-    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package2", _))
-        .WillRepeatedly(Return(expectedPackageInfo[0]));
+        .WillOnce(Return(expectedPackageList_));
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo(testPack1_, _))
+        .WillOnce(Return(expectedPackageInfo_[0]));
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo(testPack2_, _))
+        .WillRepeatedly(Return(expectedPackageInfo_[0]));
+    
+    EXPECT_CALL(*mockEnv_.fileUtils_, FileSearchWithWildCard( _, _ ) )
+        .WillRepeatedly(
+             ::testing::DoAll(SetArgReferee<1>(jsonarray_), Return(0) )
+         );
+
+    EXPECT_CALL(*mockEnv_.fileUtils_, PathIsValid( _ ) )
+        .WillRepeatedly( Return( true ) );
 
     // Invoke the function under test
     int32_t result = manager_->GetInstalledPackages(catalogRules, packagesDiscovered);
     
+    ASSERT_THAT( packagesDiscovered.packages[0].configs, SizeIs( 1 ) );
+    
+    EXPECT_EQ( packagesDiscovered.packages[0].configs[0].deployPath, json_path_ );
+    EXPECT_EQ( packagesDiscovered.packages[0].configs[0].unresolvedDeployPath, json_path_ );
+    EXPECT_THAT( packagesDiscovered.packages[0].configs[0].cfgPath.empty(), IsTrue() );
+    EXPECT_THAT( packagesDiscovered.packages[0].configs[0].unresolvedCfgPath.empty(), IsTrue() );
+}
+
+// Test case for GetInstalledPackages
+TEST_F(PmPlatformComponentManagerTest, GetConfigPaths) {
+    // Prepare test data
+    PmProductDiscoveryConfigurable config = {
+        scm_json_, 
+        scm_json_, {}, {}, 1, true, {"json", "cm"}
+    };
+    
+    std::vector<PmProductDiscoveryRules> catalogRules(catalogRules_);
+    catalogRules[0].configurables.push_back(config);
+    PackageInventory packagesDiscovered;
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.pkgUtil_, listPackages(_))
+        .WillOnce(Return(expectedPackageList_));
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo(testPack1_, _))
+        .WillOnce(Return(expectedPackageInfo_[0]));
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo(testPack2_, _))
+        .WillRepeatedly(Return(expectedPackageInfo_[0]));
+    
+    EXPECT_CALL(*mockEnv_.fileUtils_, FileSearchWithWildCard( _, _ ) )
+        .WillRepeatedly(
+             ::testing::DoAll(SetArgReferee<1>(jsonarray_), Return(0) )
+         );
+
+    EXPECT_CALL(*mockEnv_.fileUtils_, PathIsValid( _ ) )
+        .WillRepeatedly( Return( true ) );
+
+    // Invoke the function under test
+    int32_t result = manager_->GetInstalledPackages( catalogRules, packagesDiscovered );
+    
+    ASSERT_THAT( packagesDiscovered.packages[0].configs, SizeIs( 1 ) );
+    
+    EXPECT_EQ( packagesDiscovered.packages[0].configs[0].cfgPath, json_path_ );
+    EXPECT_EQ( packagesDiscovered.packages[0].configs[0].unresolvedCfgPath, json_path_ );
+    EXPECT_THAT( packagesDiscovered.packages[0].configs[0].deployPath.empty(), IsTrue() );
+    EXPECT_THAT( packagesDiscovered.packages[0].configs[0].unresolvedDeployPath.empty(), IsTrue() );
+}
+
+
+// Test case for GetInstalledPackages
+TEST_F(PmPlatformComponentManagerTest, GetInstalledPackages) {
+    // Prepare test data
+    std::vector<PmProductDiscoveryRules> catalogRules(catalogRules_);
+    PackageInventory packagesDiscovered;
+    
+    // Set up expectations on the mock object
+    EXPECT_CALL(*mockEnv_.pkgUtil_, listPackages(_))
+        .WillOnce(Return(expectedPackageList_));
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo(testPack1_, _))
+        .WillOnce(Return(expectedPackageInfo_[0]));
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo(testPack2_, _))
+        .WillRepeatedly(Return(expectedPackageInfo_[0]));
+    
+    // Invoke the function under test
+    int32_t result = manager_->GetInstalledPackages( catalogRules, packagesDiscovered );
+    
     // Verify the result and expectations
     EXPECT_EQ(result, 0);
     EXPECT_EQ(packagesDiscovered.packages.size(), 1);
-    EXPECT_EQ(packagesDiscovered.packages[0].product, expectedPackageInfo[0].packageIdentifier);
-    EXPECT_EQ(packagesDiscovered.packages[0].version, expectedPackageInfo[0].version);
+    EXPECT_EQ(packagesDiscovered.packages[0].product, expectedPackageInfo_[0].packageIdentifier);
+    EXPECT_EQ(packagesDiscovered.packages[0].version, expectedPackageInfo_[0].version);
 }
 
 // Test case for CachedInventory
 TEST_F(PmPlatformComponentManagerTest, FilledCachedInventory) {
     // Prepare test data
-    std::vector<PmProductDiscoveryRules> catalogRules = {
-        { "ProductA", {}, {}, {}, {}, { {"com.test.Package1"}, {"com.test.Package2"} } }
-    };
     PackageInventory packagesDiscovered;
     
-        // Define expected results
-    std::vector<std::string> expectedPackageList = {"com.test.Package1", "com.test.Package2"};
-    PmPackageInfo expectedPackageInfo[] = {
-        { "ProductA", "2.0", "/path/to/package"},
-    };
         // Set up expectations on the mock object
     EXPECT_CALL(*mockEnv_.pkgUtil_, listPackages(_))
-        .WillOnce(Return(expectedPackageList));
-    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package1", _))
-        .WillOnce(Return(expectedPackageInfo[0]));
-    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo("com.test.Package2", _))
-        .WillOnce(Return(expectedPackageInfo[0]));
+        .WillOnce(Return(expectedPackageList_));
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo(testPack1_, _))
+        .WillOnce(Return(expectedPackageInfo_[0]));
+    EXPECT_CALL(*mockEnv_.pkgUtil_, getPackageInfo(testPack2_, _))
+        .WillRepeatedly(Return(expectedPackageInfo_[0]));
     
         // Invoke the function under test
-    int32_t result = manager_->GetInstalledPackages(catalogRules, packagesDiscovered);
+    int32_t result = manager_->GetInstalledPackages(catalogRules_, packagesDiscovered);
     
     PackageInventory cachedInventory;
     int32_t resultCached = manager_->GetCachedInventory(cachedInventory);
     
     // Verify the result and expectations
     EXPECT_EQ(resultCached, 0);
-    EXPECT_EQ(cachedInventory.packages.size(), 1);
-    EXPECT_EQ(cachedInventory.packages[0].product, expectedPackageInfo[0].packageIdentifier);
-    EXPECT_EQ(cachedInventory.packages[0].version, expectedPackageInfo[0].version);
+    ASSERT_EQ(cachedInventory.packages.size(), 1);
+    EXPECT_EQ(cachedInventory.packages[0].product, expectedPackageInfo_[0].packageIdentifier);
+    EXPECT_EQ(cachedInventory.packages[0].version, expectedPackageInfo_[0].version);
 }
 
 // Test case for CachedInventory

@@ -84,7 +84,7 @@ public:
             CFRelease(certEnc64S);
         }
 
-        ON_CALL(*_retrieverMock, GetSslCertificates(_) ).WillByDefault( Return( x509certificates_.size() ));
+        ON_CALL(*_retrieverMock, GetSslCertificates(_) ).WillByDefault( Return( (int32_t)x509certificates_.size() ));
         ON_CALL(*_retrieverMock, GetSslCertificates(_)).WillByDefault(SetArgReferee<0>(x509certificates_));
         PmLogger::initLogger();
     }
