@@ -1,5 +1,6 @@
 -- Define a constant for the log file path
-property logFilePath : "/Library/Logs/Cisco/SecureClient/CloudManagement/cm_uninstall.log"
+property loggingPath : "/Library/Logs/Cisco/SecureClient/CloudManagement/"
+property logFilePath : loggingPath & "cm_uninstall.log"
 
 -- Define a global flag to track errors
 property hasError : false
@@ -36,7 +37,19 @@ on logAction(actionText)
 	set result to result & zero_pad(seconds of now as integer, 2)
 	
 	set logEntry to "[" & result & "] " & actionText
-	do shell script "echo " & quoted form of logEntry & " >> " & logFilePath with administrator privileges
+    try
+        -- Ensure the directory structure exists
+        do shell script "mkdir -p " & quoted form of loggingPath with administrator privileges
+            
+        -- Try to create the log file if it doesn't exist
+        do shell script "touch " & quoted form of logFilePath with administrator privileges
+    
+        -- Append the log entry to the file
+        do shell script "echo " & quoted form of logEntry & " >> " & logFilePath with administrator privileges
+	on error
+        display dialog "Failed to log action. Check log file path: " & logFilePath
+	end try
+
 end logAction
 
 -- Function to handle errors and display a failure message
@@ -141,9 +154,17 @@ else
 	on error errMsg
 		handleError("Failed to remove " & cmUninstallApp & " or its parent folder: " & errMsg)
 	end try
-	
+ 
+    -- Check if the folder loggingPath exists before attempting to remove it
+    if (do shell script "[ -d " & quoted form of loggingPath & " ] ; echo $?") is equal to "0" then
+        try
+            do shell script "rm -rf " & quoted form of loggingPath with administrator privileges
+        on error errMsg
+            logAction("Failed to remove folder: " & loggingPath & " - " & errMsg)
+        end try
+    end if
+    	
 	-- Display success message
-	logAction("Successfully uninstalled Cisco Secure Client CloudManagement.")
 	display dialog "Successfully uninstalled Cisco Secure Client CloudManagement."
 end if
 
