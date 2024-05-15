@@ -14,8 +14,14 @@ CMREPORT_BINARY="cmreport"
 LAUNCHD_DIR="/Library/LaunchDaemons"
 LAUNCHD_FILE="com.cisco.secureclient.cloudmanagement.plist"
 CM_PACKAGE_ID="com.cisco.secureclient.cloudmanagement"
+CM_UNINSTALLER_PKG_ID="com.cisco.secureclient.cloudmanagement-uninstaller"
+CM_BOOTSTRAP_PKG_ID="com.cisco.secureclient.cloudmanagement_bootstrap"
 CM_CRASHPAD_DIR="/opt/cisco/secureclient/cloudmanagement/ch"
 CM_LOG_DIR="/Library/Logs/Cisco/SecureClient/CloudManagement"
+
+CM_UNINSTALL_APP="Uninstall CloudManagement.app"
+CM_UNINSTALL_PATH="/Applications/Cisco/Cloud Management/"
+CM_UNINSTALL_APP_PATH="${CM_UNINSTALL_PATH}${CM_UNINSTALL_APP}"
 
 echo "Uninstalling Cisco Secure Client CloudManagement ..."
 
@@ -64,6 +70,20 @@ rm -rf "${CM_CRASHPAD_DIR}" || exit
 rm -rf "${CM_LOG_DIR}" || exit
 
 pkgutil --forget "${CM_PACKAGE_ID}"
+pkgutil --forget "${CM_UNINSTALLER_PKG_ID}"
+pkgutil --forget "${CM_BOOTSTRAP_PKG_ID}"
+
+# Check if CM_UNINSTALL_APP exists and delete it
+if [ -e "$CM_UNINSTALL_APP_PATH" ]; then
+    rm -rf "$CM_UNINSTALL_APP_PATH"
+    echo "Removed Uninstall CloudManagement application: $CM_UNINSTALL_APP_PATH"
+
+    # Remove the parent folder as well if it's empty
+    if [ -z "$(ls -A "$CM_UNINSTALL_PATH")" ]; then
+        rmdir "$CM_UNINSTALL_PATH"
+        echo "Removed parent folder: $CM_UNINSTALL_PATH"
+    fi
+fi
 
 echo "Successfully uninstalled Cisco Secure Client CloudManagement."
 

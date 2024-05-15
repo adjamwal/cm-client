@@ -68,6 +68,8 @@ set CMREPORT_BINARY to "cmreport"
 set LAUNCHD_DIR to "/Library/LaunchDaemons"
 set LAUNCHD_FILE to "com.cisco.secureclient.cloudmanagement.plist"
 set CM_PACKAGE_ID to "com.cisco.secureclient.cloudmanagement"
+set CM_UNINSTALLER_PKG_ID to "com.cisco.secureclient.cloudmanagement-uninstaller"
+set CM_BOOTSTRAP_PKG_ID to "com.cisco.secureclient.cloudmanagement_bootstrap"
 set CM_CRASHPAD_DIR to (CM_DIR & "/ch")
 
 -- Uninstall Cisco Secure Client CloudManagement
@@ -125,10 +127,24 @@ end try
 
 -- Forget the package using pkgutil
 try
-	do shell script "pkgutil --forget " & (quoted form of CM_PACKAGE_ID) with administrator privileges
-	logAction("Forgot package: " & CM_PACKAGE_ID)
+    do shell script "pkgutil --forget " & (quoted form of CM_PACKAGE_ID) with administrator privileges
+    logAction("Forgot package: " & CM_PACKAGE_ID)
 on error errMsg
-	handleError("Failed to forget package: " & errMsg)
+    logAction("Failed to forget package: " & errMsg)
+end try
+
+try
+    do shell script "pkgutil --forget " & (quoted form of CM_UNINSTALLER_PKG_ID) with administrator privileges
+    logAction("Forgot package: " & CM_UNINSTALLER_PKG_ID)
+on error errMsg
+    logAction("Failed to forget package: " & errMsg)
+end try
+
+try
+    do shell script "pkgutil --forget " & (quoted form of CM_BOOTSTRAP_PKG_ID) with administrator privileges
+    logAction("Forgot package: " & CM_BOOTSTRAP_PKG_ID)
+on error errMsg
+    logAction("Failed to forget package: " & errMsg)
 end try
 
 -- Display a single failure message if any errors occurred
