@@ -33,8 +33,15 @@ PmAgentController::PmAgentController( const std::string& path, const std::string
 
 PmAgentController::~PmAgentController()
 {
-    stop();
-    cleanup();
+    try
+    {
+        stop();
+        cleanup();
+    }
+    catch(CMLogger::logger_exception& e)
+    {
+        CM_LOG_ERROR( "Failed to kill process with pid: %d. Following error produced: %s", pid_, e.what());
+    }
 }
 
 PM_STATUS PmAgentController::start()
