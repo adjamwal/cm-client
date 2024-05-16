@@ -78,8 +78,8 @@ std::list<PmProxy> convertProxyList(const std::list<proxy::ProxyRecord>& inputLi
 
 PmPlatformConfiguration::PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
                                                  std::shared_ptr<PackageManager::PmCertManager> certmgr)
-    :   cmidapi_(cmidapi),
-        certmgr_(certmgr),
+    :   cmidapi_(std::move(cmidapi)),
+        certmgr_(std::move(certmgr)),
         pProxyEngine_(proxy::createProxyEngine())
 {
     certmgr_->LoadSystemSslCertificates();
@@ -168,7 +168,7 @@ void PmPlatformConfiguration::ReleaseSslCertificates(X509 **certificates, size_t
 std::string PmPlatformConfiguration::GetHttpUserAgent()
 {
     static std::string httpUserAgent = static_cast<std::string>(kHttpUserAgentPrefix) + static_cast<std::string>(GetPmVersion());
-    return httpUserAgent;
+    return std::move(httpUserAgent);
 }
 
 std::string PmPlatformConfiguration::GetInstallDirectory()
