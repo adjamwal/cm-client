@@ -66,7 +66,7 @@ PmPlatformComponentManager::PmPlatformComponentManager(
     std::shared_ptr<IPmPkgUtil> pkgUtil,
     std::shared_ptr<IPmCodesignVerifier> codesignVerifier,
     std::shared_ptr<PackageManager::IFileUtilities> fileUtils)
-: pkgUtil_(pkgUtil), codesignVerifier_(codesignVerifier), discovery_(pkgUtil, fileUtils), fileUtils_(fileUtils)
+    : pkgUtil_(pkgUtil), codesignVerifier_(std::move(codesignVerifier)), discovery_(pkgUtil, fileUtils), fileUtils_(std::move(fileUtils))
 {}
 
 int32_t PmPlatformComponentManager::GetInstalledPackages(const std::vector<PmProductDiscoveryRules> &catalogRules, PackageInventory &packagesDiscovered)
