@@ -64,9 +64,15 @@ CMLogger::CMLogger( const std::string& fileName ) :
 
 CMLogger::~CMLogger()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    spdlog::get( loggerName_ )->flush();
-    spdlog::drop( loggerName_ );
+    try {
+        std::lock_guard<std::mutex> lock(mutex_);
+        spdlog::get( loggerName_ )->flush();
+        spdlog::drop( loggerName_ );
+    } catch (const std::length_error& e) {
+        std::cerr << "Exception caught in CMLogger destructor: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "Unknown exception caught in CMLogger destructor." << std::endl;
+    }
 }
 
 void CMLogger::SetLogLevel( CM_LOG_LVL_T logLevel )
