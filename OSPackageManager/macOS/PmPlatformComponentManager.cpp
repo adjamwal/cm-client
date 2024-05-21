@@ -53,7 +53,7 @@ bool containsRebootInstruction(const std::string& sArgs)
 {
     static const std::vector<std::string> vRebootRestart = {"SR=true", "FR=true"};
     for (auto& arg: vRebootRestart) {
-        if (std::string::npos != sArgs.find_first_of(arg))
+        if (std::string::npos != sArgs.find(arg))
             return true;
     }
         
