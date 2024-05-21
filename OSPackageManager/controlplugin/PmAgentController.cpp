@@ -40,7 +40,7 @@ PmAgentController::~PmAgentController()
     }
     catch(CMLogger::logger_exception& e)
     {
-        CM_LOG_ERROR( "Failed to kill process with pid: %d. Following error produced: %s", pid_, e.what());
+        std::cerr << "CMLogger exception caught in PmAgentController destructor: " << e.what() << std::endl;
     }
 }
 
