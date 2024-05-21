@@ -15,7 +15,7 @@ public:
      * @param pkgUtil The IPmPkgUtil instance to use for package management operations.
      * @param fileUtils The IFileUtilities instance to use for file operations. 
      */
-    PmPlatformDiscovery(std::shared_ptr<IPmPkgUtil> pkgUtil, std::shared_ptr<PackageManager::IFileUtilities> fileUtils) : pkgUtilManager_(pkgUtil), fileUtils_(fileUtils) {}
+    PmPlatformDiscovery(std::shared_ptr<IPmPkgUtil> pkgUtil, std::shared_ptr<PackageManager::IFileUtilities> fileUtils) : pkgUtilManager_(std::move(pkgUtil)), fileUtils_(std::move(fileUtils)) {}
     
     /**
      * @brief Discovers the installed packages based on the provided catalog rules.
