@@ -15,7 +15,7 @@
 #include "PmLogger.hpp"
 #include "IPmPkgUtil.hpp"
 
-CodesignVerifier::CodesignVerifier(std::shared_ptr<IPmPkgUtil> pkgUtil) : pkgUtil_(pkgUtil)
+CodesignVerifier::CodesignVerifier(std::shared_ptr<IPmPkgUtil> pkgUtil) : pkgUtil_(std::move(pkgUtil))
 {
 
 }
