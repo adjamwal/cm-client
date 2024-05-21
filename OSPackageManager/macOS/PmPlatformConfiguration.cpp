@@ -167,8 +167,8 @@ void PmPlatformConfiguration::ReleaseSslCertificates(X509 **certificates, size_t
 
 std::string PmPlatformConfiguration::GetHttpUserAgent()
 {
-    static std::string httpUserAgent = static_cast<std::string>(kHttpUserAgentPrefix) + static_cast<std::string>(GetPmVersion());
-    return std::move(httpUserAgent);
+    static const std::string httpUserAgent = static_cast<std::string>(kHttpUserAgentPrefix) + static_cast<std::string>(GetPmVersion());
+    return httpUserAgent;
 }
 
 std::string PmPlatformConfiguration::GetInstallDirectory()
