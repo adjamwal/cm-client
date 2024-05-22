@@ -33,8 +33,15 @@ PmAgentController::PmAgentController( const std::string& path, const std::string
 
 PmAgentController::~PmAgentController()
 {
-    stop();
-    cleanup();
+    try
+    {
+        stop();
+        cleanup();
+    }
+    catch(CMLogger::logger_exception& e)
+    {
+        std::cerr << "CMLogger exception caught in PmAgentController destructor: " << e.what() << std::endl;
+    }
 }
 
 PM_STATUS PmAgentController::start()
