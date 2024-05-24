@@ -62,8 +62,11 @@ Daemon::Daemon():
 void Daemon::start()
 {
     using namespace std::chrono_literals;
+    std::error_code ecode;
     CM_LOG_DEBUG("Starting cloud management");
- 
+    CM_LOG_INFO( "CM: Using config path: %s, exists: %s, code: %d, msg: %s", ConfigShared::Config::cmConfigPath.c_str(),
+                 std::filesystem::exists(ConfigShared::Config::cmConfigPath) ? "Yes" : "No", ecode.value(), ecode.message().c_str() );
+
     fileWatcher_->add(config_->getPath(), []() {ConfigShared::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
     isRunning_ = true;
   

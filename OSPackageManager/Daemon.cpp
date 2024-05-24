@@ -81,6 +81,7 @@ void Daemon::setBooststrapPath(const std::string& strPath)
     if(std::filesystem::exists(p))
     {
         bootstrap_ = p;
+        PM_LOG_INFO( "PM Using bootstrap path: %s", bootstrap_.c_str() );
     }
     else
     {
@@ -94,6 +95,7 @@ void Daemon::setConfigPath(const std::string& strPath)
     if(std::filesystem::exists(p))
     {
         configFile_ = p;
+        PM_LOG_INFO( "PM Using config path: %s", configFile_.c_str() );
     }
     else
     {
@@ -112,6 +114,8 @@ void Daemon::setLoggerDir(const std::string& strLoggerDir)
             loggerDir_ = p;
         }
         loggerDir_ = p;
+
+        PM_LOG_INFO( "PM Using logged directory path: %s", loggerDir_.c_str() );
     }
     catch(std::exception& ex)
     {

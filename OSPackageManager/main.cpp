@@ -17,14 +17,23 @@ int main(int argc, char *argv[])
     //
 
     try {
+        const int nArgsReq = 5; 
         std::setlocale(LC_CTYPE, "UTF-8");
         PmLogger::initLogger();
-        if(argc < 5)
+
+        std::string arguments;
+        for ( int i = 0; i < argc; i++ ) {
+            arguments += " ";
+            arguments += argv[i];
+        }
+
+        if(argc < nArgsReq)
         {
-                //LOG_ERROR("Error: not enough arguments.\n"
-                //          "Usage: cmpackagemanager --bootstrap <PathToJSONBoostrapFile> --config-path <PathToJSONConfigFile>");
+            PM_LOG_ERROR("Error: not enough arguments. Required: %d, provided: %d, command: %s", nArgsReq, argc, arguments.c_str() );
             return 1;
         }
+
+        PM_LOG_INFO("PM Command: %s", arguments.c_str() );
         
         auto service = PackageManager::Daemon();
         

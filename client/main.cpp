@@ -69,8 +69,13 @@ int main(int argc, char *argv[])
         // - Signal handlers
         // - atExit() handler
         //
-        (void) argc;
-        (void) argv;
+        std::string arguments;
+        for ( int i = 0; i < argc; i++ ) {
+            arguments += " ";
+            arguments += argv[i];
+        }
+        
+        CM_LOG_INFO("CM Command: %s", arguments.c_str() );
         auto service = CloudManagement::Daemon();
         
         // This blocks till we're stopped

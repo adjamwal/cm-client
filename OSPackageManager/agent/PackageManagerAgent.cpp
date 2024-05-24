@@ -38,6 +38,13 @@ PackageManagerAgent::~PackageManagerAgent()
 
 int32_t PackageManagerAgent::start()
 {
+    std::error_code ecode;
+    PM_LOG_INFO( "PM Agent - Using config path: %s, exists: %s, code: %d, msg: %s", configFile_.c_str(),
+                 std::filesystem::exists(configFile_, ecode) ? "Yes" : "No", ecode.value(), ecode.message().c_str() );
+
+    PM_LOG_INFO( "PM Agent - Using bootstrap path: %s, exists: %s, code: %d, msg: %s", bootstrapFile_.c_str(),
+                 std::filesystem::exists(bootstrapFile_, ecode) ? "Yes" : "No", ecode.value(), ecode.message().c_str() );
+
     return packageManager_->Start(configFile_.c_str(), bootstrapFile_.c_str());
 }
 
