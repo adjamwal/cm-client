@@ -38,9 +38,16 @@ PmAgentController::~PmAgentController()
         stop();
         cleanup();
     }
-    catch(CMLogger::logger_exception& e)
-    {
+    catch(CMLogger::logger_exception& e) {
         std::cerr << "CMLogger exception caught in PmAgentController destructor: " << e.what() << std::endl;
+    }
+    catch (const std::length_error& e)
+    {
+        std::cerr << "Length error caught in PmAgentController destructor: " << e.what() << std::endl;
+    }
+    catch(...)
+    {
+        std::cerr << "Unknown exception caught in PmAgentController destructor." << std::endl;
     }
 }
 
