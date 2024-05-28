@@ -22,7 +22,7 @@ constexpr std::string_view kPmVersion{"0.0"};
 #ifdef CM_CONFIG_PATH
 constexpr std::string_view kCmConfigPath{CM_CONFIG_PATH};
 #else
-constexpr std::string_view kCmConfigPath{"/opt/cisco/secureclient/cloudmanagement/etc"};
+constexpr std::string_view kCmConfigPath{"/opt/cisco/secureclient/cloudmanagement/etc/"};
 #endif
 
 #ifdef CMID_DAEMON_PATH
