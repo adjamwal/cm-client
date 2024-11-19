@@ -94,7 +94,7 @@ void CMLogger::Log(CM_LOG_LVL_T severity, bool bIsStrErr, const char *message, .
     }
 
     char logBuf[2048] = { 0 };
-    char errStr[2048] = { 0 };
+    char errStr[256] = { 0 };
     char logLine[4096] = { 0 };
     va_list  va_args;
 
@@ -112,9 +112,9 @@ void CMLogger::Log(CM_LOG_LVL_T severity, bool bIsStrErr, const char *message, .
         }
     }
 
-    snprintf( logBuf, sizeof( logBuf ), "%s %s", message, errStr );
+    (void) snprintf( logBuf, sizeof( logBuf ), "%s %s", message, errStr );
     va_start( va_args, message );
-    vsnprintf( logLine, sizeof( logLine ), logBuf, va_args );
+    (void) vsnprintf( logLine, sizeof( logLine ), logBuf, va_args );
     writeLogLine( LogLevelStr( severity ), logLine );
     va_end( va_args );
 }
@@ -126,7 +126,7 @@ void CMLogger::Log(CM_LOG_LVL_T severity, bool bIsStrErr, const char *message, v
     }
     
     char logBuf[2048] = { 0 };
-    char errStr[2048] = { 0 };
+    char errStr[256] = { 0 };
     char logLine[4096] = { 0 };
     va_list  va_args_copy;
     
@@ -144,9 +144,9 @@ void CMLogger::Log(CM_LOG_LVL_T severity, bool bIsStrErr, const char *message, v
         }
     }
     
-    snprintf( logBuf, sizeof( logBuf ), "%s %s", message, errStr );
+    (void) snprintf( logBuf, sizeof( logBuf ), "%s %s", message, errStr );
     va_copy(va_args_copy, args);
-    vsnprintf( logLine, sizeof( logLine ), logBuf, va_args_copy );
+    (void) vsnprintf( logLine, sizeof( logLine ), logBuf, va_args_copy );
     writeLogLine( LogLevelStr( severity ), logLine );
     va_end( va_args_copy );
 }

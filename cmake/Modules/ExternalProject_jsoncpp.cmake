@@ -22,6 +22,7 @@ if(NOT TARGET "third-party-${component_name}")
         CMAKE_ARGS
             -DCMAKE_INSTALL_PREFIX:PATH=${component_install_prefix}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DCMAKE_INSTALL_LIBDIR=lib
             -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES_}
             -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
             -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF

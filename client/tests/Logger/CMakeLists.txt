@@ -21,6 +21,8 @@ target_link_libraries(
   LoggerTest
   configshared
   ${GTEST_LIBS}
+  pthread
+  $<$<BOOL:${LINUX}>:stdc++fs>
 )
 
 target_include_directories(

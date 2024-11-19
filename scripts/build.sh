@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 # Copyright 2022 Cisco Systems, Inc.
 
 # set -x
@@ -228,6 +228,7 @@ else
             else
                 cmake ${CMAKE_EXTRA_ARGS} ../
             fi
+	    # Optionally add --verbose for debugging build issues
             cmake --build .
         popd
 
@@ -246,27 +247,29 @@ else
                 cmake --install .
             popd
         
-            echo "** Building CM Installer **"
-            BUILD_TYPE="${CMAKE_BUILD_DIR}"
-            DMG_INSTALLER_DIR="Installer"
-            DMG_BUILDER_SCRIPT="build_cm_installer.sh"
+            if [ "${SYSTEM}" = "Darwin" ]; then 
+                echo "** Building CM Installer **"
+                BUILD_TYPE="${CMAKE_BUILD_DIR}"
+                DMG_INSTALLER_DIR="Installer"
+                DMG_BUILDER_SCRIPT="build_cm_installer.sh"
 
-            if [ -d "${BUILD_STAGING_DIR}" ]; then
-                echo "Removing existing build Staging directory"
-                rm -rf "${BUILD_STAGING_DIR}"
+                if [ -d "${BUILD_STAGING_DIR}" ]; then
+                    echo "Removing existing build Staging directory"
+                    rm -rf "${BUILD_STAGING_DIR}"
+                fi
+
+                pushd "${DMG_INSTALLER_DIR}"
+                    "./${DMG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
+                    echo "** CM Installer built successfully **"
+                popd
+
+                echo "** Building Sample Installer **"
+                SAMPLE_PKG_BUILDER_SCRIPT="build_sample_installer.sh"
+                pushd "${DMG_INSTALLER_DIR}"
+                    "./${SAMPLE_PKG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
+                    echo "** Sample Installer built successfully **"
+                popd
             fi
-
-            pushd "${DMG_INSTALLER_DIR}"
-                "./${DMG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
-                echo "** CM Installer built successfully **"
-            popd
-
-            echo "** Building Sample Installer **"
-            SAMPLE_PKG_BUILDER_SCRIPT="build_sample_installer.sh"
-            pushd "${DMG_INSTALLER_DIR}"
-                "./${SAMPLE_PKG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
-                echo "** Sample Installer built successfully **"
-            popd
 
         fi
     fi

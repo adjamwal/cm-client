@@ -10,7 +10,9 @@
 #pragma once
 
 #include "PackageManager/IPmLogger.h"
+#ifdef __APPLE__
 #include "ProxyDiscovery/IProxyLogger.h"
+#endif /* __APPLE__ */
 #include "IConfigLogger.hpp"
 #include <string>
 #include <filesystem>
@@ -47,10 +49,13 @@ public:
     static void initLogger();
     static void releaseLogger();
     
+#ifdef __APPLE__
     proxy::IProxyLogger& getProxyLogger();
+#endif /* __APPLE__ */
     ConfigShared::IConfigLogger& getConfigLogger();
 
 private:
+#ifdef __APPLE__
     class ProxyLogger: public proxy::IProxyLogger
     {
     public:
@@ -64,6 +69,7 @@ private:
     private:
         PmLogger* pOrigLogger_;
     };
+#endif /* __APPLE__ */
     
     class ConfigLogger: public ConfigShared::IConfigLogger
     {
@@ -84,7 +90,9 @@ private:
     FILE* printDummyFile_{nullptr};
     Severity curSeverity_ = LOG_DEBUG;
     std::string loggerName_;
+#ifdef __APPLE__
     ProxyLogger proxyLogger_;
+#endif /* __APPLE__ */
     ConfigLogger configLogger_;
 
     void writeLog(Severity severity, const char* msgFormatter, va_list args);

@@ -60,12 +60,21 @@ git push -u origin <branch name>
 
 To be able to build cm-client, the following software packages are required:
 
+## On macOS
+
 - CMake - which can be acquired from [here](https://cmake.org/download/)
 - Xcode - 12.2 and higher (Minimum for Universal binaries)
 - Xcode Command Line Tools - running `clang`, `gcc` or similar commands will trigger a prompt, or just run `xcode-select --install` to begin the install process.
 - Ninja - acquire [ninja-mac.zip](https://github.com/ninja-build/ninja/releases) and copy `ninja` to `/usr/local/bin` for building crashpad (or non-Xcode builds as it's far faster than `Makefile` builds)
 
 > **NOTE** You may need to run `ninja` once and then allow it to run through `System Settings` -> `Privacy & Security`
+
+## On Linux
+
+- Basic software development tools (if not already installed) such as compilers, git, ninja and CMake
+- CiscoSSL build expects a full perl installation, this means pulling in `perl-core` on RedHat distributions, and `perl` on Debian based installations
+- libuuid-devel or uuid-devel (on Red Hat distributions), uuid-dev (on Debian)
+- libarchive, if not already installed
 
 # Build
 

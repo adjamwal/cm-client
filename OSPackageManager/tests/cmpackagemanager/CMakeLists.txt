@@ -19,8 +19,8 @@ add_executable(
   ${TESTEE_DIR}/macOS/PmCertManager.cpp
   ${TESTEE_DIR}/macOS/PmPlatformComponentManager.cpp
   ${TESTEE_DIR}/macOS/PmPlatformDiscovery.cpp
-  ${TESTEE_DIR}/macOS/PmLogger.cpp
-  ${TESTEE_DIR}/macOS/PmLogger.hpp
+  ${TESTEE_DIR}/common/PmLogger.cpp
+  ${TESTEE_DIR}/common/PmLogger.hpp
   ${TESTEE_DIR}/macOS/PmCodesignVerifierMac.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.cpp
   ${TESTEE_DIR}/macOS/FileUtilities.mm
@@ -51,7 +51,9 @@ add_executable(
   ${TESTEE_DIR}/environment/UnitTestBase.cpp
 )
 
+if(APPLE)
 set_property(TARGET PackageManagerUnitTest APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
+endif()
 
 add_dependencies(
     PackageManagerUnitTest
@@ -60,13 +62,19 @@ add_dependencies(
     third-party-gtest
     third-party-jsoncpp
     third-party-PackageManager
-    third-party-ProxyDiscovery-Mac
     third-party-spdlog
 )
 
+if(APPLE)
+add_dependencies(
+    PackageManagerUnitTest
+    third-party-ProxyDiscovery-Mac
+)
+endif()
+
 target_link_libraries(
   PackageManagerUnitTest
-  ProxyDiscovery
+  $<$<BOOL:${APPLE}>:ProxyDiscovery>
   cmidapi
   crypto
   jsoncpp
@@ -94,12 +102,13 @@ target_include_directories(
   PackageManagerUnitTest
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
-      ${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery
+      $<$<BOOL:${APPLE}>:${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery>
       ${cm-client_SOURCE_DIR}
       ${cm-client_SOURCE_DIR}/client/Logger
       ${cm-client_SOURCE_DIR}/OSPackageManager/environment
       ${cm-client_SOURCE_DIR}/OSPackageManager/proxy
       ${cm-client_SOURCE_DIR}/OSPackageManager/macOS
+      ${cm-client_SOURCE_DIR}/OSPackageManager/common
       ${cm-client_SOURCE_DIR}/OSPackageManager/configuration
       ${cm-client_SOURCE_DIR}/OSPackageManager/Mocks
       ${cm-client_SOURCE_DIR}/util

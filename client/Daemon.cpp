@@ -9,7 +9,9 @@
 #include "ComponentLoader/PMLoader.hpp"
 #include "Logger/CMLogger.hpp"
 #include "ConfigWatchdog.hpp"
+#ifdef __APPLE__
 #include "crashpad/CrashpadTuner.h"
+#endif
 #include "ThreadTimer.hpp"
 
 #include <sys/stat.h>
@@ -18,18 +20,23 @@
 
 namespace CloudManagement
 {
+#ifdef __APPLE__
 const std::string fileWatcherName {"CloudManagement_FileWatcher"};
+#endif
 
 void Daemon::configCallback()
 {
     applyLoggerSettings();
+#ifdef __APPLE__
     applyCrashpadSettings();
+#endif
 }
     
 void Daemon::applyLoggerSettings() {
     CMLogger::getInstance().SetLogLevel(static_cast<CM_LOG_LVL_T>(config_->getLogLevel()));
 }
-    
+
+#ifdef __APPLE__
 void Daemon::applyCrashpadSettings() {
     auto *pCrashpadTuner = CrashpadTuner::getInstance();
     const auto& crashpadConfig = config_->getCrashpadConfig();
@@ -42,18 +49,22 @@ void Daemon::applyCrashpadSettings() {
     if (crashpadConfig.uploadUrl.has_value())
         pCrashpadTuner->setUploadUrl( crashpadConfig.uploadUrl.value() );
 }
-    
-    
+#endif
+
 //! @todo creation of PM, should also load the process
-Daemon::Daemon():
+Daemon::Daemon() :
     config_ { std::make_unique<ConfigShared::Config>(&CMLogger::getInstance().getConfigLogger()) },
     cmidLoader_ { std::make_unique<CMIDLoader>() },
-    pmLoader_ { std::make_unique<PMLoader>() },
-    fileWatcher_ { std::make_unique<FileWatcher>(fileWatcherName) },
-    proxyWatcher_ { std::make_unique<ProxyWatcher>() }
+    pmLoader_ { std::make_unique<PMLoader>() }
+#ifdef __APPLE__
+    , fileWatcher_ { std::make_unique<FileWatcher>(fileWatcherName) }
+    , proxyWatcher_ { std::make_unique<ProxyWatcher>() }
+#endif
 {
     applyLoggerSettings();
+#ifdef __APPLE__
     applyCrashpadSettings();
+#endif
     
     ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
     ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber([&](){ this->configCallback(); });
@@ -67,7 +78,9 @@ void Daemon::start()
     CM_LOG_INFO( "CM: Using config path: %s, exists: %s, code: %d, msg: %s", ConfigShared::Config::cmConfigPath.c_str(),
                  std::filesystem::exists(ConfigShared::Config::cmConfigPath) ? "Yes" : "No", ecode.value(), ecode.message().c_str() );
 
+#ifdef __APPLE__
     fileWatcher_->add(config_->getPath(), []() {ConfigShared::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
+#endif
     isRunning_ = true;
   
     task_ = std::thread(&Daemon::mainTask, this);

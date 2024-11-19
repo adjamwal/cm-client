@@ -55,7 +55,9 @@ struct deletable_facet : Facet
 };
 
 PmLogger::PmLogger():
+#ifdef __APPLE__
         proxyLogger_(this),
+#endif
         configLogger_(this)
 {
     initDevNullDummyFile();
@@ -338,26 +340,31 @@ void PmLogger::initDevNullDummyFile()
     printDummyFile_ = fopen("/dev/null", "wb");
 }
 
+#ifdef __APPLE__
 proxy::IProxyLogger& PmLogger::getProxyLogger()
 {
     return proxyLogger_;
 }
+#endif
 
 ConfigShared::IConfigLogger& PmLogger::getConfigLogger()
 {
     return configLogger_;
 }
 
+#ifdef __APPLE__
 PmLogger::ProxyLogger::ProxyLogger(PmLogger* pLogger):
     pOrigLogger_(pLogger)
 {
 }
+#endif
 
 PmLogger::ConfigLogger::ConfigLogger(PmLogger* pLogger):
 pOrigLogger_(pLogger)
 {
 }
 
+#ifdef __APPLE__
 void PmLogger::ProxyLogger::Log( int severity, const char* msgFormatter, ... )
 {
     va_list va_args;
@@ -370,6 +377,7 @@ void PmLogger::ProxyLogger::Log( int severity, const char* msgFormatter, va_list
 {
     pOrigLogger_->Log(static_cast<PmLogger::Severity>(severity), msgFormatter, args);
 }
+#endif
 
 void PmLogger::ConfigLogger::Log( int severity, const char* msgFormatter, const char *fileName, const char *funcName, long lineNumber, ... ) {
     assert(pOrigLogger_);

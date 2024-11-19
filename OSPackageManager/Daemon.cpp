@@ -9,9 +9,12 @@
 #include "agent/PackageManagerAgent.hpp"
 #include "PmLogger.hpp"
 #include "ConfigWatchdog.hpp"
+#ifdef __APPLE__
 #include "ProxyDiscovery/IProxyLogger.h"
+#endif
 
 #include <sys/stat.h>
+#include <cassert>
 #include <chrono>
 #include <iostream>
 #include <filesystem>
@@ -46,19 +49,26 @@ Daemon::Daemon()
     setLoggerDir(static_cast<std::string>(kLogDir));
 #endif
 #endif
+#ifdef __APPLE__
+    /** @note Implement for Linux */
     fileWatcher_ = std::make_unique<FileWatcher>(fileWatcherName);
+#endif /* __APPLE__ */
 }
 
 void Daemon::start()
 {
     isRunning_ = true;
     config_ = std::make_unique<ConfigShared::Config>(configFile_, &PmLogger::getLogger().getConfigLogger());
+#ifdef __APPLE__
     fileWatcher_->add(config_->getPath(), []() {ConfigShared::ConfigWatchdog::getConfigWatchdog().detectedConfigChanges();});
+#endif /* __APPLE__ */
     ConfigShared::ConfigWatchdog::getConfigWatchdog().addSubscriber(config_->subscribeForConfigChanges());
     PmLogger::getLogger().SetLogLevel(static_cast<IPMLogger::Severity>(config_->getLogLevel()));
     PmLogger::getLogger().initFileLogging(loggerDir_, static_cast<std::string>(kLogFileName),
         kMaxSize, kMaxFiles);
+#ifdef __APPLE__
     proxy::SetProxyLogger(&PmLogger::getLogger().getProxyLogger());
+#endif
     config_->setConfigLogger(&PmLogger::getLogger().getConfigLogger());
         
     task_ = std::thread(&Daemon::mainTask, this);

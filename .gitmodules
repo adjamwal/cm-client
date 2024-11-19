@@ -29,3 +29,6 @@
 [submodule "ProxyDiscovery-Mac"]
 	path = ProxyDiscovery-Mac
 	url = ../../UnifiedConnector/ProxyDiscovery-Mac.git
+[submodule "third-party/libxml2"]
+	path = third-party/libxml2
+	url = ../../Cloud/libxml2.git

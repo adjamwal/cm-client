@@ -20,6 +20,8 @@ target_link_libraries(
   jsoncpp
   configshared
   ${GTEST_LIBS}
+  pthread
+  $<$<BOOL:${LINUX}>:stdc++fs>
 )
 
 target_compile_definitions(
@@ -43,7 +45,7 @@ target_link_directories(
   ConfigTest BEFORE
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/lib
-  ${inherited}
+      ${inherited}
 )
 
 include(GoogleTest)

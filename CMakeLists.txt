@@ -7,11 +7,12 @@ cmake_minimum_required(VERSION 3.19)
 # and find_package()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-project(cm-client VERSION 1.0.0)
-
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CXX_EXTENSIONS ON) # -std=gnu++11 instead of -std=c++11.
+
+project(cm-client VERSION 1.0.0)
 
 if(APPLE)
     message("** Building on macOS, generator ${CMAKE_GENERATOR} **")
@@ -33,6 +34,10 @@ if(APPLE)
     if(DEFINED SIGNING_CERT)
         message("--Build will sign using ${SIGNING_CERT}")
     endif()
+
+    set(LINUX false)
+else()
+    set(LINUX true)
 endif()
 
 # remove ZERO_CHECK target from xcode
@@ -76,9 +81,13 @@ include(ExternalProject_spdlog)
 include(ExternalProject_ciscossl)
 include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)
-include(ExternalProject_crashpad)
+if(APPLE)
+    include(ExternalProject_crashpad)
+    include(ExternalProject_ProxyDiscovery-Mac)
+else()
+    include(ExternalProject_libxml2)
+endif()
 include(ExternalProject_gtest)
-include(ExternalProject_ProxyDiscovery-Mac)
 include(ExternalProject_PackageManager)
 include(ExternalProject_EndpointIdentity)
 
@@ -105,6 +114,8 @@ add_subdirectory(OSPackageManager)
 ## The Cloud Management Connector client
 add_subdirectory(client)
 
+if(APPLE)
 ##
 ##
 add_subdirectory(Uninstaller)
+endif()

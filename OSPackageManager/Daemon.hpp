@@ -7,7 +7,9 @@
 #pragma once
 
 #include "PackageManager/IPmLogger.h"
+#ifdef __APPLE__
 #include "common/macOS/FileWatcher.hpp"
+#endif /* __APPLE__ */
 #include "Config.hpp"
 
 
@@ -40,7 +42,9 @@ private:
     std::string bootstrap_;
     std::string configFile_;
     std::string loggerDir_;
+#ifdef __APPLE__
     std::unique_ptr<FileWatcher> fileWatcher_;
+#endif /* __APPLE__ */
 
     void mainTask();
 };

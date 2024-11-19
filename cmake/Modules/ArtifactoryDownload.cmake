@@ -34,7 +34,10 @@ function(download_component component_name component_dst_dir)
             URL "${artifactory_url}"
             CONFIGURE_COMMAND echo "Configuration not necessary."
             BUILD_COMMAND echo "Build not necessary."
-            INSTALL_COMMAND ${COMMAND} cp -aR "${component_dst_dir}/." "${CM_THIRDPARTY_EXPORT}"
+            INSTALL_COMMAND
+	        COMMAND cp -aR "${component_dst_dir}/." "${CM_THIRDPARTY_EXPORT}"
+		COMMAND echo "Purging pkgconfig which references paths from build slave"
+	        COMMAND rm -fr "${CM_THIRDPARTY_EXPORT}/lib/pkgconfig"
         )
 
     endif()

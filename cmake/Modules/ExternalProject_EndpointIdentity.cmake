@@ -32,6 +32,7 @@ if(NOT TARGET "third-party-${component_name}")
     # TODO Currently project has no rules to install, add INSTALL_COMMAND (such as below)
     #      Right now, it's been forked and we added our own install directives
     #    INSTALL_COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/cmid/src/third-party-cmid-build/controlplugin/libcmidcontrolplugin.dylib ${CM_THIRDPARTY_EXPORT}/lib/.
+    if(APPLE)
     ExternalProject_Add(
         third-party-${component_name}
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/EndpointIdentity/cmid
@@ -46,6 +47,23 @@ if(NOT TARGET "third-party-${component_name}")
             -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
         CMAKE_COMMAND VERSION=1.1 RELNUM=1111 ${CMAKE_COMMAND}
     )
+    else()
+    ExternalProject_Add(
+        third-party-${component_name}
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/EndpointIdentity/cmid
+        PREFIX ${component_install_prefix}
+        DEPENDS third-party-libxml2
+        CMAKE_GENERATOR ${CMAKE_GENERATOR}
+        CMAKE_ARGS
+            -DBUILD_TESTING=0
+            -DCONTROL_PLUGIN_STATIC_LIB=1
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo
+            -DCMAKE_INSTALL_PREFIX:PATH=${component_install_prefix}
+            -DLIBXML2_LIBRARY=${LIBXML2_LIBRARY}
+            -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
+        CMAKE_COMMAND VERSION=1.1 RELNUM=1111 ${CMAKE_COMMAND}
+    )
+    endif()
 
     upload_component(${component_name} sign_dependee_step)
 

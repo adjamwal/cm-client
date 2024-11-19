@@ -7,6 +7,7 @@
 #include "ExecutionError.hpp"
 #include "CMLogger.hpp"
 #include "util/ScopedGuard.hpp"
+#include <string.h>
 #include <iostream>
 #include <vector>
 #include <system_error>
@@ -159,6 +160,9 @@ void PmAgentController::cleanup()
 
 PM_STATUS PmAgentController::killIfRunning()
 {
+    /** @todo Implement for Linux */
+
+#ifdef __APPLE__
     std::vector<pid_t> processIDs = pProcessWrapper_->getRunningProcesses();
     for (auto&& pid: processIDs)
     {
@@ -181,6 +185,7 @@ PM_STATUS PmAgentController::killIfRunning()
             }
         }
     }
+#endif
     return PM_STATUS::PM_OK;
 }
 

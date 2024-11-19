@@ -6,12 +6,15 @@ include(TargetEnableWarnings)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(PM_KEY "pm")
 
+if(APPLE)
 set(OS_PACKAGE_MANAGER_SRCS
     Daemon.cpp
     Daemon.hpp
     main.cpp
     agent/PackageManagerAgent.cpp
     agent/PackageManagerAgent.hpp
+    common/PmLogger.cpp
+    common/PmLogger.hpp
     macOS/IFileUtilities.hpp
     macOS/IPmCertRetriever.hpp
     macOS/FileUtilities.cpp
@@ -21,8 +24,6 @@ set(OS_PACKAGE_MANAGER_SRCS
     macOS/PmCertManager.hpp
     macOS/PmCertRetrieverImpl.cpp
     macOS/PmCertRetrieverImpl.hpp
-    macOS/PmLogger.cpp
-    macOS/PmLogger.hpp
     macOS/PmPlatformComponentManager.cpp
     macOS/PmPlatformComponentManager.hpp
     macOS/PmPlatformConfiguration.cpp
@@ -39,11 +40,31 @@ set(OS_PACKAGE_MANAGER_SRCS
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.mm
     ${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp
 )
+else()
+set(OS_PACKAGE_MANAGER_SRCS
+    Daemon.cpp
+    Daemon.hpp
+    main.cpp
+    common/PmLogger.cpp
+    common/PmLogger.hpp
+    agent/PackageManagerAgent.cpp
+    agent/PackageManagerAgent.hpp
+    linux/PmPlatformComponentManager.cpp
+    linux/PmPlatformComponentManager.hpp
+    linux/PmPlatformConfiguration.cpp
+    linux/PmPlatformConfiguration.hpp
+    linux/PmPlatformDependencies.cpp
+    linux/PmPlatformDependencies.hpp
+)
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/common/PmLogger.cpp PROPERTIES COMPILE_FLAGS "-Wno-maybe-uninitialized")
+endif()
 
 add_executable(cmpackagemanager ${OS_PACKAGE_MANAGER_SRCS})
 
+if(APPLE)
 set_property(TARGET cmpackagemanager APPEND_STRING PROPERTY 
               COMPILE_FLAGS "-fobjc-arc")
+endif()
 
 add_dependencies(cmpackagemanager
     third-party-ciscossl
@@ -52,18 +73,25 @@ add_dependencies(cmpackagemanager
     third-party-jsoncpp
     third-party-EndpointIdentity
     third-party-PackageManager
-    third-party-ProxyDiscovery-Mac
     third-party-spdlog
 )
+
+if(APPLE)
+add_dependencies(cmpackagemanager
+    third-party-ProxyDiscovery-Mac
+)
+endif()
 
 target_include_directories(cmpackagemanager
     PUBLIC
     ${CM_THIRDPARTY_EXPORT}/include
-    ${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery
+    $<$<BOOL:${APPLE}>:${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery>
     ${cm-client_SOURCE_DIR}
     ${cm-client_SOURCE_DIR}/util
     # This include should be based on platform when we extend support for Linux
-    ${CMAKE_CURRENT_SOURCE_DIR}/macOS
+    $<$<BOOL:${APPLE}>:${CMAKE_CURRENT_SOURCE_DIR}/macOS>
+    $<$<BOOL:${LINUX}>:${CMAKE_CURRENT_SOURCE_DIR}/linux>
+    ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/util
     ${CMAKE_CURRENT_SOURCE_DIR}/proxy
 )
@@ -75,7 +103,7 @@ target_link_directories(cmpackagemanager BEFORE
 
 target_link_libraries(cmpackagemanager
     PUBLIC
-    ProxyDiscovery
+    $<$<BOOL:${APPLE}>:ProxyDiscovery>
     cmidapi
     pmclient
     pmcloud
@@ -87,13 +115,14 @@ target_link_libraries(cmpackagemanager
     ssl
     util
     configshared
+    pthread
     z
-    xar
-    "-framework SystemConfiguration"
-    "-framework IOKit"
-    "-framework CoreServices"
-    "-framework Security"
-    "-framework Foundation"
+    $<$<BOOL:${LINUX}>:stdc++fs>
+    $<$<BOOL:${APPLE}>:xar>
+    "$<$<BOOL:${APPLE}>:-framework SystemConfiguration>"
+    "$<$<BOOL:${APPLE}>:-framework IOKit>"
+    "$<$<BOOL:${APPLE}>:-framework CoreServices>"
+    "$<$<BOOL:${APPLE}>:-framework Security>"
 )
 
 target_compile_definitions(cmpackagemanager

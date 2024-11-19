@@ -3,6 +3,8 @@
 #include <string>
 #include <filesystem>
 #include <fstream>
+#include <optional>
+#include <functional>
 #include <shared_mutex>
 #include <json/json.h>
 

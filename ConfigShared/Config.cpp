@@ -1,4 +1,5 @@
 #include "Config.hpp"
+#include <mutex>
 #include <cassert>
 
 namespace ConfigShared

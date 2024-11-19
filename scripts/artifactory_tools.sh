@@ -209,7 +209,7 @@ get_exclude_patterns(){
     local exclude_patterns=(${exclude_pattern_relation##*:})
     if [ "${component}" == "${prereq}" ]; then
       for exclude_pattern in "${exclude_patterns[@]}" ; do
-        full_exclude_pattern="${full_exclude_pattern} --exclude=${exclude_pattern} --exclude=./export/src --exclude=./export/tmp"
+        full_exclude_pattern="${full_exclude_pattern} --exclude=${exclude_pattern} --exclude=./export/src --exclude=./export/tmp --exclude=./export/lib/pkgconfig"
       done
       echo "${full_exclude_pattern}"
     fi

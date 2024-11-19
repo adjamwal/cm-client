@@ -1,5 +1,11 @@
 # Copyright (c) 2023 Cisco Systems, Inc. All Rights Reserved.
 
+if(APPLE)
+    set(OS_SPECIFIC_SUFFIX "Mac")
+elseif(LINUX)
+    set(OS_SPECIFIC_SUFFIX "Linux")
+endif()
+
 list(APPEND CONTROL_PLUGIN_SOURCES
     ModuleControlPlugin.cpp
     ModuleControlPlugin.hpp
@@ -7,7 +13,7 @@ list(APPEND CONTROL_PLUGIN_SOURCES
     PmAgentController.hpp
     PmStatusTypes.hpp
     IProcessWrapper.hpp
-    ProcessWrapper.cpp
+    ProcessWrapper${OS_SPECIFIC_SUFFIX}.cpp
     ProcessWrapper.hpp
     ExecutionError.hpp
     ExecutionError.cpp
@@ -39,10 +45,10 @@ add_dependencies(pmcontrolplugin
 target_link_libraries(pmcontrolplugin
     PRIVATE
 	configshared
-        ${SystemConfiguration_framework}
-        ${IOKit_framework}
-        ${CoreServices_framework}
-        ${Security_framework}
+        $<$<BOOL:${APPLE}>:${SystemConfiguration_framework}>
+	$<$<BOOL:${APPLE}>:${IOKit_framework}>
+	$<$<BOOL:${APPLE}>:${CoreServices_framework}>
+	$<$<BOOL:${APPLE}>:${Security_framework}>
 )
 
 install(TARGETS pmcontrolplugin DESTINATION ${CM_THIRDPARTY_EXPORT}/lib/)

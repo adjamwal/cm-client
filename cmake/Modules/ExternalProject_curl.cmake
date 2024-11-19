@@ -24,13 +24,13 @@ if(NOT TARGET "third-party-${component_name}")
         # than the configure.ac files and such
         #COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_SOURCE_DIR}/third-party/curl/src/configure
         CONFIGURE_COMMAND "${CURL_SRC_DIR}/configure"
-            CC=${XCODE_CC}
-            CPP=${XCODE_CPP}
+            $<$<BOOL:${APPLE}>:CC=${XCODE_CC}>
+            $<$<BOOL:${APPLE}>:CPP=${XCODE_CPP}>
             CPPFLAGS=-I${CM_THIRDPARTY_EXPORT}/include
             LDFLAGS=-L${CM_THIRDPARTY_EXPORT}/lib
             --prefix=${component_install_prefix}
-            --enable-fts5=no
-            --enable-json1=no
+            $<$<BOOL:${APPLE}>:--enable-fts5=no>
+            $<$<BOOL:${APPLE}>:--enable-json1=no>
             --without-libidn2
             --without-libssh2
             --without-zstd
@@ -49,7 +49,7 @@ if(NOT TARGET "third-party-${component_name}")
             --disable-gopher
             --disable-mqtt
             --disable-shared
-            --with-ssl=${CM_THIRDPARTY_EXPORT}
+            --with-openssl=${CM_THIRDPARTY_EXPORT}
             --without-ca-bundle
             --without-ca-path
             curl_disallow_poll=yes

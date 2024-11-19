@@ -60,11 +60,11 @@ build_ciscossl_forarch()
         local SDK_AR="${BIN_ROOT}/ar"
         local SDK_NM="${BIN_ROOT}/nm"
         local SDK_RANLIB="${BIN_ROOT}/ranlib"
-        local CURR_ARCH="linux-x86_64"
+        local CURR_ARCH="linux-$(arch)"
 
     else
         echo "Unsupported system! Aborting"
-        exit
+        exit 1
     fi
 
     rm -fr /tmp/fips

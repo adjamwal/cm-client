@@ -6,7 +6,9 @@
 #include "Daemon.hpp"
 #include "Logger/CMLogger.hpp"
 #include "Config.hpp"
+#ifdef __APPLE__
 #include "crashpad/CrashpadTuner.h"
+#endif
 #include "cmid/CMIDAPI.h"
 #include <iostream>
 
@@ -21,6 +23,7 @@ void initLogging()
     CMLogger::getInstance(logFilePath);
 }
 
+#ifdef __APPLE__
 bool GetUcIdentity(std::string& identity)
 {
     int buflen = 0;
@@ -56,14 +59,16 @@ void initCrashpad()
     pCrashpadTuner->setUploadEnabled(true);
     pCrashpadTuner->init(ConfigShared::Config::cmidExePath);
 }
-
+#endif
 }
 
 int main(int argc, char *argv[])
 {
     try {
         initLogging();
+#ifdef __APPLE__
         initCrashpad();
+#endif
         // TODO:
         //
         // - Signal handlers

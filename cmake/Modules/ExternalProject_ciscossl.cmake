@@ -35,21 +35,31 @@ if(NOT TARGET "third-party-${component_name}")
                 #
                 # Passing argument -c to do a clean prior to build
                 CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                sh "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ciscossl.sh" -c
+                /bin/bash "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ciscossl.sh" -c
             COMMAND
                 CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                sh "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ciscossl.sh"
+                /bin/bash "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ciscossl.sh"
         INSTALL_COMMAND echo "Auto-installed by build"
     )
 
     upload_component(${component_name} not_used)
 endif()
 
+if(EXISTS "${CM_THIRDPARTY_EXPORT}/libshared")
+    set(cmake_export_libshared_dir "${CM_THIRDPARTY_EXPORT}/libshared")
+else()
+    set(cmake_export_libshared_dir "${CM_THIRDPARTY_EXPORT}/lib")
+endif()
+
+# TODO Seems to be OK for Linux as symlinks are correct create a similar
+#      version for .so if needed
+if(APPLE)
 ExternalProject_Add_Step(third-party-${component_name} post_install_symlink_fix
-    WORKING_DIRECTORY "${CM_THIRDPARTY_EXPORT}/libshared"
+    WORKING_DIRECTORY "${cmake_export_libshared_dir}"
     DEPENDEES copy_exports
     COMMAND rm -rf libcrypto.dylib
     COMMAND rm -rf libssl.dylib
     COMMAND ln -sf libcrypto.1.1.dylib libcrypto.dylib
     COMMAND ln -sf libssl.1.1.dylib libssl.dylib
 )
+endif()

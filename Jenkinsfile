@@ -1,35 +1,58 @@
+import groovy.transform.Field
+
+@Field def AMPCXI_JENKINS_OWNER = 'Cloud'
+@Field def AMPCXI_JENKINS_TAG = 'master'
+
+node("ANSIBLE&&CONTROLLER") {
+  library identifier: "ampcxi-jenkins-library@${AMPCXI_JENKINS_TAG}", retriever: modernSCM (
+    scm: [
+      $class: 'GitSCMSource',
+      remote: "https://code.engine.sourcefire.com/${AMPCXI_JENKINS_OWNER}/ampcxi-jenkins",
+      credentialsId: '6ea4923c-e6a6-4df4-82b4-9b1004c9c85b'
+    ],
+    libraryPath: 'lib'
+  )
+}
+
+@Field def build_platforms
+
+def linuxBuildPlatforms() {
+  return [
+    "alma8": ["tag": "el8"],
+    "alma9": ["tag": "el9"],
+    // TODO Enable Ubuntu
+//    "ubuntu20": ["tag": "ubuntu20"],
+    "mac14arm": ["tag": "mac14arm"],
+  ]
+}
+
+// CI Helpers
+// ##### CI & Build Nodes Setup start.
+def setup_ephemeral_nodes(platformList) {
+  type = pipeline_utils.isBranch() ? "release" : "ci"
+  parallelDeployNodes = [:]
+
+  platformList.each { platform ->
+    parallelDeployNodes[platform] = {
+      def node = pipeline_utils.filter_nodes(platform, type, false)
+      if (node.size()) {
+        env."${platform}" = node.first()
+      } else {
+        def os = platform.replaceAll("-aws","")
+        if (os == "suse15") { // AWS/Provision-Manager uses 'opensuse15' to deploy 'suse15'
+          os = "opensuse15"
+        }
+
+        env."${platform}" = aws_utils.deployCINodes("daily", os)[0]
+      }
+    }
+  }
+  parallel parallelDeployNodes
+}
+// ##### CI & Build Nodes setup end.
+
 def isPullRequest() {
     return env.CHANGE_ID != null
-}
-
-def cmclientCheckout(recursiveSubmodules) {
-  checkout([$class: 'GitSCM',
-  branches: [[name: isPullRequest() ? 'refs/remotes/origin/PR-${CHANGE_ID}' : '${BRANCH_NAME}']],
-  doGenerateSubmoduleConfigurations: false,
-  extensions: [[$class: 'SubmoduleOption',
-  disableSubmodules: false,
-  parentCredentials: true,
-  recursiveSubmodules: recursiveSubmodules,
-  reference: '',
-  trackingSubmodules: false],
-  [$class: 'RelativeTargetDirectory', relativeTargetDir: 'cm-client']],
-  submoduleCfg: [],
-  userRemoteConfigs: scm.userRemoteConfigs])
-}
-
-//Perform a checkout of the cm-client repo into a subfolder and update all submodules
-def repoCheckout(platform) {
-  if (!isPullRequest()){
-    echo "Branch Build; cleaning workspace before checkout"
-    deleteDir()
-  }
-
-  if (isPullRequest() && hasLabel(env.CLEAN_WS_LABEL)) {
-    echo "${env.CLEAN_WS_LABEL} label found in pull request; cleaning workspace before checkout"
-    deleteDir()
-  }
-
-  cmclientCheckout(true)
 }
 
 def continueCI() {
@@ -44,6 +67,184 @@ def continueCI() {
   return true
 }
 
+def checkout_cmclient(owner, branch) {
+  if (isPullRequest() && hasLabel(env.CLEAN_WS_LABEL)) {
+    echo "${env.CLEAN_WS_LABEL} label found in pull request; cleaning workspace before checkout"
+    deleteDir()
+  }
+
+  echo "Checking out https://code.engine.sourcefire.com/${owner}/cm-client:${branch}"
+
+  checkout([
+    $class: 'GitSCM',
+    branches: [[name: "*/${branch}"]],
+    userRemoteConfigs: [[ url: "https://code.engine.sourcefire.com/${owner}/cm-client", credentialsId: "6ea4923c-e6a6-4df4-82b4-9b1004c9c85b" ]],
+    doGenerateSubmoduleConfigurations: false,
+    extensions: [
+      [ $class: 'SubmoduleOption',
+        disableSubmodules: false,
+        parentCredentials: true,
+        recursiveSubmodules: true,
+        reference: '',
+        threads: 8, // default 1, max 8
+        shallow: true,
+        trackingSubmodules: false],
+      [ $class: 'RelativeTargetDirectory', relativeTargetDir: 'cm-client']
+    ]
+  ])
+}
+
+def generate_checkout(platform, owner, tag) {
+  return {
+    node(env."${platform}") {
+      env."CUSTOM_WORKSPACE_${platform}" = "${WORKSPACE}/${AMPCX_TAG}"
+      ws(evaluate("env.CUSTOM_WORKSPACE_${platform}")) {
+        stage(platform) {
+          checkout_cmclient(owner, tag)
+        }
+      }
+    }
+  }
+}
+
+def generate_build(platform) {
+  return {
+    node(env."${platform}") {
+      ws(evaluate("env.CUSTOM_WORKSPACE_${platform}")) {
+        stage(platform) {
+          pipeline_utils.printNode()
+          if (continueCI()) {
+            withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
+              dir("cm-client") {
+                if (platform.toLowerCase().contains("mac")) {
+                  sh './build -c'
+                  sh './build -d'
+                } else {
+                  // Run with devtoolset on Linux, where applicable
+                  sh """
+                    ${pipeline_utils.prependDevtoolset(platform)} ./build -d
+                  """
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+def generate_release_build(platform) {
+  return {
+    node(env."${platform}") {
+      ws(evaluate("env.CUSTOM_WORKSPACE_${platform}")) {
+        stage(platform) {
+          pipeline_utils.printNode()
+          if (continueCI()) {
+            withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
+              dir("cm-client") {
+                env.CM_BUILD_VER = "1.0.0000"
+                if (platform.toLowerCase().contains("mac")) {
+                  sh './build -r'
+                } else {
+                  // Run with devtoolset on Linux, where applicable
+                  sh """
+                    ${pipeline_utils.prependDevtoolset(platform)} ./build -r
+                  """
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+def generate_test_build(platform) {
+  return {
+    node(env."${platform}") {
+      ws(evaluate("env.CUSTOM_WORKSPACE_${platform}")) {
+        stage(platform) {
+          pipeline_utils.printNode()
+          if (continueCI()) {
+            withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
+              dir("cm-client") {
+                if (platform.toLowerCase().contains("mac")) {
+                  // Do this for each individual test suite, i.e. add PackageManager when available
+                  dir("cm-client/debug/client/tests"){
+                    sh 'ctest --output-on-failure'
+                  }
+                  dir("cm-client/debug/OSPackageManager/tests"){
+                    sh 'ctest --output-on-failure'
+                  }
+                } else {
+                  // Do this for each individual test suite, i.e. add PackageManager when available
+                  dir("cm-client/debug/client/tests"){
+                    sh 'ctest --output-on-failure'
+                  }
+                  // TODO OSPackageManager tests currently disabled on Linux
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+def generate_xcode_build(platform) {
+  return {
+    node(env."${platform}") {
+      ws(evaluate("env.CUSTOM_WORKSPACE_${platform}")) {
+        stage(platform) {
+          pipeline_utils.printNode()
+          if (continueCI()) {
+            withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
+              dir("cm-client") {
+                if (platform.toLowerCase().contains("mac")) {
+                  sh './build -c'
+                  sh './build -x -d'
+                  sh 'xcodebuild build -project xcode_debug/cm-client.xcodeproj -configuration "Debug" -scheme ALL_BUILD'
+                } else {
+                  echo "Xcode build not applicable on Linux"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+def generate_xcode_release_build(platform) {
+  return {
+    node(env."${platform}") {
+      ws(evaluate("env.CUSTOM_WORKSPACE_${platform}")) {
+        stage(platform) {
+          pipeline_utils.printNode()
+          if (continueCI()) {
+            withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
+              dir("cm-client") {
+                env.CM_BUILD_VER = "1.0.0000"
+                if (platform.toLowerCase().contains("mac")) {
+                  env.CM_BUILD_VER = "1.0.0000"
+                  sh './build -x -r'
+                  sh 'xcodebuild build -project xcode_release/cm-client.xcodeproj -configuration "Release" -scheme ALL_BUILD'
+                } else {
+                  echo "Xcode build not applicable on Linux"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 def hasLabel(target_label) {
   def retval = false
   for (label in pullRequest.labels) {
@@ -55,69 +256,70 @@ def hasLabel(target_label) {
   return retval;
 }
 
-def run_mac_ci() {
-  stage('Mac Checkout') {
-    if (continueCI()) {
-      repoCheckout("mac")
+def run_cmclient_ci() {
+  stage('Setup Ephemeral Nodes') {
+    build_platforms = linuxBuildPlatforms().keySet()
+    println "Build Platforms: ${build_platforms.join(',')}"
+
+    setup_ephemeral_nodes(build_platforms)
+    println build_platforms.collectEntries { ["${it}" : env."${it}"] }
+  }
+  stage('Checkout') {
+    parallel_checkout = build_platforms.collectEntries {
+      ["${it}" : generate_checkout(it, env.CHANGE_FORK, env.CHANGE_BRANCH)]
     }
+    parallel parallel_checkout
   }
   stage("Build Debug") {
-    if (continueCI()) {
-      withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
-        withCredentials([string(credentialsId: 'ARTIFACTORY_TOKEN', variable: 'ARTIFACTORY_TOKEN')]) {
-          dir("cm-client"){
-            env.CM_BUILD_VER = "1.0.0000"
-            sh './build'
-          }
-        }
-      }
+    parallel_build = build_platforms.collectEntries {
+      ["${it}" : generate_build(it)]
     }
+    parallel parallel_build
   }
   stage("Build Release") {
     if (continueCI()) {
-      withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
-        dir("cm-client"){
-          env.CM_BUILD_VER = "1.0.0000"
-          sh './build -r'
-        }
+      parallel_build = build_platforms.collectEntries {
+        ["${it}" : generate_release_build(it)]
       }
+      parallel parallel_build
     }
   }
   stage("Test") {
     if (continueCI()) {
-      // Do this for each individual test suite, i.e. add PackageManager when available
-      dir("cm-client/debug/client/tests"){
-        sh 'ctest --output-on-failure'
+      parallel_build = build_platforms.collectEntries {
+        ["${it}" : generate_test_build(it)]
       }
-      dir("cm-client/debug/OSPackageManager/tests"){
-        sh 'ctest --output-on-failure'
-      }
+      parallel parallel_build
     }
   }
-
   stage("Build Xcode Debug") {
-    if (continueCI()) {
-      withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
-        dir("cm-client"){
-          sh './build -x -d'
-          sh 'xcodebuild build -project xcode_debug/cm-client.xcodeproj -configuration "Debug" -scheme ALL_BUILD'
-        }
-      }
+    parallel_build = build_platforms.collectEntries {
+      ["${it}" : generate_xcode_build(it)]
     }
+    parallel parallel_build
   }
-
   stage("Build Xcode Release") {
     if (continueCI()) {
-      withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
-        dir("cm-client"){
-          env.CM_BUILD_VER = "1.0.0000"
-          sh './build -x -r'
-          sh 'xcodebuild build -project xcode_release/cm-client.xcodeproj -configuration "Release" -scheme ALL_BUILD'
-        }
+      parallel_build = build_platforms.collectEntries {
+        ["${it}" : generate_xcode_release_build(it)]
       }
+      parallel parallel_build
     }
   }
+  // TODO Add test stage when available
 }
+
+properties([
+  parameters([
+    string(name: 'AMPCX_OWNER', value: env.CHANGE_FORK == null ? 'UnifiedConnector' : env.CHANGE_FORK),
+    string(name: 'AMPCX_TAG', value: env.CHANGE_BRANCH == null ? env.BRANCH_NAME : env.CHANGE_BRANCH),
+    string(name: 'AMPCXI_JENKINS_OWNER', value: AMPCXI_JENKINS_OWNER),
+    string(name: 'AMPCXI_JENKINS_TAG', value: AMPCXI_JENKINS_TAG),
+    booleanParam(name: 'IS_PULL_REQUEST', value: pipeline_utils.isPullRequest()),
+    string(name: 'LABELS', value: env.LABELS),
+    string(name: 'RELEASE_VERSION', value: env.RELEASE_VERSION)
+  ])
+])
 
 pipeline {
   options {
@@ -142,6 +344,10 @@ pipeline {
     RELEASE_BRANCH_PREFIX     = 'rb-'
     WANT_CI_BRANCH_PREFIX     = 'ci-'
     COV_PLATFORM_PUBLISH      = 'yes'
+    // Handle params
+    IS_PULL_REQUEST           = "${params.IS_PULL_REQUEST}"
+    LABELS                    = "${params.LABELS}"
+    RELEASE_VERSION           = "${params.RELEASE_VERSION}"
   }
   stages {
     // If this build was triggered by a pull request: 1) manually determine
@@ -180,17 +386,15 @@ pipeline {
         }
       }
     }
-    stage('CI') {
-      parallel {
-        stage('macOS') {
-          agent {
-            label 'mac-build-orbital'
-          }
-          steps {
-            script {
-              run_mac_ci()
-            }
-          }
+    stage('cmclient') {
+      agent {
+        node {
+          label "ANSIBLE&&CONTROLLER"
+        }
+      }
+      steps {
+        script {
+          run_cmclient_ci()
         }
       }
     }
