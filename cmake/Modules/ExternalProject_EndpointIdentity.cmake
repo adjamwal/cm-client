@@ -61,6 +61,7 @@ if(NOT TARGET "third-party-${component_name}")
             -DCMAKE_INSTALL_PREFIX:PATH=${component_install_prefix}
             -DLIBXML2_LIBRARY=${LIBXML2_LIBRARY}
             -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
+            -DCM_THIRDPARTY_EXPORT=${CM_THIRDPARTY_EXPORT}
         CMAKE_COMMAND VERSION=1.1 RELNUM=1111 ${CMAKE_COMMAND}
     )
     endif()
