@@ -6,7 +6,7 @@ function(upload_component component_name output)
         ExternalProject_Add_Step(
             third-party-${component_name}
             artifactory_upload
-            COMMAND ARTIFACTORY_TOKEN=$ENV{ARTIFACTORY_TOKEN} ${CM_SCRIPTS_DIR}/upload_artifact_to_artifactory.sh ${component_name}
+            COMMAND PLATFORM=$ENV{PLATFORM} ARTIFACTORY_TOKEN=$ENV{ARTIFACTORY_TOKEN} ${CM_SCRIPTS_DIR}/upload_artifact_to_artifactory.sh ${component_name}
             DEPENDEES install
         )
         set(${output} artifactory_upload PARENT_SCOPE)
