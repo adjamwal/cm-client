@@ -5,7 +5,10 @@ cmake_minimum_required(VERSION 3.19)
 
 # Specify search path for CMake modules to be loaded by include()
 # and find_package()
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+set(CUSTOM_CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
+list(APPEND CMAKE_MODULE_PATH "${CUSTOM_CMAKE_MODULE_PATH}")
+list(APPEND CMAKE_MODULE_PATH "${CUSTOM_CMAKE_MODULE_PATH}/helper")
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
@@ -13,6 +16,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CXX_EXTENSIONS ON) # -std=gnu++11 instead of -std=c++11.
 
 project(cm-client VERSION 1.0.0)
+
+# Include helper functions.
+include(determine_architecture)
+include(determine_platform)
 
 if(APPLE)
     message("** Building on macOS, generator ${CMAKE_GENERATOR} **")
@@ -34,10 +41,6 @@ if(APPLE)
     if(DEFINED SIGNING_CERT)
         message("--Build will sign using ${SIGNING_CERT}")
     endif()
-
-    set(LINUX false)
-else()
-    set(LINUX true)
 endif()
 
 # remove ZERO_CHECK target from xcode

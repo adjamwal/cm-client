@@ -16,23 +16,6 @@ if [ -z "${WORKSPACE_ROOT}" ]; then
     #echo "Using WORKSPACE_ROOT=${WORKSPACE_ROOT}"
 fi
 
-is_mac_os() {
-    [[ "${OSTYPE}" == "darwin"* ]]
-}
-
-is_linux() {
-    [[ "${OSTYPE}" == "linux"* ]]
-}
-
-if is_mac_os; then
-    PLATFORM=macOS
-elif is_linux; then
-    PLATFORM=linux
-else
-    echo "Unsupported platform"
-    exit 1
-fi
-
 # Note that Artifactory web pages indicate that engci-maven.cisco.com be used
 # when running searches or downloads from Artifactory but that server doesn't
 # reliably return the correct results or downloads. We were directed to instead
@@ -58,6 +41,7 @@ get_prereq_dir(){
     "curl:third-party/curl"
     "gtest:third-party/gtest"
     "jsoncpp:third-party/jsoncpp"
+    "libxml2:third-party/libxml2"
     "spdlog:third-party/spdlog"
     "crashpad:third-party/crashpad/crashpad"
   )
@@ -155,14 +139,20 @@ get_dependency_string(){
   local build_script_path
   local build_script_hash
 
-  # NOTE We can use $(uname) to specify different
-  #      dependencies for different OS'.  Right now,
-  #      we're only concernd about Mac
-  dependency_relations=(
-    "curl:ciscossl"
-    "PackageManager:ciscossl curl jsoncpp gtest"
-    "crashpad:ciscossl curl"
-  )
+  if [ "$(uname)" = "Linux" ]; then
+    dependency_relations=(
+      "curl:ciscossl"
+      "EndpointIdentity:libxml2"
+      "PackageManager:ciscossl curl jsoncpp gtest"
+      "crashpad:ciscossl curl"
+    )
+  else
+    dependency_relations=(
+      "curl:ciscossl"
+      "PackageManager:ciscossl curl jsoncpp gtest"
+      "crashpad:ciscossl curl"
+    )
+  fi
 
   dependency_string=""
 
@@ -198,6 +188,7 @@ get_exclude_patterns(){
     "curl:*.la"
     "gtest:*.la"
     "jsoncpp:*.la"
+    "libxml2:"
     "spdlog:*.la"
     "PackageManager:*.la"
     "EndpointIdentity:*.la"
@@ -291,7 +282,7 @@ get_artifactory_filename(){
     exit 1
   fi
 
-  file_name_local="${prereq_description}_${cmake_file_commit_hash}${PLATFORM}${dependency_string}.tar.gz"
+  file_name_local="${prereq_description}_${cmake_file_commit_hash}${prereq_platform}${dependency_string}.tar.gz"
 
   echo "${file_name_local}"
 }
@@ -313,9 +304,9 @@ get_artifactory_key(){
 
   if [ -z "$cmake_file_commit_hash" ];
   then
-    search_key="sccm_${component}_${PLATFORM}_${head_commit_fullhash}${dependency_string}"
+    search_key="sccm_${component}_${prereq_platform}_${head_commit_fullhash}${dependency_string}"
   else
-    search_key="sccm_${component}_${PLATFORM}_${head_commit_fullhash}_${cmake_file_commit_hash}${dependency_string}"
+    search_key="sccm_${component}_${prereq_platform}_${head_commit_fullhash}_${cmake_file_commit_hash}${dependency_string}"
   fi
 
   echo "${search_key}"
@@ -500,6 +491,7 @@ get_artifactory_download_url(){
 # main starts here...
 
 exec_action=$(basename $0)
+prereq_platform="${PLATFORM}"
 if [ "${exec_action}" = "get_artifactory_url.sh" ]; then
     if [ $# -ge 1 ]; then
       get_prereq_download_url "${1}"

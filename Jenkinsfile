@@ -97,6 +97,7 @@ def checkout_cmclient(owner, branch) {
 def generate_checkout(platform, owner, tag) {
   return {
     node(env."${platform}") {
+      def AMPCX_TAG = env.CHANGE_BRANCH == null ? env.BRANCH_NAME : env.CHANGE_BRANCH
       env."CUSTOM_WORKSPACE_${platform}" = "${WORKSPACE}/${AMPCX_TAG}"
       ws(evaluate("env.CUSTOM_WORKSPACE_${platform}")) {
         stage(platform) {
@@ -115,15 +116,17 @@ def generate_build(platform) {
           pipeline_utils.printNode()
           if (continueCI()) {
             withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
-              dir("cm-client") {
-                if (platform.toLowerCase().contains("mac")) {
-                  sh './build -c'
-                  sh './build -d'
-                } else {
-                  // Run with devtoolset on Linux, where applicable
-                  sh """
-                    ${pipeline_utils.prependDevtoolset(platform)} ./build -d
-                  """
+              withCredentials([string(credentialsId: 'GENERAL_ARTIFACTORY_TOKEN', variable: 'ARTIFACTORY_TOKEN')]) {
+                dir("cm-client") {
+                  if (platform.toLowerCase().contains("mac")) {
+                    sh './build -c'
+                    sh './build -d'
+                  } else {
+                    // Run with devtoolset on Linux, where applicable
+                    sh """
+                      ${pipeline_utils.prependDevtoolset(platform)} ./build -d
+                    """
+                  }
                 }
               }
             }
@@ -311,13 +314,8 @@ def run_cmclient_ci() {
 
 properties([
   parameters([
-    string(name: 'AMPCX_OWNER', value: env.CHANGE_FORK == null ? 'UnifiedConnector' : env.CHANGE_FORK),
-    string(name: 'AMPCX_TAG', value: env.CHANGE_BRANCH == null ? env.BRANCH_NAME : env.CHANGE_BRANCH),
-    string(name: 'AMPCXI_JENKINS_OWNER', value: AMPCXI_JENKINS_OWNER),
-    string(name: 'AMPCXI_JENKINS_TAG', value: AMPCXI_JENKINS_TAG),
-    booleanParam(name: 'IS_PULL_REQUEST', value: pipeline_utils.isPullRequest()),
-    string(name: 'LABELS', value: env.LABELS),
-    string(name: 'RELEASE_VERSION', value: env.RELEASE_VERSION)
+    string(name: 'AMPCXI_JENKINS_OWNER', defaultValue: "Cloud"),
+    string(name: 'AMPCXI_JENKINS_TAG', defaultValue: "master")
   ])
 ])
 
@@ -344,10 +342,6 @@ pipeline {
     RELEASE_BRANCH_PREFIX     = 'rb-'
     WANT_CI_BRANCH_PREFIX     = 'ci-'
     COV_PLATFORM_PUBLISH      = 'yes'
-    // Handle params
-    IS_PULL_REQUEST           = "${params.IS_PULL_REQUEST}"
-    LABELS                    = "${params.LABELS}"
-    RELEASE_VERSION           = "${params.RELEASE_VERSION}"
   }
   stages {
     // If this build was triggered by a pull request: 1) manually determine
