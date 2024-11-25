@@ -60,6 +60,7 @@ get_prereq_dir(){
     "jsoncpp:third-party/jsoncpp"
     "spdlog:third-party/spdlog"
     "crashpad:third-party/crashpad/crashpad"
+    "boost:third-party/boost"
   )
   for prereq_dir in "${prereq_dirs[@]}" ; do
     local component="${prereq_dir%%:*}"
