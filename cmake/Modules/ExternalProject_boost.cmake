@@ -20,7 +20,7 @@ if(NOT TARGET "third-party-${component_name}")
         INSTALL_DIR ${component_install_prefix}
         CONFIGURE_COMMAND ./bootstrap.sh
         BUILD_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/b2 link=static cxxflags=-fPIC --with-chrono --with-date_time --with-filesystem --with-system --with-thread --with-regex
-        INSTALL_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/b2 link=static --prefix=${component_install_prefix}
+        INSTALL_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/b2 link=static install --prefix=${component_install_prefix}
         BUILD_IN_SOURCE 1
     )
 
