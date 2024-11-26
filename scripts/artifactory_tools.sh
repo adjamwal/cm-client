@@ -44,6 +44,7 @@ get_prereq_dir(){
     "libxml2:third-party/libxml2"
     "spdlog:third-party/spdlog"
     "crashpad:third-party/crashpad/crashpad"
+    "boost:third-party/boost"
   )
   for prereq_dir in "${prereq_dirs[@]}" ; do
     local component="${prereq_dir%%:*}"
