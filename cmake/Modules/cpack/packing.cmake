@@ -30,7 +30,7 @@ set(CPACK_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
     WORLD_EXECUTE
 )
 
-set(cpack_build_dir ${CMAKE_CURRENT_BINARY_DIR}/cpack/generic)
+#set(cpack_build_dir ${CMAKE_CURRENT_BINARY_DIR}/cpack/generic)
 
 # HAVE_RPM
 find_program(have_rpm rpm)
@@ -60,7 +60,7 @@ else()
     set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, crontabs")
 endif()
 
-
+include(cpack/install_generic_files)
 
 set(CPACK_RPM_USER_FILELIST
 "%ghost %{_localstatedir}/log/cisco/secureclient/cloudmanagement/csc_cms.log"
