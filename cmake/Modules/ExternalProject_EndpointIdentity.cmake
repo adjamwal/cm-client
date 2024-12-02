@@ -52,7 +52,7 @@ if(NOT TARGET "third-party-${component_name}")
         third-party-${component_name}
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/EndpointIdentity/cmid
         PREFIX ${component_install_prefix}
-        DEPENDS third-party-libxml2
+        DEPENDS third-party-libxml2 third-party-curl third-party-ciscossl third-party-boost
         CMAKE_GENERATOR ${CMAKE_GENERATOR}
         CMAKE_ARGS
             -DBUILD_TESTING=0

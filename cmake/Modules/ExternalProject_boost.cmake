@@ -18,10 +18,10 @@ if(NOT TARGET "third-party-${component_name}")
         third-party-${component_name}
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}
         INSTALL_DIR ${component_install_prefix}
-        CONFIGURE_COMMAND ./bootstrap.sh
-        BUILD_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/b2 link=static cxxflags=-fPIC --without-python
-        INSTALL_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/third-party/${component_name}/b2 link=static install --prefix=${component_install_prefix}
-        BUILD_IN_SOURCE 1
+        CONFIGURE_COMMAND ./bootstrap.sh --with-libraries=chrono,date_time,filesystem,regex,system,thread
+        BUILD_COMMAND ./b2 --build-dir=${component_dst_dir} --stagedir=${component_dst_dir} link=static cxxflags=-fPIC --without-python
+        INSTALL_COMMAND ./b2 link=static install --prefix=${component_install_prefix} --build-dir=${component_dst_dir}
+        BUILD_IN_SOURCE ON
     )
 
     upload_component(${component_name} not_used)
