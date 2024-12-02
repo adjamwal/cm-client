@@ -30,13 +30,11 @@ set(CPACK_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
     WORLD_EXECUTE
 )
 
-#set(cpack_build_dir ${CMAKE_CURRENT_BINARY_DIR}/cpack/generic)
-
 # HAVE_RPM
 find_program(have_rpm rpm)
 if(have_rpm)
     set(RPM_BUILD true)
-    set(cpack_build_dir ${CMAKE_CURRENT_BINARY_DIR}/cpack/rpm)
+    set(CPACK_GENERATOR "RPM")
 endif()
 
 # CPack RPM specific variables
@@ -46,7 +44,7 @@ set(CPACK_RPM_PACKAGE_ARCHITECTURE "${arch}")
 set(CPACK_RPM_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}.${CPACK_RPM_PACKAGE_ARCHITECTURE}.rpm")
 set(CPACK_RPM_PACKAGE_LICENSE "Proprietary")
 set(CPACK_RPM_PACKAGE_GROUP "Applications/Security")
-set(CPACK_GENERATOR "RPM")
+
 
 # Will override umask settings for RPM packages.
 set(CPACK_RPM_DEFAULT_DIR_PERMISSIONS ${CPACK_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS})
