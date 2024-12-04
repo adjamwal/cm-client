@@ -9,6 +9,9 @@ set(component_install_prefix "${CMAKE_CURRENT_SOURCE_DIR}/third-party/${componen
 
 if(NOT BUILD_ALL_THIRD_PARTY)
     download_component(${component_name} ${component_dst_dir})
+
+    set(LIBXML2_INCLUDE_DIR ${CM_THIRDPARTY_EXPORT}/include/libxml2)
+    set(LIBXML2_LIBRARY ${CM_THIRDPARTY_EXPORT}/lib/libxml2.a)
 endif()
 
 if(NOT TARGET "third-party-${component_name}")
@@ -28,17 +31,18 @@ if(NOT TARGET "third-party-${component_name}")
     )
 
     upload_component(${component_name} not_used)
+
+    set(LIBXML2_INCLUDE_DIR ${component_install_prefix}/include/libxml2)
+    file(MAKE_DIRECTORY ${LIBXML2_INCLUDE_DIR})
+
+    add_library(${component_name} STATIC IMPORTED)
+    set_target_properties(${component_name} PROPERTIES
+        IMPORTED_LOCATION ${component_install_prefix}/lib/libxml2.a
+    )
+    set(LIBXML2_LIBRARY ${component_install_prefix}/lib/libxml2.a)
+
+    target_include_directories(${component_name} INTERFACE
+        ${LIBXML2_INCLUDE_DIR}
+    )
 endif()
 
-set(LIBXML2_INCLUDE_DIR ${component_install_prefix}/include/libxml2)
-file(MAKE_DIRECTORY ${LIBXML2_INCLUDE_DIR})
-
-add_library(${component_name} STATIC IMPORTED)
-set_target_properties(${component_name} PROPERTIES
-    IMPORTED_LOCATION ${component_install_prefix}/lib/libxml2.a
-)
-set(LIBXML2_LIBRARY ${component_install_prefix}/lib/libxml2.a)
-
-target_include_directories(${component_name} INTERFACE
-    ${LIBXML2_INCLUDE_DIR}
-)

@@ -20,8 +20,7 @@ def linuxBuildPlatforms() {
   return [
     "alma8": ["tag": "el8"],
     "alma9": ["tag": "el9"],
-    // TODO Enable Ubuntu
-//    "ubuntu20": ["tag": "ubuntu20"],
+    "ubuntu20": ["tag": "ubuntu20"],
     "mac14arm": ["tag": "mac14arm"],
   ]
 }
