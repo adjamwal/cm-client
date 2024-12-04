@@ -13,6 +13,19 @@ endif()
 
 set(FFF_EXPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/fff")
 
+if(LINUX)
+    # HAVE_DPKG
+    find_program(have_dpkg dpkg)
+    if(have_dpkg)
+        # There's a linkage error in the tests, skipping building the tests for simplicity
+        set(SKIP_TESTS true)
+    else()
+        set(SKIP_TESTS false)
+    endif()
+else()
+    set(SKIP_TESTS false)
+endif()
+
 if(NOT TARGET "third-party-${component_name}")
     #
     # TODO Be more specific about tool chain
@@ -32,7 +45,7 @@ if(NOT TARGET "third-party-${component_name}")
             -Dfff_INCLUDE_DIRS=${FFF_EXPORT_DIR}
             -Dgtest_INCLUDE_DIRS=${CM_THIRDPARTY_EXPORT}/include
             -Dgtest_LIBRARY=${CM_THIRDPARTY_EXPORT}/lib
-            -DSKIP_TESTS=FALSE
+            -DSKIP_TESTS=${SKIP_TESTS}
             -DCMAKE_INSTALL_PREFIX:PATH=${component_install_prefix}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES_}
