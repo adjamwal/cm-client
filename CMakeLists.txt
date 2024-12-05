@@ -121,4 +121,6 @@ if(APPLE)
 ##
 ##
 add_subdirectory(Uninstaller)
+else()
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/cpack/packing.cmake")
 endif()
