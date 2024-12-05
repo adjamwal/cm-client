@@ -160,7 +160,9 @@ endif()
 
 target_enable_warnings(cmpackagemanager)
 
-install(TARGETS cmpackagemanager DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)
+install(TARGETS cmpackagemanager 
+        DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/
+        COMPONENT installstaging)
 
 add_subdirectory(controlplugin)
 
