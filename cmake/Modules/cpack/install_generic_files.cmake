@@ -23,16 +23,3 @@ install(
 )
 
 FILE(MAKE_DIRECTORY ${CPACK_PACKAGING_INSTALL_PREFIX}/etc)
-
-install(
-    PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/linux/systemd/csccmservice
-    TYPE BIN
-    COMPONENT linuxinstall
-)
-
-install(
-    FILES ${CMAKE_CURRENT_SOURCE_DIR}/linux/systemd/csccloudmanagement.service
-    DESTINATION ${systemd_install_path}
-    COMPONENT linuxinstall
-    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
-)
