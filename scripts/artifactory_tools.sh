@@ -44,6 +44,7 @@ get_prereq_dir(){
     "libxml2:third-party/libxml2"
     "spdlog:third-party/spdlog"
     "crashpad:third-party/crashpad/crashpad"
+    "boost:third-party/boost"
   )
   for prereq_dir in "${prereq_dirs[@]}" ; do
     local component="${prereq_dir%%:*}"
@@ -142,7 +143,7 @@ get_dependency_string(){
   if [ "$(uname)" = "Linux" ]; then
     dependency_relations=(
       "curl:ciscossl"
-      "EndpointIdentity:libxml2"
+      "EndpointIdentity:libxml2 ciscossl curl boost"
       "PackageManager:ciscossl curl jsoncpp gtest"
       "crashpad:ciscossl curl"
     )
@@ -194,6 +195,7 @@ get_exclude_patterns(){
     "EndpointIdentity:*.la"
     "crashpad:"
     "ProxyDiscovery-Mac:"
+    "boost:"
   )
   for exclude_pattern_relation in "${exclude_pattern_relations[@]}" ; do
     local component="${exclude_pattern_relation%%:*}"

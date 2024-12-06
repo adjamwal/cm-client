@@ -1,5 +1,5 @@
-# jsoncpp external project build file
-# Copyright Cisco Systems, Inc. 2022
+# libxml2 external project build file
+# Copyright Cisco Systems, Inc. 2024
 
 include(ExternalProject)
 
