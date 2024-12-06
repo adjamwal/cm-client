@@ -9,7 +9,9 @@ set(CUSTOM_CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
 list(APPEND CMAKE_MODULE_PATH "${CUSTOM_CMAKE_MODULE_PATH}")
 list(APPEND CMAKE_MODULE_PATH "${CUSTOM_CMAKE_MODULE_PATH}/helper")
-
+if(LINUX)
+    list(APPEND CMAKE_MODULE_PATH "${CUSTOM_CMAKE_MODULE_PATH}/cpack")
+endif()
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -121,6 +123,8 @@ if(APPLE)
 ##
 ##
 add_subdirectory(Uninstaller)
-else()
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/cpack/packing.cmake")
+endif()
+
+if(LINUX)
+    include(packing)
 endif()

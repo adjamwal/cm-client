@@ -4,7 +4,7 @@
 include(helper/determine_platform_derivatives)
 
 # Set CPack metadata variables.
-set(CPACK_PACKAGE_NAME "cisco-secure-client-linux-cloudmanagement")
+set(CPACK_PACKAGE_NAME "cisco-secure-client-cloudmanagement")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cisco Cloud Management for Linux")
 set(CPACK_PACKAGE_VENDOR "Cisco")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://www.cisco.com/site/us/en/products/security/secure-client/index.html")
@@ -68,7 +68,6 @@ set(CPACK_RPM_USER_FILELIST
 "%ghost %{_localstatedir}/log/cisco/secureclient/cloudmanagement/csc_cmid_control_plugin.log"
 "%ghost %{_localstatedir}/log/cisco/secureclient/cloudmanagement/csccloudmanagement_cmidapi.log"
 "%ghost %{_localstatedir}/log/cisco/secureclient/cloudmanagement/cmpackagemanager_cmidapi.log"
-
 )
 
 include(CPack)
