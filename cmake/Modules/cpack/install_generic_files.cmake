@@ -12,14 +12,12 @@ install(
         ${CMAKE_CURRENT_BINARY_DIR}/export/bin/cmpackagemanager
         ${CMAKE_CURRENT_BINARY_DIR}/export/bin/csc_cmid
     DESTINATION ${CPACK_PACKAGING_INSTALL_PREFIX}/bin
-    COMPONENT linuxinstall
+    COMPONENT client
 )
 
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/export/lib/libcmidapi.so
     DESTINATION ${CPACK_PACKAGING_INSTALL_PREFIX}/lib
-    COMPONENT linuxinstall
+    COMPONENT client
     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
 )
-
-FILE(MAKE_DIRECTORY ${CPACK_PACKAGING_INSTALL_PREFIX}/etc)

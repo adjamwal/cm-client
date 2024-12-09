@@ -9,7 +9,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cisco Cloud Management for Linux")
 set(CPACK_PACKAGE_VENDOR "Cisco")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://www.cisco.com/site/us/en/products/security/secure-client/index.html")
 set(CPACK_PACKAGE_VERSION $ENV{CM_BUILD_VER})
-set(CPACK_PACKAGE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Staging)
+set(CPACK_PACKAGE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Installer)
 
 # Given 0 CPack will try to use all available CPU cores.
 set(CPACK_THREADS 0)
@@ -17,7 +17,7 @@ set(CPACK_THREADS 0)
 set(CPACK_VERBATIM_VARIABLES YES)
 
 set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/cisco/secureclient/cloudmanagement")
-set(CPACK_COMPONENTS_ALL linuxinstall)
+set(CPACK_COMPONENTS_ALL client)
 
 
 # Will NOT override umask settings.
