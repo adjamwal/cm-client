@@ -269,7 +269,7 @@ else
                     "./${SAMPLE_PKG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
                     echo "** Sample Installer built successfully **"
                 popd
-            else
+            elif command -v yum >/dev/null 2>/dev/null; then
                 pushd "${CMAKE_BUILD_DIR}"
                     cpack --verbose
                 popd
