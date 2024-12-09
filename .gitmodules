@@ -32,3 +32,6 @@
 [submodule "third-party/libxml2"]
 	path = third-party/libxml2
 	url = ../../Cloud/libxml2.git
+[submodule "third-party/boost"]
+	path = third-party/boost
+	url = ../../Cloud/boost-rel.git

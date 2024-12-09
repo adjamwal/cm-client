@@ -71,7 +71,7 @@ To be able to build cm-client, the following software packages are required:
 
 ## On Linux
 
-- Basic software development tools (if not already installed) such as compilers, git, ninja and CMake
+- Basic software development tools (if not already installed) such as compilers, git, autoconf/automake/libtool, ninja and CMake (i.e. `apt install build-essential` on Ubuntu)
 - CiscoSSL build expects a full perl installation, this means pulling in `perl-core` on RedHat distributions, and `perl` on Debian based installations
 - libuuid-devel or uuid-devel (on Red Hat distributions), uuid-dev (on Debian)
 - libarchive, if not already installed

@@ -52,7 +52,7 @@ if(NOT TARGET "third-party-${component_name}")
         third-party-${component_name}
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/EndpointIdentity/cmid
         PREFIX ${component_install_prefix}
-        DEPENDS third-party-libxml2
+        DEPENDS third-party-libxml2 third-party-curl third-party-ciscossl third-party-boost
         CMAKE_GENERATOR ${CMAKE_GENERATOR}
         CMAKE_ARGS
             -DBUILD_TESTING=0
@@ -61,6 +61,7 @@ if(NOT TARGET "third-party-${component_name}")
             -DCMAKE_INSTALL_PREFIX:PATH=${component_install_prefix}
             -DLIBXML2_LIBRARY=${LIBXML2_LIBRARY}
             -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
+            -DCM_THIRDPARTY_EXPORT=${CM_THIRDPARTY_EXPORT}
         CMAKE_COMMAND VERSION=1.1 RELNUM=1111 ${CMAKE_COMMAND}
     )
     endif()
