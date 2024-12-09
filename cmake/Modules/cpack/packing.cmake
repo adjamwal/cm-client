@@ -61,6 +61,10 @@ endif()
 
 include(cpack/install_generic_files)
 
+set(INSTALL_SCRIPT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/linux/installer)
+set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE ${INSTALL_SCRIPT_DIR}/postinstall)
+set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE ${INSTALL_SCRIPT_DIR}/preuninstall)
+
 set(CPACK_RPM_USER_FILELIST
 "%ghost %{_localstatedir}/log/cisco/secureclient/cloudmanagement/csc_cms.log"
 "%ghost %{_localstatedir}/log/cisco/secureclient/cloudmanagement/cmpackagemanager.log"
