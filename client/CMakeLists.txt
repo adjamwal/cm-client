@@ -124,7 +124,9 @@ endif()
 
 target_enable_warnings(csccloudmanagement)
 
-install(TARGETS csccloudmanagement DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/)
+install(TARGETS csccloudmanagement 
+        DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/
+        COMPONENT installstaging)
 
 # Include tests
 if(BUILD_TESTING)
