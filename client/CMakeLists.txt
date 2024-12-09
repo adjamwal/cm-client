@@ -26,6 +26,12 @@ set(CM_CLIENT_SRCS
 
 if(LINUX)
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Logger/CMLogger.cpp PROPERTIES COMPILE_FLAGS "-Wno-maybe-uninitialized")
+
+set_target_properties(csccloudmanagement
+PROPERTIES
+    INSTALL_RPATH "$ORIGIN/../lib"
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
 endif()
 
 add_executable(csccloudmanagement ${CM_CLIENT_SRCS})

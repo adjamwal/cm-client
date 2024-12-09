@@ -125,6 +125,14 @@ target_link_libraries(cmpackagemanager
     "$<$<BOOL:${APPLE}>:-framework Security>"
 )
 
+if(LINUX)
+set_target_properties(cmpackagemanager
+PROPERTIES
+    INSTALL_RPATH "$ORIGIN/../lib"
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
+endif()
+
 target_compile_definitions(cmpackagemanager
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
