@@ -244,7 +244,7 @@ else
             pushd "${CMAKE_BUILD_DIR}"
                 cmake --build .
                 # Copy files to debug/export/{bin,lib,...} directory for use by installer
-                cmake --install .
+                cmake --install . --component installstaging
             popd
         
             if [ "${SYSTEM}" = "Darwin" ]; then 
@@ -268,6 +268,10 @@ else
                 pushd "${DMG_INSTALLER_DIR}"
                     "./${SAMPLE_PKG_BUILDER_SCRIPT}" "${BUILD_TYPE}" "${BUILD_STAGING_DIR}"
                     echo "** Sample Installer built successfully **"
+                popd
+            else
+                pushd "${CMAKE_BUILD_DIR}"
+                    cpack --verbose
                 popd
             fi
 
