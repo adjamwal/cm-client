@@ -7,11 +7,9 @@ cmake_minimum_required(VERSION 3.19)
 # and find_package()
 set(CUSTOM_CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
 
-list(APPEND CMAKE_MODULE_PATH "${CUSTOM_CMAKE_MODULE_PATH}")
-list(APPEND CMAKE_MODULE_PATH "${CUSTOM_CMAKE_MODULE_PATH}/helper")
-if(LINUX)
-    list(APPEND CMAKE_MODULE_PATH "${CUSTOM_CMAKE_MODULE_PATH}/cpack")
-endif()
+list(APPEND CMAKE_MODULE_PATH ${CUSTOM_CMAKE_MODULE_PATH})
+list(APPEND CMAKE_MODULE_PATH ${CUSTOM_CMAKE_MODULE_PATH}/helper)
+list(APPEND CMAKE_MODULE_PATH ${CUSTOM_CMAKE_MODULE_PATH}/cpack)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,6 +20,10 @@ project(cm-client VERSION 1.0.0)
 # Include helper functions.
 include(determine_architecture)
 include(determine_platform)
+
+if(LINUX)
+    include(packing)
+endif()
 
 if(APPLE)
     message("** Building on macOS, generator ${CMAKE_GENERATOR} **")
@@ -124,8 +126,4 @@ if(APPLE)
 ##
 ##
 add_subdirectory(Uninstaller)
-endif()
-
-if(LINUX)
-    include(packing)
 endif()
