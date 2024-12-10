@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CM_SERVICE="csccloudmanagement.service"
+CM_SERVICE="csccloudmanagement"
 
 systemctl daemon-reload
 systemctl enable ${CM_SERVICE}

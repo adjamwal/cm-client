@@ -6,6 +6,8 @@ After=network.target
 Type=simple
 ExecStart=/opt/cisco/secureclient/cloudmanagement/bin/csccloudmanagement
 TimeoutStopSec=30
+#Fresh stop timeout for every ExecStop and need one to have the time refreshed (do nothing)
+ExecStop=
 Restart=always
 StartLimitInterval=30
 StartLimitBurst=10
