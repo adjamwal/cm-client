@@ -1,0 +1,9 @@
+#!/bin/bash
+
+CM_SERVICE="csccloudmanagement"
+
+systemctl daemon-reload
+systemctl enable ${CM_SERVICE}
+systemctl start ${CM_SERVICE}
+
+exit 0

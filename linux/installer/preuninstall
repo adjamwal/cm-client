@@ -1,0 +1,8 @@
+#!/bin/bash
+
+CM_SERVICE="csccloudmanagement"
+
+systemctl stop ${CM_SERVICE}
+systemctl disable ${CM_SERVICE}
+
+exit 0

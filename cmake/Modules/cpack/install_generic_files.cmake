@@ -4,6 +4,8 @@
 # Set rpm-specific variables.
 if(RPM_BUILD)
     set(systemd_install_path "/usr/lib/systemd/system")
+else()
+    set(systemd_install_path "/lib/systemd/system")
 endif()
 
 install(
@@ -20,4 +22,11 @@ install(
     DESTINATION ${CPACK_PACKAGING_INSTALL_PREFIX}/lib
     COMPONENT client
     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+)
+
+install(
+    FILES ${CMAKE_CURRENT_SOURCE_DIR}/linux/systemd/csccloudmanagement.service
+    DESTINATION ${systemd_install_path}
+    COMPONENT client
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
 )

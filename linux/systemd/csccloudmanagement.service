@@ -1,0 +1,22 @@
+[Unit]
+Description=Cisco Secure Client Cloud Management
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/cisco/secureclient/cloudmanagement/bin/csccloudmanagement
+TimeoutStopSec=30
+#Fresh stop timeout for every ExecStop and need one to have the time refreshed (do nothing)
+ExecStop=
+Restart=always
+StartLimitInterval=30
+StartLimitBurst=10
+LimitCORE=infinity
+StandardOutput=null
+StandardError=null
+KillSignal=SIGTERM
+SendSIGKILL=yes
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target
