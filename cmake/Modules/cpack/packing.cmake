@@ -36,6 +36,8 @@ find_program(have_rpm rpm)
 if(have_rpm)
     set(RPM_BUILD true)
     set(CPACK_GENERATOR "RPM")
+elseif(have_dpkg)
+    set(DEB_BUILD true)
 endif()
 
 # CPack RPM specific variables

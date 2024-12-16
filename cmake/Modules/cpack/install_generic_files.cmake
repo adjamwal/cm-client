@@ -4,6 +4,8 @@
 # Set rpm-specific variables.
 if(RPM_BUILD)
     set(systemd_install_path "/usr/lib/systemd/system")
+elseif(DEB_BUILD)
+    set(systemd_install_path "/lib/systemd/system")
 endif()
 
 install(
