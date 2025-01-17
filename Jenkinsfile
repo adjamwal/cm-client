@@ -115,7 +115,7 @@ def generate_build(platform) {
           pipeline_utils.printNode()
           if (continueCI()) {
             withEnv(['PATH+=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/var/lib/jenkins/go/bin']) {
-              withCredentials([string(credentialsId: 'GENERAL_ARTIFACTORY_TOKEN', variable: 'ARTIFACTORY_TOKEN')]) {
+              withVault([configuration: vault_utils.staging_config(), vaultSecrets: vault_utils.get_secrets("artifactory")]) {
                 dir("cm-client") {
                   if (platform.toLowerCase().contains("mac")) {
                     sh './build -c'
