@@ -33,8 +33,6 @@ constexpr std::string_view kCmidDaemonPath{"/opt/cisco/secureclient/cloudmanagem
 
 #ifdef CM_SHARED_LOG_PATH
 constexpr std::string_view kCmSharedLogPath{CM_SHARED_LOG_PATH};
-#elif __APPLE__
-constexpr std::string_view kCmSharedLogPath{"/Library/Logs/Cisco/SecureClient/CloudManagement/"};
 #else
 constexpr std::string_view kCmSharedLogPath{"/var/logs/cisco/secureclient/cloudmanagement/"};
 #endif
@@ -62,9 +60,13 @@ static std::string sArchForConfig = determineArch();
 
 }
 
+PmPlatformConfiguration::PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi)
+    :   cmidapi_(std::move(cmidapi))
+{
+}
+
 bool PmPlatformConfiguration::GetIdentityToken(std::string& token)
 {
-#if 0
     assert(cmidapi_);
     
     int buflen = 0;
@@ -81,15 +83,10 @@ bool PmPlatformConfiguration::GetIdentityToken(std::string& token)
 
     token = cmid;
     return true;
-#else
-    (void) token;
-    return false;
-#endif
 }
 
 bool PmPlatformConfiguration::GetUcIdentity(std::string& identity)
 {
-#if 0
     assert(cmidapi_);
 
     int buflen = 0;
@@ -106,15 +103,10 @@ bool PmPlatformConfiguration::GetUcIdentity(std::string& identity)
     
     identity = cmid;
     return true;
-#else
-    (void) identity;
-    return false;
-#endif
 }
 
 bool PmPlatformConfiguration::RefreshIdentity()
 {
-#if 0
     assert(cmidapi_);
 
     cmid_result_t result = cmidapi_->refresh_token();
@@ -122,9 +114,6 @@ bool PmPlatformConfiguration::RefreshIdentity()
         return false;
     }
     return true;
-#else
-    return false;
-#endif
 }
 
 int32_t PmPlatformConfiguration::ReloadSslCertificates()
@@ -171,7 +160,6 @@ std::string PmPlatformConfiguration::GetPmVersion()
     return static_cast<std::string>(kPmVersion);
 }
 
-#if 0
 cmid_result_t PmPlatformConfiguration::GetUrl( cmid_url_type_t urlType, std::string& url )
 {
     cmid_result_t result = CMID_RES_GENERAL_ERROR;
@@ -187,11 +175,9 @@ cmid_result_t PmPlatformConfiguration::GetUrl( cmid_url_type_t urlType, std::str
     
     return result;
 }
-#endif
 
 bool PmPlatformConfiguration::GetPmUrls(PmUrlList& urls)
 {
-#if 0
     cmid_result_t rtn = CMID_RES_SUCCESS;
     cmid_result_t tmpRtn = CMID_RES_SUCCESS;
     
@@ -216,10 +202,6 @@ bool PmPlatformConfiguration::GetPmUrls(PmUrlList& urls)
     PM_LOG_DEBUG("Event Url %s Checkin Url %s Catalog Url %s", urls.eventUrl.c_str(), urls.checkinUrl.c_str(), urls.catalogUrl.c_str());
 
     return rtn == CMID_RES_SUCCESS;
-#else
-    (void) urls;
-    return false;
-#endif
 }
 
 bool PmPlatformConfiguration::UpdateCertStoreForUrl(const std::string &url)

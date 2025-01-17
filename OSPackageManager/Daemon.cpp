@@ -24,8 +24,12 @@ namespace
 {
     constexpr std::string_view kLogFileName = "cmpackagemanager.log";
 #ifndef CM_SHARED_LOG_PATH
+#ifdef __APPLE__
     constexpr std::string_view kLogDir = "/Library/Logs/Cisco/SecureClient/CloudManagement";
-#endif
+#elif __linux__
+    constexpr std::string_view kLogDir = "/var/logs/cisco/secureclient/cloudmanagement/";
+#endif // APPLE / linux
+#endif // CM_ShARED_LOG_PATH
     constexpr size_t kMaxSize = 1048576 * 15;
     constexpr size_t kMaxFiles = 5;
 }
@@ -46,6 +50,8 @@ Daemon::Daemon()
     setLoggerDir(CM_SHARED_LOG_PATH);
 #else
 #ifdef __APPLE__
+    setLoggerDir(static_cast<std::string>(kLogDir));
+#elif __linux__
     setLoggerDir(static_cast<std::string>(kLogDir));
 #endif
 #endif
