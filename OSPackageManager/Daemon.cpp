@@ -29,7 +29,7 @@ namespace
 #elif __linux__
     constexpr std::string_view kLogDir = "/var/logs/cisco/secureclient/cloudmanagement/";
 #endif // APPLE / linux
-#endif // CM_ShARED_LOG_PATH
+#endif // CM_SHARED_LOG_PATH
     constexpr size_t kMaxSize = 1048576 * 15;
     constexpr size_t kMaxFiles = 5;
 }
