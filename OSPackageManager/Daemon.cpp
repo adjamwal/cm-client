@@ -49,9 +49,7 @@ Daemon::Daemon()
 #ifdef CM_SHARED_LOG_PATH
     setLoggerDir(CM_SHARED_LOG_PATH);
 #else
-#ifdef __APPLE__
-    setLoggerDir(static_cast<std::string>(kLogDir));
-#elif __linux__
+#if defined(__APPLE__) || defined(__linux__)
     setLoggerDir(static_cast<std::string>(kLogDir));
 #endif
 #endif
