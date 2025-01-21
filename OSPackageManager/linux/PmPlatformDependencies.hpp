@@ -8,6 +8,7 @@
 #include "PmPlatformConfiguration.hpp"
 
 #include "PackageManager/IPmPlatformDependencies.h"
+#include "CMIDAPIProxy.hpp"
 
 class IPmPkgUtil;
 
@@ -15,7 +16,7 @@ class PmPlatformDependencies : public IPmPlatformDependencies
 {
 public:
     PmPlatformDependencies()
-	    : pmConfiguration_ { PmPlatformConfiguration() },
+	    : pmConfiguration_ { PmPlatformConfiguration(std::make_shared<CMIDAPIProxy>()) },
 	      pmComponentManager_ { PmPlatformComponentManager() }
     {}
 
