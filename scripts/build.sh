@@ -6,17 +6,19 @@
 SYSTEM="$(uname -s)"
 clean=false
 development_only=false
+local_web_server=false
 usage=false
 if [ $# -ge 1 ] && [ "$1" = "clean" ]; then
     clean=true
 else
-    while getopts cdhrxs: flag
+    while getopts cdhrwxs: flag
     do
       case "${flag}" in
         c) clean=true;;
         d) development_only=true;;
         x) xcode=true;; # Only applicable to macOS
         r) release=true;;
+        w) local_web_server=true;;
         s) sign=true
            # Use - to let script choose the signing certificate
            if [ "${OPTARG}" != "-" ]; then
@@ -47,6 +49,7 @@ if [ "${usage}" = "true" ] || [ "x${CM_BUILD_VER}" = "x" -a "${clean}" = "false"
     echo " -d		development only (skip installer on non-Xcode projects)"
     echo " -h		help (this usage)"
     echo " -r		release (default: debug)"
+    echo " -w		configure to use local webserver (debug builds only)"
     echo " -x		Xcode project generator (macOS only)"
     echo " -s <cert>	Sign binaries (use - for <cert> for build to select automatically)"
     echo
@@ -90,9 +93,13 @@ fi
 if [ "${BUILD_SUBMODULES_FROM_SRC}" = "YES" ]; then
     CMAKE_EXTRA_ARGS="-DBUILD_ALL_THIRD_PARTY:BOOL=ON ${CMAKE_EXTRA_ARGS}"
 fi
-
 if [ "${development_only}" = "true" ]; then
     CMAKE_EXTRA_ARGS="-DBUILD_DEV_ONLY:BOOL=ON ${CMAKE_EXTRA_ARGS}"
+
+    if [ "${local_web_server}" = "true" ]; then
+        echo "** Overriding Package Manager URLs to use local web server"
+        CMAKE_EXTRA_ARGS="-DLOCAL_WEBSERVER_OVERRIDE=1 ${CMAKE_EXTRA_ARGS}"
+    fi
 fi
 
 if [ "${sign}" = "true" ]; then

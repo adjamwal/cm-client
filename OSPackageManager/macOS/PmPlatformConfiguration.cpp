@@ -194,6 +194,23 @@ std::string PmPlatformConfiguration::GetPmVersion()
 cmid_result_t PmPlatformConfiguration::GetUrl( cmid_url_type_t urlType, std::string& url )
 {
     cmid_result_t result = CMID_RES_GENERAL_ERROR;
+
+#if defined(DEBUG) && LOCAL_WEBSERVER_OVERRIDE
+    switch ( urlType ) {
+        case CMID_CHECKIN_URL:
+            url = "http://localhost:5000/checkin";
+            return CMID_RES_SUCCESS;
+
+        case CMID_CATALOG_URL:
+            url = "http://localhost:5000/catalog";
+            return CMID_RES_SUCCESS;
+
+        case CMID_EVENT_URL:
+        default:
+            // Fall-through
+    }
+#endif // LOCAL_WEBSERVER_OVERRIDE
+
     int urlSize = 0;
     result = cmidapi_->get_url( urlType, nullptr, &urlSize );
     if( result == CMID_RES_INSUFFICIENT_LEN ) {
