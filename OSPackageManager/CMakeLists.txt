@@ -144,6 +144,7 @@ target_compile_definitions(cmpackagemanager
     "$<$<CONFIG:DEBUG>:CM_SHARED_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}/\">"
     PackageManager_VERSION_MAJOR=\"1\"
     PackageManager_VERSION_MINOR=\"0\"
+    $<IF:${LOCAL_WEBSERVER_OVERRIDE},LOCAL_WEBSERVER_OVERRIDE=1,LOCAL_WEBSERVER_OVERRIDE=0>
 )
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")

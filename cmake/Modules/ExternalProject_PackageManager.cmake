@@ -53,5 +53,17 @@ if(NOT TARGET "third-party-${component_name}")
             -DBUILD_WITH_HTTP_ENABLED=${BUILD_WITH_HTTP_ENABLED}
     )
 
+if(LINUX)
+    # Reasons for always building PackageManager are in the main CMakeLists.txt
+    # IF we're changing this behaviour then we must also update that file to match
+    ExternalProject_Add_Step(
+        third-party-${component_name}
+        copy_exports
+        COMMENT "-- Copying exports for ${component_name} to common export directory"
+        COMMAND ${COMMAND} cp -aR "${component_install_prefix}/." "${CM_THIRDPARTY_EXPORT}"
+        DEPENDEES install
+    )
+else()
     upload_component(${component_name} not_used)
+endif()
 endif()

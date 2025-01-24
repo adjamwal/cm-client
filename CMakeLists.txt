@@ -57,12 +57,30 @@ else()
     set(BUILD_ALL_THIRD_PARTY false)
 endif()
 
+if(NOT DEFINED LOCAL_WEBSERVER_OVERRIDE)
+    set(LOCAL_WEBSERVER_OVERRIDE "0")
+endif()
+
 option(BUILD_DEV_ONLY "" OFF)
 # Change manually to force an individual library to be built instead
-option(BUILD_PACKAGE_MANAGER_THIRD_PARTY "" OFF)
 option(BUILD_ENDPOINT_IDENTITY_THIRD_PARTY "" OFF)
 option(BUILD_CRASHPAD "" OFF)
 option(BUILD_PROXY_DISCOVERY_THIRD_PARTY "" OFF)
+
+if(LINUX)
+# We're enforcing this to be built for the following reasons:
+# 1. Occasionally, a linking issue appears when we choose to use the Artifactory built library
+# 2. We're actively developing the Package Manager on Linux, so always building the library makes sense
+#
+# With this enabled we will minimally impact build times, and for development we will allow PM
+# to connect with non-HTTPS servers which will aid during development as it will let us connect
+# to our mock golang webserver
+#
+# If we change this behaviour we should also update the PackageManager external project to match
+option(BUILD_PACKAGE_MANAGER_THIRD_PARTY "" ON)
+else()
+option(BUILD_PACKAGE_MANAGER_THIRD_PARTY "" OFF)
+endif()
 
 if(BUILD_DEV_ONLY AND (BUILD_ALL_THIRD_PARTY OR BUILD_PACKAGE_MANAGER_THIRD_PARTY))
     set(BUILD_WITH_HTTP_ENABLED ON CACHE STRING INTERNAL FORCE)

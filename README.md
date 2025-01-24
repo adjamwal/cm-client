@@ -151,13 +151,16 @@ To use it:
 Opening http://localhost:5000/catalog in browser opens Mac catalog itself
 Opening http://localhost:5000/checkin in browser opens checkin reponse from server 
 
-Navigating same urls through regular `http` access (eg. through PM) receives same output as browser does.
-To achieve that, modify in `PmPlatformConfiguration::GetPmUrls(PmUrlList& urls)` code so that it looks like:
+By default, and in release and production builds, Package Manager will only connect securely (HTTPS) to the UCB backend.  In order to leverage the local webserver for local testing, building for development (debug) will disable this behaviour allowing us to make insecure HTTP connections.  For Package Manager to use the local webserver, the method `PmPlatformConfiguration::GetPmUrls(PmUrlList& urls)` code has to point the URLs to the local webserver.  The checking URL, and catalog URL must point too the following.
 
 `urls.checkinUrl = "http://localhost:5000/checkin";`
 `urls.catalogUrl = "http://localhost:5000/catalog";`
 
+These updates **do not need to be applied manually**.  Passing `-w` to the build script will override the URLs above to then point us to the local webserver.  If using cmake directly to configure the build (instead of the script), pass the define `LOCAL_WEBSERVER_OVERRIDE=1` during the initial run of CMake.
+
 With this modification we can finetune what we want from backend without really interacting with it, as well as testing various scenarios on webserver.
+
+## Test Packages for use with the Local Webserver for Mac
 
 Mac test package (signed by Cisco Enterprise certificate and notarised by Apple) can be found there https://clg5-lab-macjenkins.cisco.com/view/CM%20Client/job/Secure-Client/job/Release-CM-Client-Test/
 
