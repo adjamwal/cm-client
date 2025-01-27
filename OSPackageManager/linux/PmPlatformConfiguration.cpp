@@ -176,7 +176,7 @@ cmid_result_t PmPlatformConfiguration::GetUrl( cmid_url_type_t urlType, std::str
 
         case CMID_EVENT_URL:
         default:
-            // Fall-through
+            [[fallthrough]];
     }
 #endif // LOCAL_WEBSERVER_OVERRIDE
 
