@@ -49,6 +49,8 @@ set(OS_PACKAGE_MANAGER_SRCS
     common/PmLogger.hpp
     agent/PackageManagerAgent.cpp
     agent/PackageManagerAgent.hpp
+    linux/PackageUtilRPM.cpp
+    linux/PackageUtilRPM.hpp
     linux/PmPlatformComponentManager.cpp
     linux/PmPlatformComponentManager.hpp
     linux/PmPlatformConfiguration.cpp
@@ -118,6 +120,7 @@ target_link_libraries(cmpackagemanager
     pthread
     z
     $<$<BOOL:${LINUX}>:stdc++fs>
+    $<$<BOOL:${LINUX}>:dl>
     $<$<BOOL:${APPLE}>:xar>
     "$<$<BOOL:${APPLE}>:-framework SystemConfiguration>"
     "$<$<BOOL:${APPLE}>:-framework IOKit>"
