@@ -49,8 +49,10 @@ set(OS_PACKAGE_MANAGER_SRCS
     common/PmLogger.hpp
     agent/PackageManagerAgent.cpp
     agent/PackageManagerAgent.hpp
-    linux/PackageUtilRPM.cpp
-    linux/PackageUtilRPM.hpp
+    linux/LinuxCommandExec.cpp
+    linux/LinuxCommandExec.hpp
+    $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.cpp>
+    $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.hpp>
     linux/PmPlatformComponentManager.cpp
     linux/PmPlatformComponentManager.hpp
     linux/PmPlatformConfiguration.cpp

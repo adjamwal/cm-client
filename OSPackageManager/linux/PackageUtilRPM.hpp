@@ -1,6 +1,10 @@
 #pragma once
 
 #include "IPackageUtil.hpp"
+#include <dlfcn.h>
+#include <rpm/rpmlib.h>
+#include <rpm/rpmts.h>
+#include <rpm/rpmdb.h>
 
 /**
  * @brief A class that implements the 'PackageUtil' utility to perform package-related operations for RPM.
@@ -14,7 +18,7 @@ public:
      * @param libRPMhandle Reference of handle for libRPM library.
      * @return True if successfully loaded, false otherwise. 
      */
-    bool loadLibRPM(void * &libRPMhandle) const;
+    bool loadLibRPM(void * &libRPMhandle);
 
     /**
      * @brief Unloads the libRPM library.
@@ -61,4 +65,15 @@ public:
      * @return True if the uninstallation was successful, false otherwise.
      */
     bool uninstallPackage(const std::string& packageIdentifier) const override;
+
+private:
+    // Function pointers for librpm functions
+    int (*rpmReadConfigFiles_ptr_)(const char*, const char*);
+    rpmts (*rpmtsCreate_ptr_)(void);
+    rpmRC (*rpmReadPackageFile_ptr_)(rpmts, FD_t, const char*, Header**);
+    rpmts (*rpmtsFree_ptr_)(rpmts);
+    rpmdbMatchIterator (*rpmtsInitIterator_ptr_)(rpmts, rpmDbiTagVal, const void*, size_t);
+    Header (*rpmdbNextIterator_ptr_)(rpmdbMatchIterator);
+    rpmdbMatchIterator (*rpmdbFreeIterator_ptr_)(rpmdbMatchIterator);
+    const char* (*headerGetString_ptr_)(Header, rpmTagVal);
 };

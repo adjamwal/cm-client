@@ -6,7 +6,8 @@ set(RHEL_VARIANTS
     "redhat"
     "rocky"
     "almalinux"
-    "oracle")
+    "oracle"
+    "rhel")
 
 cmake_host_system_information(RESULT DISTRO QUERY DISTRIB_INFO)
 

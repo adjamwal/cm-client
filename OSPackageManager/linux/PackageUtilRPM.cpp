@@ -2,50 +2,34 @@
 #include <map>
 #include <string>
 #include <list>
-#include <dlfcn.h>
-#include <rpm/rpmlib.h>
-#include <rpm/rpmts.h>
-#include <rpm/rpmdb.h>
 #include "PmLogger.hpp"
+#include "LinuxCommandExec.hpp"
 #include "PackageUtilRPM.hpp"
 
-#define COMMAND_SHELL_BUFFER_SIZE     1024
+bool PackageUtilRPM::loadLibRPM(void * &libRPMhandle) {
 
-// Function pointers for librpm functions
-int (*rpmReadConfigFiles_ptr)(const char*, const char*);
-rpmts (*rpmtsCreate_ptr)(void);
-rpmRC (*rpmReadPackageFile_ptr)(rpmts, FD_t, const char*, Header**);
-rpmts (*rpmtsFree_ptr)(rpmts);
-rpmdbMatchIterator (*rpmtsInitIterator_ptr)(rpmts, rpmDbiTagVal, const void*, size_t);
-Header (*rpmdbNextIterator_ptr)(rpmdbMatchIterator);
-rpmdbMatchIterator (*rpmdbFreeIterator_ptr)(rpmdbMatchIterator);
-const char* (*headerGetString_ptr)(Header, rpmTagVal);
-
-
-bool PackageUtilRPM::loadLibRPM(void * &libRPMhandle_) const {
-
-    libRPMhandle_ = dlmopen(LM_ID_NEWLM, "librpm.so", RTLD_LAZY);
-    if (!libRPMhandle_) {
+    libRPMhandle = dlmopen(LM_ID_NEWLM, "librpm.so", RTLD_LAZY);
+    if (!libRPMhandle) {
         PM_LOG_ERROR("Failed to load librpm: %s", dlerror());
         return false;
     }
 
-    rpmReadConfigFiles_ptr = (int (*)(const char*, const char*))dlsym(libRPMhandle_, "rpmReadConfigFiles");
-    rpmtsCreate_ptr = (rpmts (*)(void))dlsym(libRPMhandle_, "rpmtsCreate");
-    rpmReadPackageFile_ptr = (rpmRC (*)(rpmts, FD_t, const char*, Header**))dlsym(libRPMhandle_, "rpmReadPackageFile");
-    rpmtsFree_ptr = (rpmts (*)(rpmts))dlsym(libRPMhandle_, "rpmtsFree");
-    rpmtsInitIterator_ptr = (rpmdbMatchIterator (*)(rpmts, rpmDbiTagVal, const void*, size_t))dlsym(libRPMhandle_, "rpmtsInitIterator");
-    rpmdbNextIterator_ptr = (Header (*)(rpmdbMatchIterator))dlsym(libRPMhandle_, "rpmdbNextIterator");
-    rpmdbFreeIterator_ptr = (rpmdbMatchIterator (*)(rpmdbMatchIterator))dlsym(libRPMhandle_, "rpmdbFreeIterator");
-    headerGetString_ptr = (const char* (*)(Header, rpmTagVal))dlsym(libRPMhandle_, "headerGetString");
-    if (!rpmReadConfigFiles_ptr || !rpmtsCreate_ptr || !rpmReadPackageFile_ptr || !rpmtsFree_ptr || 
-        !rpmtsInitIterator_ptr || !rpmdbNextIterator_ptr || 
-        !rpmdbFreeIterator_ptr || !headerGetString_ptr ) {
+    rpmReadConfigFiles_ptr_ = (int (*)(const char*, const char*))dlsym(libRPMhandle, "rpmReadConfigFiles");
+    rpmtsCreate_ptr_ = (rpmts (*)(void))dlsym(libRPMhandle, "rpmtsCreate");
+    rpmReadPackageFile_ptr_ = (rpmRC (*)(rpmts, FD_t, const char*, Header**))dlsym(libRPMhandle, "rpmReadPackageFile");
+    rpmtsFree_ptr_ = (rpmts (*)(rpmts))dlsym(libRPMhandle, "rpmtsFree");
+    rpmtsInitIterator_ptr_ = (rpmdbMatchIterator (*)(rpmts, rpmDbiTagVal, const void*, size_t))dlsym(libRPMhandle, "rpmtsInitIterator");
+    rpmdbNextIterator_ptr_ = (Header (*)(rpmdbMatchIterator))dlsym(libRPMhandle, "rpmdbNextIterator");
+    rpmdbFreeIterator_ptr_ = (rpmdbMatchIterator (*)(rpmdbMatchIterator))dlsym(libRPMhandle, "rpmdbFreeIterator");
+    headerGetString_ptr_ = (const char* (*)(Header, rpmTagVal))dlsym(libRPMhandle, "headerGetString");
+    if (!rpmReadConfigFiles_ptr_ || !rpmtsCreate_ptr_ || !rpmReadPackageFile_ptr_ || !rpmtsFree_ptr_ || 
+        !rpmtsInitIterator_ptr_ || !rpmdbNextIterator_ptr_ || 
+        !rpmdbFreeIterator_ptr_ || !headerGetString_ptr_ ) {
         PM_LOG_ERROR("Failed to resolve symbols: %s", dlerror());
         return false;
     }
 
-    rpmReadConfigFiles_ptr(NULL, NULL);
+    rpmReadConfigFiles_ptr_(NULL, NULL);
 
     return true;
 }
@@ -61,71 +45,11 @@ bool PackageUtilRPM::unloadLibRPM(void * &libRPMhandle) const {
     return true;
 }
 
-bool executeCmd(const std::string& rtstrCommand, std::string& rstrResult)
-{
-    char   szCmdBuffer[COMMAND_SHELL_BUFFER_SIZE] = {0};
-    FILE *pCmdOutput = popen(rtstrCommand.c_str(), "r");
-
-    if(NULL == pCmdOutput)
-    {
-        return false;
-    }
-    while(fgets(szCmdBuffer, COMMAND_SHELL_BUFFER_SIZE, pCmdOutput))
-    {
-        rstrResult += szCmdBuffer;
-    }
-    pclose( pCmdOutput );
-    return true;
-}
-
-void extractLines(const std::string& rstrResult,
-    std::list<std::string>& rstrResultList)
-{
-    unsigned int begin = 0, end = 0;
-    end = rstrResult.find('\n', begin);
-    while (end < static_cast<unsigned int>(rstrResult.size()))
-    {
-        // get the new line and remove carriage return if it exist
-        std::string::size_type pos;
-        std::string newLine(rstrResult, begin, end - begin);
-        pos = newLine.find('\r', 0);
-        if (pos != std::string::npos)
-        {
-            newLine.erase(pos, newLine.length() - pos);
-        }
-
-        rstrResultList.push_back(newLine);
-        begin = end + 1;
-        end = rstrResult.find('\n', begin);
-    }
-}
-
-bool execute(const std::string& rCommand,
-    std::list<std::string>& rstrResultList)
-{
-    bool status = true;
-    if (rCommand.empty())
-    {
-        status = false;
-    }
-    else
-    {
-        std::string result;
-        status = executeCmd(rCommand, result);
-        if (status)
-        {
-            extractLines(result, rstrResultList);
-        }
-    }
-
-    return status;
-}
-
 std::vector<std::string> PackageUtilRPM::listPackages() const {
     std::vector<std::string>result;
     std::list<std::string>packageList;
 
-    bool status = execute("rpm -qa", packageList); // packageList would contain all packages in NVRA format as parsed from o/p.
+    bool status = LinuxCommandExec::execute("rpm -qa", packageList); // packageList would contain all packages in NVRA format as parsed from o/p.
     if (status){
         result.insert(result.end(), packageList.begin(), packageList.end());
     } 
@@ -139,27 +63,32 @@ std::vector<std::string> PackageUtilRPM::listPackages() const {
 PackageInfo PackageUtilRPM::getPackageInfo(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const {
     // NOTE: This API assumes the caller is sure that the package exists on the system and is asking for the information.
     //       If the package does not exist, the API will return an empty PackageInfo object.
-    
+
     PackageInfo result;
     (void) identifierType;
     (void) packageIdentifier;
 
     void * libRPMhandle = nullptr; // Handle for the load and unload of libRPM library.
-    if (!loadLibRPM(libRPMhandle)) {
+    if (!const_cast<PackageUtilRPM*>(this)->loadLibRPM(libRPMhandle)) {
         return result;
     }
 
-    rpmts ts = rpmtsCreate_ptr();
-    rpmdbMatchIterator mi = rpmtsInitIterator_ptr(ts, RPMDBI_PACKAGES, NULL, 0);
+    rpmts ts = rpmtsCreate_ptr_();
+    rpmdbMatchIterator mi = rpmtsInitIterator_ptr_(ts, RPMDBI_PACKAGES, NULL, 0);
 
     Header packageHeader;
-    while ((packageHeader = rpmdbNextIterator_ptr(mi)) != NULL) {
-        const char* packageName = headerGetString_ptr(packageHeader, RPMTAG_NAME);
-        const char* packageVersion = headerGetString_ptr(packageHeader, RPMTAG_VERSION);
-        const char* packageRelease = headerGetString_ptr(packageHeader, RPMTAG_RELEASE);
-        const char* packageArch = headerGetString_ptr(packageHeader, RPMTAG_ARCH);
+    while ((packageHeader = rpmdbNextIterator_ptr_(mi)) != NULL) {
+        const char* packageName = headerGetString_ptr_(packageHeader, RPMTAG_NAME);
+        const char* packageVersion = headerGetString_ptr_(packageHeader, RPMTAG_VERSION);
+        const char* packageRelease = headerGetString_ptr_(packageHeader, RPMTAG_RELEASE);
+        const char* packageArch = headerGetString_ptr_(packageHeader, RPMTAG_ARCH);
         // NOTE: We are not taking epoch into consideration for now because it will be mostly 0 for the packages we are interested in.
         //       If later there arises a need to consider epoch, we can add RPMTAG_EPOCH to the headerGetString_ptr function and use it here.
+        
+        if(NULL == packageName || NULL == packageVersion || NULL == packageRelease || NULL == packageArch) {
+            PM_LOG_ERROR("Failed to get package info");
+            break;
+        }
 
         std::string packageNVRAFormat = std::string(packageName) + \
                                         "-" + std::string(packageVersion) + \
@@ -180,8 +109,8 @@ PackageInfo PackageUtilRPM::getPackageInfo(const PKG_ID_TYPE& identifierType, co
         }
     }
 
-    rpmdbFreeIterator_ptr(mi);
-    rpmtsFree_ptr(ts);
+    rpmdbFreeIterator_ptr_(mi);
+    rpmtsFree_ptr_(ts);
 
     unloadLibRPM(libRPMhandle);
     return result;
