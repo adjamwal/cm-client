@@ -1,61 +1,71 @@
-#include <vector>
-#include <map>
-#include <string>
-#include <list>
-#include "PmLogger.hpp"
-#include "LinuxCommandExec.hpp"
 #include "PackageUtilRPM.hpp"
+#include "CommandExec.hpp"
+#include "PmLogger.hpp"
 
-bool PackageUtilRPM::loadLibRPM(void * &libRPMhandle) {
+#define RPM_LIB_PATH "/usr/lib64/librpm.so"
+#define RPM_BIN_STR "/bin/rpm"
+#define RPM_LIST_PKG_OPTION "-qa"
+#define RPM_LIST_PKG_FILES_OPTION "-ql"
+#define RPM_INSTALL_PKG_OPTION "-i"
+#define RPM_UNINSTALL_PKG_OPTION "-e"
 
-    libRPMhandle = dlmopen(LM_ID_NEWLM, "librpm.so", RTLD_LAZY);
-    if (!libRPMhandle) {
+bool PackageUtilRPM::loadLibRPM() {
+
+    libRPMhandle_ = dlmopen(LM_ID_NEWLM, RPM_LIB_PATH, RTLD_LAZY);
+    if (!libRPMhandle_) {
         PM_LOG_ERROR("Failed to load librpm: %s", dlerror());
         return false;
     }
 
-    rpmReadConfigFiles_ptr_ = (int (*)(const char*, const char*))dlsym(libRPMhandle, "rpmReadConfigFiles");
-    rpmtsCreate_ptr_ = (rpmts (*)(void))dlsym(libRPMhandle, "rpmtsCreate");
-    rpmReadPackageFile_ptr_ = (rpmRC (*)(rpmts, FD_t, const char*, Header**))dlsym(libRPMhandle, "rpmReadPackageFile");
-    rpmtsFree_ptr_ = (rpmts (*)(rpmts))dlsym(libRPMhandle, "rpmtsFree");
-    rpmtsInitIterator_ptr_ = (rpmdbMatchIterator (*)(rpmts, rpmDbiTagVal, const void*, size_t))dlsym(libRPMhandle, "rpmtsInitIterator");
-    rpmdbNextIterator_ptr_ = (Header (*)(rpmdbMatchIterator))dlsym(libRPMhandle, "rpmdbNextIterator");
-    rpmdbFreeIterator_ptr_ = (rpmdbMatchIterator (*)(rpmdbMatchIterator))dlsym(libRPMhandle, "rpmdbFreeIterator");
-    headerGetString_ptr_ = (const char* (*)(Header, rpmTagVal))dlsym(libRPMhandle, "headerGetString");
-    if (!rpmReadConfigFiles_ptr_ || !rpmtsCreate_ptr_ || !rpmReadPackageFile_ptr_ || !rpmtsFree_ptr_ || 
-        !rpmtsInitIterator_ptr_ || !rpmdbNextIterator_ptr_ || 
-        !rpmdbFreeIterator_ptr_ || !headerGetString_ptr_ ) {
+    fpRpmReadConfigFiles_ = reinterpret_cast<fpRpmReadConfigFiles_t>(dlsym(libRPMhandle_, "rpmReadConfigFiles"));
+    fpRpmTsCreate_ = reinterpret_cast<fpRpmTsCreate_t>(dlsym(libRPMhandle_, "rpmtsCreate"));
+    fpRpmReadPackageFile_ = reinterpret_cast<fpRpmReadPackageFile_t>(dlsym(libRPMhandle_, "rpmReadPackageFile"));
+    fpRpmTsFree_ = reinterpret_cast<fpRpmTsFree_t>(dlsym(libRPMhandle_, "rpmtsFree"));
+    fpRpmTsInitIterator_ = reinterpret_cast<fpRpmTsInitIterator_t>(dlsym(libRPMhandle_, "rpmtsInitIterator"));
+    fpRpmDbNextIterator_ = reinterpret_cast<fpRpmDbNextIterator_t>(dlsym(libRPMhandle_, "rpmdbNextIterator"));
+    fpRpmDbFreeIterator_ = reinterpret_cast<fpRpmDbFreeIterator_t>(dlsym(libRPMhandle_, "rpmdbFreeIterator"));
+    fpHeaderGetString_ = reinterpret_cast<fpHeaderGetString_t>(dlsym(libRPMhandle_, "headerGetString"));
+
+    if (!fpRpmReadConfigFiles_ || !fpRpmTsCreate_ || !fpRpmReadPackageFile_ || !fpRpmTsFree_ || 
+        !fpRpmTsInitIterator_ || !fpRpmDbNextIterator_ || 
+        !fpRpmDbFreeIterator_ || !fpHeaderGetString_ ) {
         PM_LOG_ERROR("Failed to resolve symbols: %s", dlerror());
+        unloadLibRPM();
         return false;
     }
 
-    rpmReadConfigFiles_ptr_(NULL, NULL);
+    fpRpmReadConfigFiles_(NULL, NULL);
 
     return true;
 }
 
-bool PackageUtilRPM::unloadLibRPM(void * &libRPMhandle) const {
-    int retVal = dlclose(libRPMhandle);
+bool PackageUtilRPM::unloadLibRPM() {
+    int retVal = dlclose(libRPMhandle_);
     if(0 != retVal) {
         PM_LOG_ERROR("Failed to unload librpm: %s", dlerror());
         return false;
     }
 
-    libRPMhandle = nullptr;
+    libRPMhandle_ = nullptr;
     return true;
 }
 
 std::vector<std::string> PackageUtilRPM::listPackages() const {
     std::vector<std::string>result;
-    std::list<std::string>packageList;
+    char* rpmBinString = strdup(RPM_BIN_STR);;
+    char* listPkgOption = strdup(RPM_LIST_PKG_OPTION);
+    char* listArgv[] = {rpmBinString, listPkgOption, NULL};
+    int exitCode = 0;
+    std::string outputBuffer;
 
-    bool status = LinuxCommandExec::execute("rpm -qa", packageList); // packageList would contain all packages in NVRA format as parsed from o/p.
-    if (status){
-        result.insert(result.end(), packageList.begin(), packageList.end());
-    } 
-    else {
-        PM_LOG_ERROR("Failed to list packages");
-    }  
+    int ret = CommandExec::ExecuteCommandCaptureOutput(rpmBinString, listArgv, &exitCode, outputBuffer);
+    if(ret != 0){
+        PM_LOG_ERROR("Failed to execute list packages command.");
+    } else if(exitCode != 0) {
+        PM_LOG_ERROR("Failed to list packages. Exit code: %d", exitCode);
+    } else {
+        CommandExec::ParseOutput(outputBuffer, result);
+    }
 
     return result;
 }
@@ -68,26 +78,20 @@ PackageInfo PackageUtilRPM::getPackageInfo(const PKG_ID_TYPE& identifierType, co
     (void) identifierType;
     (void) packageIdentifier;
 
-    void * libRPMhandle = nullptr; // Handle for the load and unload of libRPM library.
-    if (!const_cast<PackageUtilRPM*>(this)->loadLibRPM(libRPMhandle)) {
-        return result;
-    }
-
-    rpmts ts = rpmtsCreate_ptr_();
-    rpmdbMatchIterator mi = rpmtsInitIterator_ptr_(ts, RPMDBI_PACKAGES, NULL, 0);
+    rpmts ts = fpRpmTsCreate_();
+    rpmdbMatchIterator mi = fpRpmTsInitIterator_(ts, RPMDBI_PACKAGES, NULL, 0);
 
     Header packageHeader;
-    while ((packageHeader = rpmdbNextIterator_ptr_(mi)) != NULL) {
-        const char* packageName = headerGetString_ptr_(packageHeader, RPMTAG_NAME);
-        const char* packageVersion = headerGetString_ptr_(packageHeader, RPMTAG_VERSION);
-        const char* packageRelease = headerGetString_ptr_(packageHeader, RPMTAG_RELEASE);
-        const char* packageArch = headerGetString_ptr_(packageHeader, RPMTAG_ARCH);
+    while ((packageHeader = fpRpmDbNextIterator_(mi)) != NULL) {
+        const char* packageName = fpHeaderGetString_(packageHeader, RPMTAG_NAME);
+        const char* packageVersion = fpHeaderGetString_(packageHeader, RPMTAG_VERSION);
+        const char* packageRelease = fpHeaderGetString_(packageHeader, RPMTAG_RELEASE);
+        const char* packageArch = fpHeaderGetString_(packageHeader, RPMTAG_ARCH);
         // NOTE: We are not taking epoch into consideration for now because it will be mostly 0 for the packages we are interested in.
         //       If later there arises a need to consider epoch, we can add RPMTAG_EPOCH to the headerGetString_ptr function and use it here.
         
         if(NULL == packageName || NULL == packageVersion || NULL == packageRelease || NULL == packageArch) {
-            PM_LOG_ERROR("Failed to get package info");
-            break;
+            continue;
         }
 
         std::string packageNVRAFormat = std::string(packageName) + \
@@ -95,13 +99,8 @@ PackageInfo PackageUtilRPM::getPackageInfo(const PKG_ID_TYPE& identifierType, co
                                         "-" + std::string(packageRelease) + \
                                         "." + std::string(packageArch);
 
-        if(identifierType == PKG_ID_TYPE::NAME && packageName == packageIdentifier) {
-            result.packageIdentifier = packageNVRAFormat;
-            result.packageName = packageName;
-            result.version = packageVersion;
-            break;
-        } 
-        else if(identifierType == PKG_ID_TYPE::NVRA && packageNVRAFormat == packageIdentifier) {
+        if((identifierType == PKG_ID_TYPE::NAME && packageName == packageIdentifier) || \
+            (identifierType == PKG_ID_TYPE::NVRA && packageNVRAFormat == packageIdentifier)) {
             result.packageIdentifier = packageNVRAFormat;
             result.packageName = packageName;
             result.version = packageVersion;
@@ -109,30 +108,66 @@ PackageInfo PackageUtilRPM::getPackageInfo(const PKG_ID_TYPE& identifierType, co
         }
     }
 
-    rpmdbFreeIterator_ptr_(mi);
-    rpmtsFree_ptr_(ts);
+    fpRpmDbFreeIterator_(mi);
+    fpRpmTsFree_(ts);
 
-    unloadLibRPM(libRPMhandle);
     return result;
 }
 
 std::vector<std::string> PackageUtilRPM::listPackageFiles(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const {
-    // Pending Implementation
-    std::vector<std::string> result;
-    (void) identifierType;
-    (void) packageIdentifier;
+    (void) identifierType; // Currently this is of no use as rpm -ql command works with both name and NVRA format similarly.
+    std::vector<std::string>result;
+    char* rpmBinString = strdup(RPM_BIN_STR);
+    char* listPkgFilesOption = strdup(RPM_LIST_PKG_FILES_OPTION);
+    char* listArgv[] = {rpmBinString, listPkgFilesOption, strdup(packageIdentifier.c_str()), NULL};
+    int exitCode = 0;
+    std::string outputBuffer;
+
+    int ret = CommandExec::ExecuteCommandCaptureOutput(rpmBinString, listArgv, &exitCode, outputBuffer);
+    if(ret != 0){
+        PM_LOG_ERROR("Failed to execute list package files command.");
+    } else if(exitCode != 0) {
+        PM_LOG_ERROR("Failed to list package files. Exit code: %d", exitCode);
+    } else {
+        CommandExec::ParseOutput(outputBuffer, result);
+    }  
+
     return result;
 }
 
 bool PackageUtilRPM::installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions) const {
-    // Pending Implementation
-    (void) packagePath;
-    (void) installOptions;
+    (void) installOptions; // Currently this is of no use.
+    char* rpmBinString = strdup(RPM_BIN_STR);
+    char* installPkgOption = strdup(RPM_INSTALL_PKG_OPTION);
+    char* installArgv[] = {rpmBinString, installPkgOption, strdup(packagePath.c_str()), NULL};
+    int exitCode = 0;
+
+    int ret = CommandExec::ExecuteCommand(rpmBinString, installArgv, &exitCode);
+    if(ret != 0){
+        PM_LOG_ERROR("Failed to execute install package command.");
+        return false;
+    } else if(exitCode != 0) {
+        PM_LOG_ERROR("Failed to install package. Exit code: %d", exitCode);
+        return false;
+    }
+
     return true;
 }
 
 bool PackageUtilRPM::uninstallPackage(const std::string& packageIdentifier) const {
-    // Pending Implementation
-    (void) packageIdentifier;
+    char* rpmBinString = strdup(RPM_BIN_STR);
+    char* uninstallPkgOption = strdup(RPM_UNINSTALL_PKG_OPTION);
+    char* uninstallArgv[] = {rpmBinString, uninstallPkgOption, strdup(packageIdentifier.c_str()), NULL};
+    int exitCode = 0;
+
+    int ret = CommandExec::ExecuteCommand(rpmBinString, uninstallArgv, &exitCode);
+    if(ret != 0){
+        PM_LOG_ERROR("Failed to execute uninstall package command.");
+        return false;
+    } else if(exitCode != 0) {
+        PM_LOG_ERROR("Failed to uninstall package. Exit code: %d", exitCode);
+        return false;
+    } 
+
     return true;
 }

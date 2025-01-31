@@ -6,6 +6,15 @@
 #include <rpm/rpmts.h>
 #include <rpm/rpmdb.h>
 
+typedef int (*fpRpmReadConfigFiles_t)(const char*, const char*);
+typedef rpmts (*fpRpmTsCreate_t)(void);
+typedef rpmRC (*fpRpmReadPackageFile_t)(rpmts, FD_t, const char*, Header**);
+typedef rpmts (*fpRpmTsFree_t)(rpmts);
+typedef rpmdbMatchIterator (*fpRpmTsInitIterator_t)(rpmts, rpmDbiTagVal, const void*, size_t);
+typedef Header (*fpRpmDbNextIterator_t)(rpmdbMatchIterator);
+typedef rpmdbMatchIterator (*fpRpmDbFreeIterator_t)(rpmdbMatchIterator);
+typedef const char* (*fpHeaderGetString_t)(Header, rpmTagVal);
+
 /**
  * @brief A class that implements the 'PackageUtil' utility to perform package-related operations for RPM.
  * Implements the IPackageUtil interface.
@@ -14,19 +23,19 @@ class PackageUtilRPM : public IPackageUtil {
 public:
 
     /**
-     * @brief Delay loads the libRPM library.
-     * @param libRPMhandle Reference of handle for libRPM library.
-     * @return True if successfully loaded, false otherwise. 
+     * @brief Constructor to load librpm for RPM package operations.
      */
-    bool loadLibRPM(void * &libRPMhandle);
+    PackageUtilRPM() {
+        loadLibRPM();
+    }
 
     /**
-     * @brief Unloads the libRPM library.
-     * @param libRPMhandle Reference of handle for libRPM library.
-     * @return True if successfully unloaded, false otherwise. 
+     * @brief Destructor to unload librpm for RPM package operations.
      */
-    bool unloadLibRPM(void * &libRPMhandle) const;
-    
+    ~PackageUtilRPM() {
+        unloadLibRPM();
+    }
+
     /**
      * @brief Lists the packages installed.
      * @return A vector of package identifiers.
@@ -67,13 +76,27 @@ public:
     bool uninstallPackage(const std::string& packageIdentifier) const override;
 
 private:
+    void* libRPMhandle_ = nullptr; // Handle for the load and unload of libRPM library.
+
     // Function pointers for librpm functions
-    int (*rpmReadConfigFiles_ptr_)(const char*, const char*);
-    rpmts (*rpmtsCreate_ptr_)(void);
-    rpmRC (*rpmReadPackageFile_ptr_)(rpmts, FD_t, const char*, Header**);
-    rpmts (*rpmtsFree_ptr_)(rpmts);
-    rpmdbMatchIterator (*rpmtsInitIterator_ptr_)(rpmts, rpmDbiTagVal, const void*, size_t);
-    Header (*rpmdbNextIterator_ptr_)(rpmdbMatchIterator);
-    rpmdbMatchIterator (*rpmdbFreeIterator_ptr_)(rpmdbMatchIterator);
-    const char* (*headerGetString_ptr_)(Header, rpmTagVal);
+    fpRpmReadConfigFiles_t fpRpmReadConfigFiles_ = nullptr;
+    fpRpmTsCreate_t fpRpmTsCreate_ = nullptr;
+    fpRpmReadPackageFile_t fpRpmReadPackageFile_ = nullptr;
+    fpRpmTsFree_t fpRpmTsFree_ = nullptr;
+    fpRpmTsInitIterator_t fpRpmTsInitIterator_ = nullptr;
+    fpRpmDbNextIterator_t fpRpmDbNextIterator_ = nullptr;
+    fpRpmDbFreeIterator_t fpRpmDbFreeIterator_ = nullptr;
+    fpHeaderGetString_t fpHeaderGetString_ = nullptr;
+
+    /**
+     * @brief Delay loads the libRPM library.
+     * @return True if successfully loaded, false otherwise. 
+     */
+    bool loadLibRPM();
+
+    /**
+     * @brief Unloads the libRPM library.
+     * @return True if successfully unloaded, false otherwise. 
+     */
+    bool unloadLibRPM();
 };
