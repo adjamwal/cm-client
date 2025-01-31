@@ -73,8 +73,6 @@ int CommandExec::ExecuteCommandCaptureOutput(char *cmd, char * const *argv, int 
     fd_set readFds;
     const int waitPidOptions = 0;
     const struct timespec selectTimeout = { .tv_nsec = 10000000 };
-    const struct timespec cmdPollInterval = { .tv_nsec = 10000000 };
-    struct timespec cmdTimeRemaining = { .tv_sec = 0 };
     int flags = fcntl(out[0], F_GETFL, 0);
     
 
@@ -154,16 +152,6 @@ int CommandExec::ExecuteCommandCaptureOutput(char *cmd, char * const *argv, int 
                 PM_LOG_ERROR( "Process '%s' stopped abnormally: %d", cmd, pid);
             } else {
                 PM_LOG_ERROR( "Process '%s' did not return: %d", cmd, pid);
-            }
-            break;
-        }
-        nanosleep(&cmdPollInterval, NULL);
-        cmdTimeRemaining.tv_sec -= cmdPollInterval.tv_sec;
-        cmdTimeRemaining.tv_nsec -= cmdPollInterval.tv_nsec;
-        if (cmdTimeRemaining.tv_sec < 0 || cmdTimeRemaining.tv_nsec < 0) {
-            PM_LOG_ERROR( "Process '%s' timed out, killing: %d", cmd, pid);
-            if (!kill(pid, SIGKILL)) {
-                (void)waitpid(pid, &status, 0);
             }
             break;
         }
