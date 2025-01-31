@@ -8,26 +8,6 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#define FULL_NANOSLEEP_CHECKED(ts) \
-    { \
-        struct timespec delayLocal = *ts, remainLocal; \
-        while (nanosleep(&delayLocal, &remainLocal) == -1 && errno == EINTR) { \
-            delayLocal = remainLocal; \
-        } \
-    }
-
-struct timespec subtractTimespec(const struct timespec *a, const struct timespec *b)
-{
-    struct timespec result = { .tv_sec = a->tv_sec - b->tv_sec, .tv_nsec = a->tv_nsec - b->tv_nsec };
-
-    if (result.tv_nsec < 0) {
-        result.tv_sec--;
-        result.tv_nsec += 1000000000;
-    }
-
-    return result;
-}
-
 int CommandExec::ExecuteCommand(char *cmd, char * const *argv, int *exitCode)
 {
     int ret = -1;
