@@ -151,6 +151,7 @@ bool PackageUtilRPM::installPackage(const std::string& packagePath, const std::m
         return false;
     }
 
+    PM_LOG_INFO("Package installed successfully.");
     return true;
 }
 
@@ -169,5 +170,6 @@ bool PackageUtilRPM::uninstallPackage(const std::string& packageIdentifier) cons
         return false;
     } 
 
+    PM_LOG_INFO("Package uninstalled successfully.");
     return true;
 }

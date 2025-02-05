@@ -26,7 +26,9 @@ public:
      * @brief Constructor to load librpm for RPM package operations.
      */
     PackageUtilRPM() {
-        loadLibRPM();
+        if(!loadLibRPM()) {
+            throw PackageUtilException("Failed to load librpm for RPM package operations.");
+        }
     }
 
     /**

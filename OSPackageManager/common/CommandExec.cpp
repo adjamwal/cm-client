@@ -11,9 +11,9 @@
 int CommandExec::ExecuteCommand(char *cmd, char * const *argv, int *exitCode)
 {
     int ret = -1;
-    int status;
-    pid_t pid;
-    pid_t waitPid;
+    int status = 1;
+    pid_t pid = -1;
+    pid_t waitPid = -1;
     extern char **environ;
 
     do {
@@ -62,15 +62,16 @@ int CommandExec::ExecuteCommand(char *cmd, char * const *argv, int *exitCode)
 int CommandExec::ExecuteCommandCaptureOutput(char *cmd, char * const *argv, int *exitCode, std::string &output)
 {
     int ret = -1;
-    int status;
-    pid_t pid;
-    pid_t waitPid;
+    int status = 1;
+    pid_t pid = -1;
+    pid_t waitPid = -1;
     extern char **environ;
-    posix_spawn_file_actions_t childFdActions;
+    posix_spawn_file_actions_t childFdActions = {0};
     bool childFdActions_init = false;
     int out[2] = { -1, -1 };
     ssize_t bytesRead = 0;
     fd_set readFds;
+    FD_ZERO(&readFds);
     const int waitPidOptions = 0;
     const struct timespec selectTimeout = { .tv_nsec = 10000000 };
     int flags = fcntl(out[0], F_GETFL, 0);
@@ -110,52 +111,50 @@ int CommandExec::ExecuteCommandCaptureOutput(char *cmd, char * const *argv, int 
 
     fcntl(out[0], F_SETFL, flags | O_NONBLOCK);
 
-    for (;;) {
+    do {
         waitPid = waitpid(pid, &status, waitPidOptions);
-        if (waitPid < 0) {
-            if (errno == EINTR) {
-                continue;
-            }
-            PM_LOG_ERROR("waitpid failed");
-            break;
-        } else if (waitPid > 0) {
-            if (WIFEXITED(status)) {
-                int err;
+    } while (waitPid < 0 && errno == EINTR);
+    
+    if (waitPid < 0) {
+        PM_LOG_ERROR("waitpid failed");
+        goto done;
+    } else if (waitPid > 0) {
+        if (WIFEXITED(status)) {
+            int err;
 
-                PM_LOG_DEBUG("Process '%s' terminated normally: %d (exit code: %d)", cmd, pid, WEXITSTATUS(status));
+            PM_LOG_DEBUG("Process '%s' terminated normally: %d (exit code: %d)", cmd, pid, WEXITSTATUS(status));
 
-                FD_ZERO(&readFds);
-                FD_SET(out[0], &readFds);
-                output.clear();
+            FD_ZERO(&readFds);
+            FD_SET(out[0], &readFds);
+            output.clear();
 
-                while ((err = pselect(out[0] + 1, &readFds, NULL, NULL, &selectTimeout, NULL)) < 0 &&
-                       errno == EINTR)
-                    ;
-                if (err < 0) {
-                    PM_LOG_ERROR("pselect failed");
-                    goto done;
-                } else if (err == 1) {
-                    char buffer[1024];
-                    while ((bytesRead = read(out[0], buffer, sizeof(buffer) - 1)) > 0) {
-                        buffer[bytesRead] = '\0';
-                        output.append(buffer);                       
-                    }
+            while ((err = pselect(out[0] + 1, &readFds, NULL, NULL, &selectTimeout, NULL)) < 0 &&
+                   errno == EINTR)
+                ;
+            if (err < 0) {
+                PM_LOG_ERROR("pselect failed");
+                goto done;
+            } else if (err == 1) {
+                char buffer[1024];
+                while ((bytesRead = read(out[0], buffer, sizeof(buffer) - 1)) > 0) {
+                    buffer[bytesRead] = '\0';
+                    output.append(buffer);                       
                 }
-
-                if (exitCode) {
-                    *exitCode = WEXITSTATUS(status);
-                }
-                ret = 0;
-            } else if (WIFSIGNALED(status)) {
-                PM_LOG_ERROR( "Process '%s' terminated due to uncaught exception: %d", cmd, pid);
-            } else if (WIFSTOPPED(status)) {
-                PM_LOG_ERROR( "Process '%s' stopped abnormally: %d", cmd, pid);
-            } else {
-                PM_LOG_ERROR( "Process '%s' did not return: %d", cmd, pid);
             }
-            break;
+
+            if (exitCode) {
+                *exitCode = WEXITSTATUS(status);
+            }
+            ret = 0;
+        } else if (WIFSIGNALED(status)) {
+            PM_LOG_ERROR( "Process '%s' terminated due to uncaught exception: %d", cmd, pid);
+        } else if (WIFSTOPPED(status)) {
+            PM_LOG_ERROR( "Process '%s' stopped abnormally: %d", cmd, pid);
+        } else {
+            PM_LOG_ERROR( "Process '%s' did not return: %d", cmd, pid);
         }
     }
+
 done:
     if (out[0] != -1) {
         (void)close(out[0]);
