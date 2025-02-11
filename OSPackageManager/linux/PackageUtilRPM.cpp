@@ -3,17 +3,17 @@
 #include "PmLogger.hpp"
 
 namespace { //anonymous namespace
-    const std::string rpmLibPath = "/usr/lib64/librpm.so";
-    const std::string rpmBinStr = "/bin/rpm";
-    const std::string rpmListPkgOption = "-qa";
-    const std::string rpmListPkgFilesOption = "-ql";
-    const std::string rpmInstallPkgOption = "-i";
-    const std::string rpmUninstallPkgOption = "-e";
+    const std::string rpmLibPath {"/usr/lib64/librpm.so"};
+    const std::string rpmBinStr {"/bin/rpm"};
+    const std::string rpmListPkgOption {"-qa"};
+    const std::string rpmListPkgFilesOption {"-ql"};
+    const std::string rpmInstallPkgOption {"-i"};
+    const std::string rpmUninstallPkgOption {"-e"};
 }
 
 bool PackageUtilRPM::loadLibRPM() {
 
-    libRPMhandle_ = dlmopen(LM_ID_NEWLM, RPM_LIB_PATH, RTLD_LAZY);
+    libRPMhandle_ = dlmopen(LM_ID_NEWLM, rpmLibPath.c_str(), RTLD_LAZY);
     if (!libRPMhandle_) {
         PM_LOG_ERROR("Failed to load librpm: %s", dlerror());
         return false;
