@@ -9,7 +9,7 @@
 #include <fcntl.h>
 #include <memory>
 
-int CommandExec::ExecuteCommand(const std::string cmd, const std::vector<std::string> argv, int &exitCode) {
+int CommandExec::ExecuteCommand(const std::string &cmd, const std::vector<std::string> &argv, int &exitCode) {
     int ret = -1;
     int status = 1;
     pid_t pid = -1;
@@ -61,7 +61,7 @@ int CommandExec::ExecuteCommand(const std::string cmd, const std::vector<std::st
     return ret;
 }
 
-int CommandExec::ExecuteCommandCaptureOutput(const std::string cmd, const std::vector<std::string> argv, int &exitCode, std::string &output) {
+int CommandExec::ExecuteCommandCaptureOutput(const std::string &cmd, const std::vector<std::string> &argv, int &exitCode, std::string &output) {
     int ret = -1;
     int status = 1;
     pid_t pid = -1;

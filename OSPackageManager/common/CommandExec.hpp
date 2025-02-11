@@ -13,7 +13,7 @@ public:
      * @param exitCode The exit code of the command.
      * @return 0 if the command was executed successfully.
      */
-    static int ExecuteCommand(const std::string cmd, const std::vector<std::string> argv, int &exitCode);
+    static int ExecuteCommand(const std::string &cmd, const std::vector<std::string> &argv, int &exitCode);
 
     /**
      * @brief Executes a command and captures the output.
@@ -23,7 +23,7 @@ public:
      * @param output The output of the command.
      * @return 0 if the command was executed successfully.
      */
-    static int ExecuteCommandCaptureOutput(const std::string cmd, const std::vector<std::string> argv, int &exitCode, std::string &output);
+    static int ExecuteCommandCaptureOutput(const std::string &cmd, const std::vector<std::string> &argv, int &exitCode, std::string &output);
 
     /**
      * @brief Parses the output of a command.
