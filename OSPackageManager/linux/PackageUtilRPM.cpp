@@ -2,13 +2,6 @@
 #include "CommandExec.hpp"
 #include "PmLogger.hpp"
 
-#define RPM_LIB_PATH "/usr/lib64/librpm.so"
-#define RPM_BIN_STR "/bin/rpm"
-#define RPM_LIST_PKG_OPTION "-qa"
-#define RPM_LIST_PKG_FILES_OPTION "-ql"
-#define RPM_INSTALL_PKG_OPTION "-i"
-#define RPM_UNINSTALL_PKG_OPTION "-e"
-
 namespace { //anonymous namespace
     const std::string rpmLibPath = "/usr/lib64/librpm.so";
     const std::string rpmBinStr = "/bin/rpm";
