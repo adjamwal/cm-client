@@ -9,24 +9,30 @@
 #include <fcntl.h>
 #include <memory>
 
-int CommandExec::ExecuteCommand(char *cmd, char * const *argv, int *exitCode) {
+int CommandExec::ExecuteCommand(const std::string cmd, const std::vector<std::string> argv, int &exitCode) {
     int ret = -1;
     int status = 1;
     pid_t pid = -1;
     pid_t waitPid = -1;
     extern char **environ;
 
-    if (!cmd || !*cmd || !argv || '/' != cmd[0]) {
+    if (cmd.empty() || argv.empty() || '/' != cmd[0]) {
         errno = EINVAL;
         return ret;
     }
 
-    if (posix_spawn(&pid, cmd, NULL, NULL, argv, environ) != 0) {
-        PM_LOG_ERROR("posix_spawn failed: %s", cmd);
+    std::vector<char*> argv_cstr;
+    for (const auto& arg : argv) {
+        argv_cstr.push_back(const_cast<char*>(arg.c_str()));
+    }
+    argv_cstr.push_back(nullptr);
+
+    if (posix_spawn(&pid, cmd.c_str(), NULL, NULL, argv_cstr.data(), environ) != 0) {
+        PM_LOG_ERROR("posix_spawn failed: %s", cmd.c_str());
         return ret;
     }
 
-    PM_LOG_DEBUG("Spawned process for cmd %s: %d", cmd, pid);
+    PM_LOG_DEBUG("Spawned process for cmd %s: %d", cmd.c_str(), pid);
 
     while ((waitPid = waitpid(pid, &status, 0)) == -1 && errno == EINTR)
         ;
@@ -38,9 +44,7 @@ int CommandExec::ExecuteCommand(char *cmd, char * const *argv, int *exitCode) {
     if (WIFEXITED(status)) {
         ret = 0;
         PM_LOG_DEBUG("Process terminated normally: %d (exit code: %d)", pid, WEXITSTATUS(status));
-        if (exitCode) {
-            *exitCode = WEXITSTATUS(status);
-        }
+        exitCode = WEXITSTATUS(status);
         return ret;
     }
 
@@ -57,7 +61,7 @@ int CommandExec::ExecuteCommand(char *cmd, char * const *argv, int *exitCode) {
     return ret;
 }
 
-int CommandExec::ExecuteCommandCaptureOutput(char *cmd, char * const *argv, int *exitCode, std::string &output) {
+int CommandExec::ExecuteCommandCaptureOutput(const std::string cmd, const std::vector<std::string> argv, int &exitCode, std::string &output) {
     int ret = -1;
     int status = 1;
     pid_t pid = -1;
@@ -68,7 +72,7 @@ int CommandExec::ExecuteCommandCaptureOutput(char *cmd, char * const *argv, int 
     ssize_t bytesRead = 0;
     const int waitPidOptions = 0;   
 
-    if (!cmd || !*cmd || !argv || '/' != cmd[0]) {
+    if (cmd.empty() || argv.empty() || '/' != cmd[0]) {
         return ret;
     }
 
@@ -113,12 +117,18 @@ int CommandExec::ExecuteCommandCaptureOutput(char *cmd, char * const *argv, int 
         return ret;
     }
 
-    if (posix_spawn(&pid, cmd, &childFdActions, NULL, argv, environ) != 0) {
-        PM_LOG_ERROR("posix_spawn failed: %s", cmd);
+    std::vector<char*> argv_cstr;
+    for (const auto& arg : argv) {
+        argv_cstr.push_back(const_cast<char*>(arg.c_str()));
+    }
+    argv_cstr.push_back(nullptr);
+
+    if (posix_spawn(&pid, cmd.c_str(), &childFdActions, NULL, argv_cstr.data(), environ) != 0) {
+        PM_LOG_ERROR("posix_spawn failed: %s", cmd.c_str());
         return ret;
     }
 
-    PM_LOG_DEBUG("Spawned process for cmd %s: %d", cmd, pid);
+    PM_LOG_DEBUG("Spawned process for cmd %s: %d", cmd.c_str(), pid);
 
     fcntl(out[0], F_SETFL, flags | O_NONBLOCK);
 
@@ -131,7 +141,7 @@ int CommandExec::ExecuteCommandCaptureOutput(char *cmd, char * const *argv, int 
         return ret;
     } else if (waitPid > 0) {
         if (WIFEXITED(status)) {
-            PM_LOG_DEBUG("Process '%s' terminated normally: %d (exit code: %d)", cmd, pid, WEXITSTATUS(status));
+            PM_LOG_DEBUG("Process '%s' terminated normally: %d (exit code: %d)", cmd.c_str(), pid, WEXITSTATUS(status));
             
             output.clear();
 
@@ -141,16 +151,14 @@ int CommandExec::ExecuteCommandCaptureOutput(char *cmd, char * const *argv, int 
                 output.append(buffer);
             }                       
 
-            if (exitCode) {
-                *exitCode = WEXITSTATUS(status);
-            }
+            exitCode = WEXITSTATUS(status);
             ret = 0;
         } else if (WIFSIGNALED(status)) {
-            PM_LOG_ERROR( "Process '%s' terminated due to uncaught exception: %d", cmd, pid);
+            PM_LOG_ERROR( "Process '%s' terminated due to uncaught exception: %d", cmd.c_str(), pid);
         } else if (WIFSTOPPED(status)) {
-            PM_LOG_ERROR( "Process '%s' stopped abnormally: %d", cmd, pid);
+            PM_LOG_ERROR( "Process '%s' stopped abnormally: %d", cmd.c_str(), pid);
         } else {
-            PM_LOG_ERROR( "Process '%s' did not return: %d", cmd, pid);
+            PM_LOG_ERROR( "Process '%s' did not return: %d", cmd.c_str(), pid);
         }
     }
 

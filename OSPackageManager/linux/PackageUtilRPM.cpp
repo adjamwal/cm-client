@@ -52,13 +52,13 @@ bool PackageUtilRPM::unloadLibRPM() {
 
 std::vector<std::string> PackageUtilRPM::listPackages() const {
     std::vector<std::string>result;
-    char* rpmBinString = strdup(RPM_BIN_STR);;
-    char* listPkgOption = strdup(RPM_LIST_PKG_OPTION);
-    char* listArgv[] = {rpmBinString, listPkgOption, NULL};
+    std::string rpmBinString = RPM_BIN_STR;
+    std::string listPkgOption = RPM_LIST_PKG_OPTION;
+    std::vector<std::string> listArgv = {rpmBinString, listPkgOption};
     int exitCode = 0;
     std::string outputBuffer;
 
-    int ret = CommandExec::ExecuteCommandCaptureOutput(rpmBinString, listArgv, &exitCode, outputBuffer);
+    int ret = CommandExec::ExecuteCommandCaptureOutput(rpmBinString, listArgv, exitCode, outputBuffer);
     if(ret != 0){
         PM_LOG_ERROR("Failed to execute list packages command.");
     } else if(exitCode != 0) {
@@ -117,13 +117,13 @@ PackageInfo PackageUtilRPM::getPackageInfo(const PKG_ID_TYPE& identifierType, co
 std::vector<std::string> PackageUtilRPM::listPackageFiles(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const {
     (void) identifierType; // Currently this is of no use as rpm -ql command works with both name and NVRA format similarly.
     std::vector<std::string>result;
-    char* rpmBinString = strdup(RPM_BIN_STR);
-    char* listPkgFilesOption = strdup(RPM_LIST_PKG_FILES_OPTION);
-    char* listArgv[] = {rpmBinString, listPkgFilesOption, strdup(packageIdentifier.c_str()), NULL};
+    std::string rpmBinString = RPM_BIN_STR;
+    std::string listPkgFilesOption = RPM_LIST_PKG_FILES_OPTION;
+    std::vector<std::string> listArgv = {rpmBinString, listPkgFilesOption, packageIdentifier};
     int exitCode = 0;
     std::string outputBuffer;
 
-    int ret = CommandExec::ExecuteCommandCaptureOutput(rpmBinString, listArgv, &exitCode, outputBuffer);
+    int ret = CommandExec::ExecuteCommandCaptureOutput(rpmBinString, listArgv, exitCode, outputBuffer);
     if(ret != 0){
         PM_LOG_ERROR("Failed to execute list package files command.");
     } else if(exitCode != 0) {
@@ -137,12 +137,12 @@ std::vector<std::string> PackageUtilRPM::listPackageFiles(const PKG_ID_TYPE& ide
 
 bool PackageUtilRPM::installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions) const {
     (void) installOptions; // Currently this is of no use.
-    char* rpmBinString = strdup(RPM_BIN_STR);
-    char* installPkgOption = strdup(RPM_INSTALL_PKG_OPTION);
-    char* installArgv[] = {rpmBinString, installPkgOption, strdup(packagePath.c_str()), NULL};
+    std::string rpmBinString = RPM_BIN_STR;
+    std::string installPkgOption = RPM_INSTALL_PKG_OPTION;
+    std::vector<std::string> installArgv = {rpmBinString, installPkgOption, packagePath};
     int exitCode = 0;
 
-    int ret = CommandExec::ExecuteCommand(rpmBinString, installArgv, &exitCode);
+    int ret = CommandExec::ExecuteCommand(rpmBinString, installArgv, exitCode);
     if(ret != 0){
         PM_LOG_ERROR("Failed to execute install package command.");
         return false;
@@ -156,12 +156,12 @@ bool PackageUtilRPM::installPackage(const std::string& packagePath, const std::m
 }
 
 bool PackageUtilRPM::uninstallPackage(const std::string& packageIdentifier) const {
-    char* rpmBinString = strdup(RPM_BIN_STR);
-    char* uninstallPkgOption = strdup(RPM_UNINSTALL_PKG_OPTION);
-    char* uninstallArgv[] = {rpmBinString, uninstallPkgOption, strdup(packageIdentifier.c_str()), NULL};
+    std::string rpmBinString = RPM_BIN_STR;
+    std::string uninstallPkgOption = RPM_UNINSTALL_PKG_OPTION;
+    std::vector<std::string> uninstallArgv = {rpmBinString, uninstallPkgOption, packageIdentifier};
     int exitCode = 0;
 
-    int ret = CommandExec::ExecuteCommand(rpmBinString, uninstallArgv, &exitCode);
+    int ret = CommandExec::ExecuteCommand(rpmBinString, uninstallArgv, exitCode);
     if(ret != 0){
         PM_LOG_ERROR("Failed to execute uninstall package command.");
         return false;
