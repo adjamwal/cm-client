@@ -29,7 +29,25 @@ public:
      */
     PackageInventory CachedInventory() const override;
 
+protected:
+    void ResolveAndDiscover(
+        const std::filesystem::path& unresolvedPath,
+        const std::filesystem::path& resolvedPath,
+        std::string& out_knownFolderId,
+        std::string& out_knownFolderIdConversion,
+        std::vector<std::filesystem::path>& out_discoveredFiles );
+
+    void DiscoverPackageConfigurables(
+        const std::vector<PmProductDiscoveryConfigurable>& configurables,
+        std::vector<PackageConfigInfo>& packageConfigs );
+
 private:
+    void ProcessPackageDiscovery(const PmProductDiscoveryRules& rule,
+                                 const std::string& pkgIdentifier,
+                                 const std::vector<std::string>& packageList,
+                                 PKG_ID_TYPE pkgType,
+                                 std::set<std::string>& uniquePks,
+                                 PackageInventory& packagesDiscovered);
     std::shared_ptr<IPackageUtil> pkgUtilManager_; /**< The IPackageUtil instance for package management operations. */
     PackageInventory lastDetectedPackages_;
 };
