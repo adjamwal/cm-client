@@ -2,6 +2,7 @@
 
 #include "IPackageUtil.hpp"
 #include "IPmPlatformDiscovery.hpp"
+#include "IFileUtilities.hpp"
 
 /**
  * @brief A class that performs platform discovery by utilizing the package manager utility.
@@ -42,13 +43,15 @@ protected:
         std::vector<PackageConfigInfo>& packageConfigs );
 
 private:
-    void ProcessPackageDiscovery(const PmProductDiscoveryRules& rule,
-                                 const std::string& pkgIdentifier,
-                                 const std::vector<std::string>& packageList,
-                                 PKG_ID_TYPE pkgType,
-                                 std::set<std::string>& uniquePks,
-                                 PackageInventory& packagesDiscovered);
+    void ProcessPackageDiscovery(
+        const PmProductDiscoveryRules& rule,
+        const std::string& pkgIdentifier,
+        const std::vector<std::string>& packageList,
+        PKG_ID_TYPE pkgType,
+        std::set<std::string>& uniquePks,
+        PackageInventory& packagesDiscovered);
     std::shared_ptr<IPackageUtil> pkgUtilManager_; /**< The IPackageUtil instance for package management operations. */
+    std::shared_ptr<PackageManager::IFileUtilities> fileUtils_;
     PackageInventory lastDetectedPackages_;
 };
 
