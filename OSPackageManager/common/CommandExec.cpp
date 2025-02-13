@@ -100,10 +100,14 @@ int CommandExec::ExecuteCommandCaptureOutput(const std::string &cmd, const std::
 
     auto outPtr = std::unique_ptr<int, decltype(close_pipe)>(out, close_pipe); // Just for cleaning purpose on return.
 
-    int flags = fcntl(out[0], F_GETFL, 0); 
-
     if (pipe(out) == -1) {
         PM_LOG_ERROR("pipe failed");
+        return ret;
+    }
+
+    int flags = fcntl(out[0], F_GETFL, 0); 
+    if (flags == -1) {
+        PM_LOG_ERROR("fcntl failed");
         return ret;
     }
 

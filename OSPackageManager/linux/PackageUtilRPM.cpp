@@ -58,6 +58,7 @@ std::vector<std::string> PackageUtilRPM::listPackages() const {
     int exitCode = 0;
     std::string outputBuffer;
 
+    // To-Do: Make sure the rpmBinStr exists before executing the command.
     int ret = CommandExec::ExecuteCommandCaptureOutput(rpmBinStr, listArgv, exitCode, outputBuffer);
     if(ret != 0){
         PM_LOG_ERROR("Failed to execute list packages command.");
@@ -79,6 +80,11 @@ PackageInfo PackageUtilRPM::getPackageInfo(const PKG_ID_TYPE& identifierType, co
     (void) packageIdentifier;
 
     rpmts ts = fpRpmTsCreate_();
+    if(NULL == ts) {
+        PM_LOG_ERROR("Failed to create rpm transaction set.");
+        return result;
+    }
+
     rpmdbMatchIterator mi = fpRpmTsInitIterator_(ts, RPMDBI_PACKAGES, NULL, 0);
 
     Header packageHeader;
