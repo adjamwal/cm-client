@@ -6,7 +6,6 @@
 
 #include "FileUtilities.hpp"
 #include "PmLogger.hpp"
-#include <vector>
 
 namespace PackageManager
 {
