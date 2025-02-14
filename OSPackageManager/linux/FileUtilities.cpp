@@ -16,7 +16,7 @@ bool FileUtilities::PathIsValid(const std::filesystem::path &filePath) {
     }
     catch (std::filesystem::filesystem_error &err){
         bValid = false;
-        PM_LOG_ERROR("PathIsValid failed on file:\"%s\" with code: %d and message: \"%s\"", filePath.c_str(), err.code().value(), err.what());
+        PM_LOG_ERROR("Exception thrown while validating file path:\"%s\" with code: %d and message: \"%s\"", filePath.c_str(), err.code().value(), err.what());
     }
     
     return bValid;
