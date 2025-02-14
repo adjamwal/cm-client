@@ -10,12 +10,12 @@
  */
 class PmPlatformDiscovery : public IPmPlatformDiscovery {
 public:
-    /**
-     * @brief Constructs a PmPlatformDiscovery object with the specified IPackageUtil instance.
-     * @param pkgUtil The IPackageUtil instance to use for package management operations.
+        /**
+     * @brief Constructs a PmPlatformDiscovery object with the specified IPmPkgUtil instance.
+     * @param pkgUtil The IPmPkgUtil instance to use for package management operations.
      * @param fileUtils The IFileUtilities instance to use for file operations. 
      */
-    PmPlatformDiscovery(std::shared_ptr<IPmPkgUtil> pkgUtil) : pkgUtilManager_(std::move(pkgUtil)) {}
+    PmPlatformDiscovery(std::shared_ptr<IPackageUtil> pkgUtil, std::shared_ptr<PackageManager::IFileUtilities> fileUtils) : pkgUtilManager_(std::move(pkgUtil)), fileUtils_(std::move(fileUtils)) {}
     
     /**
      * @brief Discovers the installed packages based on the provided catalog rules.
