@@ -7,7 +7,6 @@
 #pragma once
 
 #include "IFileUtilities.hpp"
-#include <vector>
 
 namespace PackageManager
 {
