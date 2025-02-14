@@ -15,7 +15,7 @@ set(OS_PACKAGE_MANAGER_SRCS
     agent/PackageManagerAgent.hpp
     common/PmLogger.cpp
     common/PmLogger.hpp
-    macOS/IFileUtilities.hpp
+    common/IFileUtilities.hpp
     macOS/IPmCertRetriever.hpp
     macOS/FileUtilities.cpp
     macOS/FileUtilities.mm
@@ -51,6 +51,9 @@ set(OS_PACKAGE_MANAGER_SRCS
     agent/PackageManagerAgent.hpp
     common/CommandExec.cpp
     common/CommandExec.hpp
+    common/IFileUtilities.hpp
+    linux/FileUtilities.cpp
+    linux/FileUtilities.hpp
     $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.cpp>
     $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.hpp>
     linux/PmPlatformComponentManager.cpp
