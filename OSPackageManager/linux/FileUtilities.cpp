@@ -6,6 +6,7 @@
 
 #include "FileUtilities.hpp"
 #include "PmLogger.hpp"
+#include <glob.h>
 
 namespace PackageManager
 {

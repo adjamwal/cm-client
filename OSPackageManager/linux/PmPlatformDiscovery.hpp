@@ -3,6 +3,7 @@
 #include "IPackageUtil.hpp"
 #include "IPmPlatformDiscovery.hpp"
 #include "IFileUtilities.hpp"
+#include <set>
 
 /**
  * @brief A class that performs platform discovery by utilizing the package manager utility.

@@ -1,7 +1,6 @@
 #include "PmPlatformDiscovery.hpp"
 #include "PmLogger.hpp"
 #include <regex>
-#include <set>
 #include <sys/utsname.h>
 #include <cassert>
 
@@ -209,11 +208,11 @@ PackageInventory PmPlatformDiscovery::DiscoverInstalledPackages( const std::vect
     const auto& packagenames = extractPackageNames(packages);
     for (const auto& rule : catalogRules) {
         for (const auto& pkgRule : rule.pkgnvra_discovery) {
-            processPackageDiscovery(rule, pkgRule.pkgId, packages, PKG_ID_TYPE::NVRA, uniquePks, packagesDiscovered);
+            ProcessPackageDiscovery(rule, pkgRule.pkgId, packages, PKG_ID_TYPE::NVRA, uniquePks, packagesDiscovered);
         
         }
         for (const auto& pkgNameRule : rule.pkgname_discovery) {
-            processPackageDiscovery(rule, pkgNameRule.pkgName, packagenames, PKG_ID_TYPE::NAME, uniquePks, packagesDiscovered);
+            ProcessPackageDiscovery(rule, pkgNameRule.pkgName, packagenames, PKG_ID_TYPE::NAME, uniquePks, packagesDiscovered);
         }
     }
     packagesDiscovered.architecture = sArchForDiscovery;
