@@ -212,7 +212,7 @@ PackageInventory PmPlatformDiscovery::DiscoverInstalledPackages( const std::vect
         
         }
         for (const auto& pkgNameRule : rule.pkgname_discovery) {
-            ProcessPackageDiscovery(rule, pkgNameRule.pkgName, packagenames, PKG_ID_TYPE::NAME, uniquePks, packagesDiscovered);
+            ProcessPackageDiscovery(rule, pkgNameRule.name, packagenames, PKG_ID_TYPE::NAME, uniquePks, packagesDiscovered);
         }
     }
     packagesDiscovered.architecture = sArchForDiscovery;
