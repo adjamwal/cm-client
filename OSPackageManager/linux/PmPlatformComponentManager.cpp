@@ -5,17 +5,31 @@
  */
 
 #include "PmPlatformComponentManager.hpp"
+#include "PmLogger.hpp"
+#include "FileUtilities.hpp"
+#include "PackageManager/PmTypes.h"
+#include <cassert>
+
+PmPlatformComponentManager::PmPlatformComponentManager(
+    std::shared_ptr<IPackageUtil> pkgUtil,
+    std::shared_ptr<PackageManager::IFileUtilities> fileUtils) 
+    : pkgUtil_(pkgUtil),  discovery_(pkgUtil, fileUtils), fileUtils_(std::move(fileUtils))
+{}
 
 int32_t PmPlatformComponentManager::GetInstalledPackages(const std::vector<PmProductDiscoveryRules> &catalogRules, PackageInventory &packagesDiscovered)
 {
-    (void) catalogRules;
-    (void) packagesDiscovered;
+    try {
+        packagesDiscovered = discovery_.DiscoverInstalledPackages(catalogRules);
+    } catch (PkgUtilException& e) {
+        PM_LOG_ERROR("Exception: [%s]", e.what());
+        return -1;
+    }
     return 0;
 }
 
 int32_t PmPlatformComponentManager::GetCachedInventory(PackageInventory &cachedInventory)
 {
-    (void) cachedInventory;
+    cachedInventory = discovery_.CachedInventory();
     return 0;
 }
 

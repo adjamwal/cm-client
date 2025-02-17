@@ -32,13 +32,15 @@ if(LINUX)
         "redhat"
         "rocky"
         "almalinux"
-        "oracle")
+        "oracle"
+        "rhel")
 
     cmake_host_system_information(RESULT DISTRO QUERY DISTRIB_INFO)
 
     if(${DISTRO_ID} IN_LIST RHEL_VARIANTS)
         string(SUBSTRING "${DISTRO_VERSION}" 0 1 DISTRO_VERSION_SHORT)
         set(platform "el${DISTRO_VERSION_SHORT}")
+        add_definitions(-DIS_RHEL)
     else()
         string(SUBSTRING "${DISTRO_VERSION}" 0 2 DISTRO_VERSION_SHORT)
         string(FIND ${DISTRO_ID} "suse" is_suse)
