@@ -6,6 +6,7 @@
 
 #include "PmPlatformDependencies.hpp"
 #include "CMIDAPIProxy.hpp"
+#include "FileUtilities.hpp"
 #ifdef IS_RHEL
 #include "PackageUtilRPM.hpp"
 #endif

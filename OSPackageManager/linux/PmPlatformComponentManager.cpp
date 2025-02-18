@@ -20,7 +20,7 @@ int32_t PmPlatformComponentManager::GetInstalledPackages(const std::vector<PmPro
 {
     try {
         packagesDiscovered = discovery_.DiscoverInstalledPackages(catalogRules);
-    } catch (PkgUtilException& e) {
+    } catch (PackageUtilException& e) {
         PM_LOG_ERROR("Exception: [%s]", e.what());
         return -1;
     }
