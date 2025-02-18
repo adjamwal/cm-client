@@ -12,10 +12,10 @@
 #endif
 
 PmPlatformDependencies::PmPlatformDependencies()
-	    :
-	    pmConfiguration_ { PmPlatformConfiguration(std::make_shared<CMIDAPIProxy>()) }
 #ifdef IS_RHEL
-        , pmPkgUtil_(std::make_shared<PackageUtilRPM>())
+	    :
+        pmPkgUtil_(std::make_shared<PackageUtilRPM>())
+        , pmConfiguration_ { PmPlatformConfiguration(std::make_shared<CMIDAPIProxy>()) }
         , pmComponentManager_{PmPlatformComponentManager(pmPkgUtil_, std::make_shared<PackageManager::FileUtilities>())}
 #endif
 {}
