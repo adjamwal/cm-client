@@ -56,6 +56,8 @@ set(OS_PACKAGE_MANAGER_SRCS
     linux/FileUtilities.hpp
     $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.cpp>
     $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.hpp>
+    $<$<BOOL:${is_debian_based}>:linux/PackageUtilDEB.cpp>
+    $<$<BOOL:${is_debian_based}>:linux/PackageUtilDEB.hpp>
     linux/PmPlatformComponentManager.cpp
     linux/PmPlatformComponentManager.hpp
     linux/PmPlatformConfiguration.cpp
