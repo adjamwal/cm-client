@@ -23,7 +23,7 @@ std::unordered_map<std::string, KnownFolderId> knownFolderIdMap = {
     {"UserHome", USER_HOME}
 };
 
-bool GetCurrentConsoleUser(std::string &rstrUserName) {
+bool GetCurrentConsoleUser(std::string &userName) {
     setutent();
     struct utmp * entry = getutent();
     while(NULL != entry)
@@ -32,7 +32,7 @@ bool GetCurrentConsoleUser(std::string &rstrUserName) {
         0 < entry->ut_pid && 
         0 == kill(entry->ut_pid,0) && 
         (0 != strcmp("(unknown)", entry->ut_name))) {
-            rstrUserName = entry->ut_name;
+            userName = entry->ut_name;
             endutent();
             return true;
         }
@@ -42,7 +42,7 @@ bool GetCurrentConsoleUser(std::string &rstrUserName) {
     return false;
 }
 
-void ResolveUserHomeFolder(std::string &rstrUserHomeFolder) {
+void ResolveUserHomeFolder(std::string &userHomeFolder) {
     std::string userName;
     if (!GetCurrentConsoleUser(userName)) {
         PM_LOG_ERROR("Failed to get current console user");
@@ -55,7 +55,7 @@ void ResolveUserHomeFolder(std::string &rstrUserHomeFolder) {
         return;
     }
 
-    rstrUserHomeFolder = std::string(pw->pw_dir);
+    userHomeFolder = std::string(pw->pw_dir);
 }
 
 bool FileUtilities::PathIsValid(const std::filesystem::path &filePath) {
