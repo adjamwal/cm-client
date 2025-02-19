@@ -6,9 +6,58 @@
 
 #include "FileUtilities.hpp"
 #include "PmLogger.hpp"
+#include <pwd.h>
+#include <utmp.h>
+#include <signal.h>
+#include <string.h>
+#include <unordered_map>
+#include <regex>
 
 namespace PackageManager
 {
+typedef enum {
+    USER_HOME = 0
+} KnownFolderId;
+
+std::unordered_map<std::string, KnownFolderId> knownFolderIdMap = {
+    {"UserHome", USER_HOME}
+};
+
+bool GetCurrentConsoleUser(std::string &rstrUserName) {
+    setutent();
+    struct utmp * entry = getutent();
+    while(NULL != entry)
+    {
+        if(USER_PROCESS == entry->ut_type && 
+        0 < entry->ut_pid && 
+        0 == kill(entry->ut_pid,0) && 
+        (0 != strcmp("(unknown)", entry->ut_name))) {
+            rstrUserName = entry->ut_name;
+            endutent();
+            return true;
+        }
+        entry = getutent();
+    }
+    endutent(); 
+    return false;
+}
+
+void ResolveUserHomeFolder(std::string &rstrUserHomeFolder) {
+    std::string userName;
+    if (!GetCurrentConsoleUser(userName)) {
+        PM_LOG_ERROR("Failed to get current console user");
+        return;
+    }
+
+    struct passwd *pw = getpwnam(userName.c_str());
+    if (pw == NULL) {
+        PM_LOG_ERROR("Failed to get user home directory for user %s", userName.c_str());
+        return;
+    }
+
+    rstrUserHomeFolder = std::string(pw->pw_dir);
+}
+
 bool FileUtilities::PathIsValid(const std::filesystem::path &filePath) {
     bool bValid = false;
     try{
@@ -51,13 +100,40 @@ int32_t FileUtilities::FileSearchWithWildCard(const std::filesystem::path& searc
 }
 
 std::string FileUtilities::ResolvePath(const std::string &basePath) {   
-    (void) basePath;
-    return std::string{};
+    const std::regex folderIdRegex(R"(<FOLDERID_([^>]+)>)");
+    std::smatch matches;
+    
+    if (std::regex_search(basePath, matches, folderIdRegex)) {
+        const auto& folderIdString = matches[1].str();
+        const auto knownFolder = ResolveKnownFolderIdForDefaultUser(folderIdString);
+        
+        if (!knownFolder.empty()) {
+            return std::regex_replace(basePath, folderIdRegex, knownFolder);
+        } else {
+            PM_LOG_WARNING("Failed to resolve path %s", basePath.c_str());
+        }
+    }
+    
+    return basePath;
 }
 
 std::string FileUtilities::ResolveKnownFolderIdForDefaultUser(const std::string& knownFolderId) {
-    (void) knownFolderId;
-    return std::string{};
+    auto it = knownFolderIdMap.find(knownFolderId);
+    if (it == knownFolderIdMap.end()) {
+        PM_LOG_WARNING("Known folder ID %s not found in map", knownFolderId.c_str());
+        return std::string {};
+    } 
+
+    std::string folderPath {};
+    switch(it->second) {
+        case USER_HOME:
+            ResolveUserHomeFolder(folderPath);
+            break;
+        default:
+            PM_LOG_WARNING("Known folder ID %s not supported", knownFolderId.c_str());
+    }
+
+    return folderPath;
 }
 
 }
