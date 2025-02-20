@@ -10,6 +10,13 @@
 
 namespace PackageManager
 {
+struct LinuxSearchPathUtil {
+    typedef enum {
+        USER_HOME = 0
+    } KNOWN_FOLDER_ID ;
+
+    const static std::unordered_map<std::string, KNOWN_FOLDER_ID> knownFolderIdMap;
+};
     
 class FileUtilities : public IFileUtilities{
 public:

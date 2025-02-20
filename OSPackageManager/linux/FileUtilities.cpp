@@ -15,11 +15,7 @@
 
 namespace PackageManager
 {
-typedef enum {
-    USER_HOME = 0
-} KnownFolderId;
-
-std::unordered_map<std::string, KnownFolderId> knownFolderIdMap = {
+const std::unordered_map<std::string, LinuxSearchPathUtil::KNOWN_FOLDER_ID> LinuxSearchPathUtil::knownFolderIdMap = {
     {"UserHome", USER_HOME}
 };
 
@@ -118,15 +114,15 @@ std::string FileUtilities::ResolvePath(const std::string &basePath) {
 }
 
 std::string FileUtilities::ResolveKnownFolderIdForDefaultUser(const std::string& knownFolderId) {
-    auto it = knownFolderIdMap.find(knownFolderId);
-    if (it == knownFolderIdMap.end()) {
+    auto it = LinuxSearchPathUtil::knownFolderIdMap.find(knownFolderId);
+    if (it == LinuxSearchPathUtil::knownFolderIdMap.end()) {
         PM_LOG_WARNING("Known folder ID %s not found in map", knownFolderId.c_str());
         return std::string {};
     } 
 
     std::string folderPath {};
     switch(it->second) {
-        case USER_HOME:
+        case LinuxSearchPathUtil::KNOWN_FOLDER_ID::USER_HOME:
             ResolveUserHomeFolder(folderPath);
             break;
         default:
