@@ -98,6 +98,11 @@ int32_t FileUtilities::FileSearchWithWildCard(const std::filesystem::path& searc
     return dwError;
 }
 
+/**
+ * @brief Resolves the path by replacing the folder ID with the actual path.
+ * @note  The folder ID should be in the format <FOLDERID_xxx>, where xxx is the supported known folder ID.
+ * @note  If the format is not correct or the folder ID is not supported, the function will return the base path as is.
+ */
 std::string FileUtilities::ResolvePath(const std::string &basePath) {   
     const std::regex folderIdRegex(R"(<FOLDERID_([^>]+)>)");
     std::smatch matches;
