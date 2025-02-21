@@ -10,32 +10,27 @@
 #include <utmp.h>
 #include <signal.h>
 #include <string.h>
-#include <unordered_map>
 #include <regex>
 
-namespace PackageManager
-{
-const std::unordered_map<std::string, LinuxSearchPathUtil::KNOWN_FOLDER_ID> LinuxSearchPathUtil::knownFolderIdMap = {
-    {"UserHome", USER_HOME}
-};
+namespace { //anonymous namespace
 
+// NOTE: This function is not thread safe.
 bool GetCurrentConsoleUser(std::string &userName) {
+    userName.erase();
     setutent();
-    struct utmp * entry = getutent();
-    while(NULL != entry)
-    {
-        if(USER_PROCESS == entry->ut_type && 
+    struct utmp *entry = nullptr;
+    do {
+        entry = getutent();
+        if (NULL != entry && USER_PROCESS == entry->ut_type && 
         0 < entry->ut_pid && 
         0 == kill(entry->ut_pid,0) && 
         (0 != strcmp("(unknown)", entry->ut_name))) {
             userName = entry->ut_name;
-            endutent();
-            return true;
+            break;
         }
-        entry = getutent();
-    }
-    endutent(); 
-    return false;
+    } while (NULL != entry);
+    endutent();
+    return !userName.empty();
 }
 
 void ResolveUserHomeFolder(std::string &userHomeFolder) {
@@ -46,13 +41,21 @@ void ResolveUserHomeFolder(std::string &userHomeFolder) {
     }
 
     struct passwd *pw = getpwnam(userName.c_str());
-    if (pw == NULL) {
+    if (pw == NULL || pw->pw_dir == NULL) {
         PM_LOG_ERROR("Failed to get user home directory for user %s", userName.c_str());
         return;
     }
 
     userHomeFolder = std::string(pw->pw_dir);
 }
+
+}
+
+namespace PackageManager
+{
+const std::unordered_map<std::string, std::function<void(std::string &)>> LinuxSearchPathUtil::knownFolderIdMap = {
+    {"UserHome", ResolveUserHomeFolder}
+};
 
 bool FileUtilities::PathIsValid(const std::filesystem::path &filePath) {
     bool bValid = false;
@@ -121,13 +124,7 @@ std::string FileUtilities::ResolveKnownFolderIdForDefaultUser(const std::string&
     } 
 
     std::string folderPath {};
-    switch(it->second) {
-        case LinuxSearchPathUtil::KNOWN_FOLDER_ID::USER_HOME:
-            ResolveUserHomeFolder(folderPath);
-            break;
-        default:
-            PM_LOG_WARNING("Known folder ID %s not supported", knownFolderId.c_str());
-    }
+    it->second(folderPath);
 
     return folderPath;
 }
