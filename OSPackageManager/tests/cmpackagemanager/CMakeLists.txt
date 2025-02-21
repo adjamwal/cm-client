@@ -1,13 +1,14 @@
 # CMakeLists.txt
 # Copyright 2023, Cisco Systems, Inc.
 
+set(component_name "PackageManagerUnitTest")
+
 get_filename_component(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
 get_filename_component(TESTEE_DIR "${TESTS_DIR}" DIRECTORY)
 
 file(GLOB_RECURSE TEST_SRCS Test*.cpp Test*.mm)
 
-add_executable(
-  PackageManagerUnitTest
+add_executable(${component_name}
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
 
   # Test files
@@ -52,11 +53,11 @@ add_executable(
 )
 
 if(APPLE)
-set_property(TARGET PackageManagerUnitTest APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
+  set_property(TARGET ${component_name} APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
 endif()
 
 add_dependencies(
-    PackageManagerUnitTest
+    ${component_name}
     third-party-ciscossl
     third-party-EndpointIdentity
     third-party-gtest
@@ -66,14 +67,14 @@ add_dependencies(
 )
 
 if(APPLE)
-add_dependencies(
-    PackageManagerUnitTest
-    third-party-ProxyDiscovery-Mac
-)
+  add_dependencies(
+      ${component_name}
+      third-party-ProxyDiscovery-Mac
+  )
 endif()
 
 target_link_libraries(
-  PackageManagerUnitTest
+  ${component_name}
   $<$<BOOL:${APPLE}>:ProxyDiscovery>
   cmidapi
   crypto
@@ -92,14 +93,14 @@ target_link_libraries(
 )
 
 target_compile_definitions(
-    PackageManagerUnitTest
+    ${component_name}
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CMID_LOG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
 )
 
 target_include_directories(
-  PackageManagerUnitTest
+  ${component_name}
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
       $<$<BOOL:${APPLE}>:${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery>
@@ -115,36 +116,36 @@ target_include_directories(
 )
 
 target_link_directories(
-  PackageManagerUnitTest BEFORE
+  ${component_name} BEFORE
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/lib
 )
 
 # Add a custom command to copy the binary to the build directory
 add_custom_command(
-    TARGET PackageManagerUnitTest PRE_BUILD
+    TARGET ${component_name} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_CURRENT_SOURCE_DIR}/Resources/mac/signedprocess
             $<TARGET_FILE_DIR:PackageManagerUnitTest>/signedprocess
 )
 
 add_custom_command(
-    TARGET PackageManagerUnitTest PRE_BUILD
+    TARGET ${component_name} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_CURRENT_SOURCE_DIR}/Resources/mac/test_package.pkg
             $<TARGET_FILE_DIR:PackageManagerUnitTest>/test_package.pkg
 )
 
 add_custom_command(
-    TARGET PackageManagerUnitTest PRE_BUILD
+    TARGET ${component_name} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_CURRENT_SOURCE_DIR}/Resources/mac/root
             $<TARGET_FILE_DIR:PackageManagerUnitTest>/root
 )
 
 # Create a custom target that depends on the copy command
-add_custom_target(CopyBinary ALL DEPENDS PackageManagerUnitTest)
+add_custom_target(CopyBinary ALL DEPENDS ${component_name})
 
 
 include(GoogleTest)
-gtest_discover_tests(PackageManagerUnitTest DISCOVERY_MODE PRE_TEST)
+gtest_discover_tests(${component_name} DISCOVERY_MODE PRE_TEST)

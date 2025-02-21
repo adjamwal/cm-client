@@ -1,0 +1,125 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Build all debug",
+            "linux": {
+                "command": "build -d",
+                "options": {
+                    "cwd": "${workspaceFolder}"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+        },
+        {
+            "type": "shell",
+            "label": "Build all release",
+            "linux": {
+                "command": "CM_BUILD_VER=1.0.0.0 build -r",
+                "options": {
+                    "cwd": "${workspaceFolder}"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+        },
+        {
+            "type": "shell",
+            "label": "Kill csccloudmanagement",
+            "command": "sudo",
+            "args": [
+                "killall",
+                "csccloudmanagement",
+                "cmpackagemanager"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "Force kill csccloudmanagement",
+            "command": "sudo",
+            "args": [
+                "killall",
+                "-9",
+                "csccloudmanagement",
+                "cmpackagemanager"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "Git sync submodules",
+            "command": "git",
+            "args": [
+                "submodule",
+                "sync",
+                "--recursive"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "Git update submodules",
+            "command": "git",
+            "args": [
+                "submodule",
+                "update",
+                "--init",
+                "--recursive"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "dependsOn": [
+                "git sync submodules"
+            ]
+        },
+        {
+            "type": "shell",
+            "label": "Reset workspace",
+            "command": "true",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "git clean all",
+                "git sync submodules",
+                "git update submodules"
+            ]
+        }
+    ],
+    "version": "2.0.0"
+}

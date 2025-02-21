@@ -2,32 +2,28 @@
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(lib configshared)
+set(component_name "configshared")
 
-list(APPEND ${lib}_SOURCES
+add_library(${component_name} STATIC
     ConfigWatchdog.cpp
     Config.cpp
     Config.hpp
     IConfigLogger.hpp
 )
 
-add_library(${lib} STATIC
-    ${${lib}_SOURCES}
-)
-
-add_dependencies(${lib}
+add_dependencies(${component_name}
     third-party-jsoncpp
  )
 
 
-target_link_libraries(${lib}
+target_link_libraries(${component_name}
     PUBLIC
     jsoncpp
 )
 
-target_compile_definitions(${lib}
+target_compile_definitions(${component_name}
     PRIVATE
-    ${lib}_MODULE_API_EXPORTS
+    ${component_name}_MODULE_API_EXPORTS
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CM_THIRDPARTY_EXPORT}/bin\">"
     "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/config\">"
@@ -37,9 +33,9 @@ target_compile_definitions(${lib}
 )
 
 
-set_target_properties(${lib} PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(${component_name} PROPERTIES LINKER_LANGUAGE CXX)
 
-target_include_directories(${lib}
+target_include_directories(${component_name}
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE
@@ -47,4 +43,4 @@ target_include_directories(${lib}
 
 )
 
-install(TARGETS ${lib} DESTINATION ${CM_THIRDPARTY_EXPORT}/lib)
+install(TARGETS ${component_name} DESTINATION ${CM_THIRDPARTY_EXPORT}/lib)

@@ -1,5 +1,7 @@
 # Copyright (c) 2023 Cisco Systems, Inc. All Rights Reserved.
 
+set(component_name "pmcontrolplugin")
+
 if(APPLE)
     set(OS_SPECIFIC_SUFFIX "Mac")
 elseif(LINUX)
@@ -20,16 +22,16 @@ list(APPEND CONTROL_PLUGIN_SOURCES
     ../util/ScopedGuard.hpp
 )
 
-add_library(pmcontrolplugin STATIC
+add_library(${component_name} STATIC
     ${CONTROL_PLUGIN_SOURCES}
 )
 
-target_compile_definitions(pmcontrolplugin
+target_compile_definitions(${component_name}
     PRIVATE
         PM_MODULE_API_EXPORTS
 )
 
-target_include_directories(pmcontrolplugin
+target_include_directories(${component_name}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -37,12 +39,12 @@ target_include_directories(pmcontrolplugin
         ${cm-client_SOURCE_DIR}/client/Logger
 )
 
-add_dependencies(pmcontrolplugin 
+add_dependencies(${component_name} 
         third-party-EndpointIdentity
         third-party-spdlog
 )
 
-target_link_libraries(pmcontrolplugin
+target_link_libraries(${component_name}
     PRIVATE
 	configshared
         $<$<BOOL:${APPLE}>:${SystemConfiguration_framework}>
@@ -51,4 +53,4 @@ target_link_libraries(pmcontrolplugin
 	$<$<BOOL:${APPLE}>:${Security_framework}>
 )
 
-install(TARGETS pmcontrolplugin DESTINATION ${CM_THIRDPARTY_EXPORT}/lib/)
+install(TARGETS ${component_name} DESTINATION ${CM_THIRDPARTY_EXPORT}/lib/)

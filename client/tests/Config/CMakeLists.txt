@@ -1,22 +1,24 @@
 # CMakeLists.txt
 # Copyright 2022, Cisco Systems, Inc.
 
+set(component_name "ConfigTest")
+
 add_executable(
-  ConfigTest
+  ${component_name}
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
   # Test files
   ConfigTest.cpp
 )
 
 add_dependencies(
-    ConfigTest
+    ${component_name}
     third-party-spdlog
     third-party-jsoncpp
     third-party-gtest
 )
 
 target_link_libraries(
-  ConfigTest
+  ${component_name}
   jsoncpp
   configshared
   ${GTEST_LIBS}
@@ -25,7 +27,7 @@ target_link_libraries(
 )
 
 target_compile_definitions(
-    ConfigTest
+    ${component_name}
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
@@ -35,21 +37,21 @@ target_compile_definitions(
 )
 
 target_include_directories(
-  ConfigTest
+  ${component_name}
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
       ${cm-client_SOURCE_DIR}/client
 )
 
 target_link_directories(
-  ConfigTest BEFORE
+  ${component_name} BEFORE
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/lib
       ${inherited}
 )
 
 include(GoogleTest)
-gtest_discover_tests(ConfigTest DISCOVERY_MODE PRE_TEST)
+gtest_discover_tests(${component_name} DISCOVERY_MODE PRE_TEST)
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")
     macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
@@ -57,6 +59,6 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
         ${XCODE_VALUE})
     endmacro (set_xcode_property)
 
-    set_xcode_property(ConfigTest CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
-    set_xcode_property(ConfigTest CLANG_CXX_LIBRARY "libc++")
+    set_xcode_property(${component_name} CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
+    set_xcode_property(${component_name} CLANG_CXX_LIBRARY "libc++")
 endif()
