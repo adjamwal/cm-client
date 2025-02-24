@@ -7,9 +7,14 @@
 #pragma once
 
 #include "IFileUtilities.hpp"
+#include <unordered_map>
+#include <functional>
 
 namespace PackageManager
 {
+struct PathResolveUtil {
+    const static std::unordered_map<std::string, std::function<void(std::string &)>> knownFolderIdMap;
+};
     
 class FileUtilities : public IFileUtilities{
 public:
