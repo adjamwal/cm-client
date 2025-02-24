@@ -1,8 +1,10 @@
 # CMakeLists.txt
 # Copyright 2022, Cisco Systems, Inc.
 
+set(component_name "LoggerTest")
+
 add_executable(
-  LoggerTest
+  ${component_name}
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.hpp
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
   ${cm-client_SOURCE_DIR}/ConfigShared/IConfigLogger.hpp
@@ -12,13 +14,13 @@ add_executable(
 )
 
 add_dependencies(
-    LoggerTest
+    ${component_name}
     third-party-spdlog
     third-party-gtest
 )
 
 target_link_libraries(
-  LoggerTest
+  ${component_name}
   configshared
   ${GTEST_LIBS}
   pthread
@@ -26,20 +28,20 @@ target_link_libraries(
 )
 
 target_include_directories(
-  LoggerTest
+  ${component_name}
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
       ${cm-client_SOURCE_DIR}/client
 )
 
 target_link_directories(
-  LoggerTest BEFORE
+  ${component_name} BEFORE
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/lib
 )
 
 include(GoogleTest)
-gtest_discover_tests(LoggerTest DISCOVERY_MODE PRE_TEST)
+gtest_discover_tests(${component_name} DISCOVERY_MODE PRE_TEST)
 
 if(CMAKE_GENERATOR STREQUAL "Xcode")
     macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
@@ -47,6 +49,6 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
         ${XCODE_VALUE})
     endmacro (set_xcode_property)
 
-    set_xcode_property(LoggerTest CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
-    set_xcode_property(LoggerTest CLANG_CXX_LIBRARY "libc++")
+    set_xcode_property(${component_name} CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
+    set_xcode_property(${component_name} CLANG_CXX_LIBRARY "libc++")
 endif()

@@ -218,6 +218,15 @@ The following is a list of Mac-specific paths to be used in an Identity catalog.
 
 These `FOLDERID_` values represent Mac-specific paths for the `NSLocalDomainMask` domain and can be referenced in your code when working with file and directory operations in the system-wide context.
 
+# Linux-Specific Paths supported during path resolving
+
+The following is a list of Linux-specific paths to be used in an Identity catalog.
+
+#### FOLDERID_UserHome
+- **Description**: The directory is the user's home directory on the system. (E.g. <FOLDERID_UserHome>/Downloads --> /home/<user_name>/Downloads)
+
+These `FOLDERID_` values represent Linux-specific paths and can be referenced in your code when working with file and directory operations in the system-wide context.
+
 # DART integration
 
 XML files from './diagnostics' directory can be placed into "/Applications/Cisco/Cisco\ Secure\ Client\ -\ DART.app/Contents/Resources/xml/config" folder used as is, together with other XML files for other products.

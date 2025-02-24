@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "debug csccloudmanagement",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug/client/csccloudmanagement",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "${workspaceFolder}/scripts/sgdb.sh",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Have gdb ignore SIGPIPE",
+                    "text": "handle SIGPIPE nostop noprint",
+                    "ignoreFailures": true
+                }
+            ],
+            "postDebugTask": "Force kill csccloudmanagement"
+        }
+    ]
+}

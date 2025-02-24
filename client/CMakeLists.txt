@@ -7,7 +7,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CM_KEY "uc")
 
-set(CM_CLIENT_SRCS
+if(LINUX)
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Logger/CMLogger.cpp PROPERTIES COMPILE_FLAGS "-Wno-maybe-uninitialized")
+endif()
+
+set(component_name "csccloudmanagement")
+
+add_executable(${component_name} 
     Daemon.cpp
     Daemon.hpp
     main.cpp
@@ -24,14 +30,7 @@ set(CM_CLIENT_SRCS
     $<$<BOOL:${APPLE}>:crashpad/CrashpadTuner.cpp>
 )
 
-if(LINUX)
-set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Logger/CMLogger.cpp PROPERTIES COMPILE_FLAGS "-Wno-maybe-uninitialized")
-
-endif()
-
-add_executable(csccloudmanagement ${CM_CLIENT_SRCS})
-
-add_dependencies(csccloudmanagement
+add_dependencies(${component_name}
     third-party-ciscossl
     third-party-curl
     third-party-jsoncpp
@@ -41,13 +40,13 @@ add_dependencies(csccloudmanagement
 )
 
 if(APPLE)
-add_dependencies(csccloudmanagement
-    third-party-crashpad
-    third-party-ProxyDiscovery-Mac
-)
+    add_dependencies(${component_name}
+        third-party-crashpad
+        third-party-ProxyDiscovery-Mac
+    )
 endif()
 
-target_include_directories(csccloudmanagement
+target_include_directories(${component_name}
     PUBLIC
     ${cm-client_SOURCE_DIR}
     ${CM_THIRDPARTY_EXPORT}/include
@@ -57,12 +56,12 @@ target_include_directories(csccloudmanagement
     ${cm-client_SOURCE_DIR}/util
 )
 
-target_link_directories(csccloudmanagement BEFORE
+target_link_directories(${component_name} BEFORE
     PRIVATE
     ${CM_THIRDPARTY_EXPORT}/lib
 )
 
-target_link_libraries(csccloudmanagement
+target_link_libraries(${component_name}
     PUBLIC
     cmidapi
     configshared
@@ -95,14 +94,14 @@ target_link_libraries(csccloudmanagement
 )
 
 if(LINUX)
-set_target_properties(csccloudmanagement
-PROPERTIES
-    INSTALL_RPATH "$ORIGIN/../lib"
-    INSTALL_RPATH_USE_LINK_PATH TRUE
-)
+    set_target_properties(${component_name}
+        PROPERTIES
+            INSTALL_RPATH "$ORIGIN/../lib"
+            INSTALL_RPATH_USE_LINK_PATH TRUE
+    )
 endif()
 
-target_compile_definitions(csccloudmanagement
+target_compile_definitions(${component_name}
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CMID_DAEMON_PATH=\"${CM_THIRDPARTY_EXPORT}/bin\">"
@@ -117,12 +116,12 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
         ${XCODE_VALUE})
     endmacro (set_xcode_property)
 
-    set_xcode_property(csccloudmanagement CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
-    set_xcode_property(csccloudmanagement CLANG_CXX_LIBRARY "libc++")
+    set_xcode_property(${component_name} CLANG_CXX_LANGUAGE_STANDARD "gnu++17")
+    set_xcode_property(${component_name} CLANG_CXX_LIBRARY "libc++")
 
     # For code signing
     if(DEFINED SIGNING_CERT)
-        set_xcode_property(csccloudmanagement CODE_SIGN_IDENTITY "${SIGNING_CERT}")
+        set_xcode_property(${component_name} CODE_SIGN_IDENTITY "${SIGNING_CERT}")
     endif()
     # Other signing attributes of interest
     # CODE_SIGN_ENTITLEMENTS my.entitlements
@@ -131,9 +130,9 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
     # PROVISIONING_PROFILE_SPECIFIER my_profile_name
 endif()
 
-target_enable_warnings(csccloudmanagement)
+target_enable_warnings(${component_name})
 
-install(TARGETS csccloudmanagement 
+install(TARGETS ${component_name} 
         DESTINATION ${CM_THIRDPARTY_EXPORT}/bin/
         COMPONENT installstaging)
 

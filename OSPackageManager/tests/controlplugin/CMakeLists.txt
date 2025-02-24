@@ -1,8 +1,9 @@
 # CMakeLists.txt
 # Copyright 2023, Cisco Systems, Inc.
 
-add_executable(
-  ControlPluginTest
+set(component_name "ControlPluginTest")
+
+add_executable(${component_name}
   ${cm-client_SOURCE_DIR}/client/Logger/CMLogger.cpp
   # Test files
   ModuleControlPluginTest.cpp
@@ -12,19 +13,19 @@ add_executable(
 )
 
 add_dependencies(
-    ControlPluginTest
+    ${component_name}
     third-party-gtest
 )
 
 target_link_libraries(
-  ControlPluginTest
+  ${component_name}
   pmcontrolplugin
   configshared
   ${GTEST_LIBS}
 )
 
 target_compile_definitions(
-    ControlPluginTest
+    ${component_name}
     PUBLIC
     "$<$<CONFIG:DEBUG>:DEBUG>"
     "$<$<CONFIG:DEBUG>:CM_CONFIG_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\">"
@@ -34,7 +35,7 @@ target_compile_definitions(
 )
 
 target_include_directories(
-  ControlPluginTest
+  ${component_name}
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/include
       ${cm-client_SOURCE_DIR}/client/Logger
@@ -42,11 +43,11 @@ target_include_directories(
 )
 
 target_link_directories(
-  ControlPluginTest BEFORE
+  ${component_name} BEFORE
   PRIVATE
       ${CM_THIRDPARTY_EXPORT}/lib
 )
 
 include(GoogleTest)
-gtest_discover_tests(ControlPluginTest DISCOVERY_MODE PRE_TEST)
+gtest_discover_tests(${component_name} DISCOVERY_MODE PRE_TEST)
 

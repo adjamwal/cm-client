@@ -1,8 +1,10 @@
 # Copyright (c) 2023 Cisco Systems, Inc. All Rights Reserved.
 
+set(component_name "util")
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-list(APPEND UTIL_SOURCES
+add_library(${component_name} STATIC
     util.hpp
     GuidUtil.hpp
     PathUtil.hpp
@@ -13,11 +15,7 @@ list(APPEND UTIL_SOURCES
     $<$<BOOL:${LINUX}>:linux/PathUtil.cpp>
 )
 
-add_library(util STATIC
-    ${UTIL_SOURCES}
-)
-
-target_compile_definitions(util
+target_compile_definitions(${component_name}
     PUBLIC
     CM_BUILD_VER=\"$ENV{CM_BUILD_VER}\"
     PRIVATE
@@ -25,18 +23,18 @@ target_compile_definitions(util
 )
 
 if(APPLE)
-set_property(TARGET util APPEND_STRING PROPERTY 
-              COMPILE_FLAGS "-fobjc-arc")
+    set_property(TARGET ${component_name} APPEND_STRING PROPERTY 
+                COMPILE_FLAGS "-fobjc-arc")
 
-target_link_libraries(util
-    PRIVATE
-        "-framework Foundation"
-)
+    target_link_libraries(${component_name}
+        PRIVATE
+            "-framework Foundation"
+    )
 endif()
 
-target_include_directories(util
+target_include_directories(${component_name}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-install(TARGETS util DESTINATION ${CM_THIRDPARTY_EXPORT}/lib)
+install(TARGETS ${component_name} DESTINATION ${CM_THIRDPARTY_EXPORT}/lib)
