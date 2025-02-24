@@ -47,7 +47,6 @@ private:
     void ProcessPackageDiscovery(
         const PmProductDiscoveryRules& rule,
         const std::string& pkgIdentifier,
-        const std::vector<std::string>& packageList,
         PKG_ID_TYPE pkgType,
         std::set<std::string>& uniquePks,
         PackageInventory& packagesDiscovered);
