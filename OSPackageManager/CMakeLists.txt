@@ -65,6 +65,8 @@ else()
         linux/PmPlatformConfiguration.hpp
         linux/PmPlatformDependencies.cpp
         linux/PmPlatformDependencies.hpp
+        linux/PmPlatformDiscovery.hpp
+        linux/PmPlatformDiscovery.cpp
     )
     set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/common/PmLogger.cpp PROPERTIES COMPILE_FLAGS "-Wno-maybe-uninitialized")
 endif()
