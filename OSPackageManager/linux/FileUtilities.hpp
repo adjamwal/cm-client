@@ -12,7 +12,7 @@
 
 namespace PackageManager
 {
-struct LinuxSearchPathUtil {
+struct PathResolveUtil {
     const static std::unordered_map<std::string, std::function<void(std::string &)>> knownFolderIdMap;
 };
     

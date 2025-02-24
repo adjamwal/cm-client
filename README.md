@@ -223,7 +223,7 @@ These `FOLDERID_` values represent Mac-specific paths for the `NSLocalDomainMask
 The following is a list of Linux-specific paths to be used in an Identity catalog.
 
 #### FOLDERID_UserHome
-- **Description**: The directory is the user's home directory on the system.
+- **Description**: The directory is the user's home directory on the system. (E.g. <FOLDERID_UserHome>/Downloads --> /home/<user_name>/Downloads)
 
 These `FOLDERID_` values represent Linux-specific paths and can be referenced in your code when working with file and directory operations in the system-wide context.
 

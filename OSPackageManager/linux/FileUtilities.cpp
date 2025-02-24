@@ -53,7 +53,7 @@ void ResolveUserHomeFolder(std::string &userHomeFolder) {
 
 namespace PackageManager
 {
-const std::unordered_map<std::string, std::function<void(std::string &)>> LinuxSearchPathUtil::knownFolderIdMap = {
+const std::unordered_map<std::string, std::function<void(std::string &)>> PathResolveUtil::knownFolderIdMap = {
     {"UserHome", ResolveUserHomeFolder}
 };
 
@@ -122,8 +122,8 @@ std::string FileUtilities::ResolvePath(const std::string &basePath) {
 }
 
 std::string FileUtilities::ResolveKnownFolderIdForDefaultUser(const std::string& knownFolderId) {
-    auto it = LinuxSearchPathUtil::knownFolderIdMap.find(knownFolderId);
-    if (it == LinuxSearchPathUtil::knownFolderIdMap.end()) {
+    auto it = PathResolveUtil::knownFolderIdMap.find(knownFolderId);
+    if (it == PathResolveUtil::knownFolderIdMap.end()) {
         PM_LOG_WARNING("Known folder ID %s not found in map", knownFolderId.c_str());
         return std::string {};
     } 
