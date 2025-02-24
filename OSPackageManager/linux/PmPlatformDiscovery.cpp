@@ -22,21 +22,6 @@ namespace
     static std::string sArchForDiscovery = determineArch();
 }
 
-
-std::vector<std::string> extractPackageNames(const std::vector<std::string>& packageList) {
-    std::vector<std::string> packageNames;
-    std::regex pattern(R"(^(.+)-\d+\.\d+)"); // Match everything before the version starts (e.g., -6.2)
-
-    for (const auto& package : packageList) {
-        std::smatch match;
-        if (std::regex_search(package, match, pattern)) {
-            packageNames.push_back(match[1]);
-        }
-    }
-    return packageNames;
-}
-
-
 void PmPlatformDiscovery::ResolveAndDiscover(
     const std::filesystem::path& unresolvedPath,
     const std::filesystem::path& resolvedPath,
@@ -174,18 +159,15 @@ void PmPlatformDiscovery::DiscoverPackageConfigurables(
 void PmPlatformDiscovery::ProcessPackageDiscovery(
     const PmProductDiscoveryRules& rule,
     const std::string& pkgIdentifier,
-    const std::vector<std::string>& packageList,
     PKG_ID_TYPE pkgType,
     std::set<std::string>& uniquePks,
     PackageInventory& packagesDiscovered) {
 
-    if (std::end(packageList) == std::find(packageList.begin(), packageList.end(), pkgIdentifier))
-        return;
-    
     const auto& pkgInfo = pkgUtilManager_->getPackageInfo(pkgType, pkgIdentifier);
     if (uniquePks.find(rule.product) != uniquePks.end())
         return;
-    
+    if(pkgInfo.version.empty())
+        return;
     uniquePks.insert(rule.product);  
     std::vector<PackageConfigInfo> configs;
     DiscoverPackageConfigurables(rule.configurables, configs);   
@@ -204,19 +186,18 @@ PackageInventory PmPlatformDiscovery::DiscoverInstalledPackages( const std::vect
     
     std::set<std::string> uniquePks;
     PackageInventory packagesDiscovered;
-    const auto& packages = pkgUtilManager_->listPackages();
-    const auto& packagenames = extractPackageNames(packages);
+
     for (const auto& rule : catalogRules) {
         for (const auto& pkgRule : rule.pkgnvra_discovery) {
-            ProcessPackageDiscovery(rule, pkgRule.pkgId, packages, PKG_ID_TYPE::NVRA, uniquePks, packagesDiscovered);
+            ProcessPackageDiscovery(rule, pkgRule.pkgId, PKG_ID_TYPE::NVRA, uniquePks, packagesDiscovered);
         
         }
         for (const auto& pkgNameRule : rule.pkgname_discovery) {
-            ProcessPackageDiscovery(rule, pkgNameRule.name, packagenames, PKG_ID_TYPE::NAME, uniquePks, packagesDiscovered);
+            ProcessPackageDiscovery(rule, pkgNameRule.name, PKG_ID_TYPE::NAME, uniquePks, packagesDiscovered);
         }
     }
     packagesDiscovered.architecture = sArchForDiscovery;
-    packagesDiscovered.platform = "darwin";
+    packagesDiscovered.platform = "linux";
 
     lastDetectedPackages_ = packagesDiscovered;  
     return packagesDiscovered;
