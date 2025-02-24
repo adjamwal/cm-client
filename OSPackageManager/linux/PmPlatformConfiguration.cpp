@@ -41,7 +41,7 @@ constexpr std::string_view kHttpUserAgentPrefix{"PackageManager/"};
 constexpr std::string_view kHttpProxyType{"http"};
 constexpr std::string_view kHttpsProxyType{"https"};
 
-const std::string linux_platform{"linux"}; 
+const std::string linux_platform{"darwin"}; 
 const std::string amd64{"amd64"};
 const std::string arm64{"arm64"};
 
@@ -49,7 +49,7 @@ auto determineArch = [](){
     std::string sPath;
     struct utsname sysinfo{};
     uname(&sysinfo);
-    sPath =  std::string(sysinfo.machine) == arm64
+    sPath =  std::string(sysinfo.machine) == "aarch64"
                                         ? arm64
                                         : amd64;
     

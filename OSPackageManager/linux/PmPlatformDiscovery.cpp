@@ -8,11 +8,11 @@ namespace
 {
     auto determineArch = [](){
         std::string sPath;
-        constexpr std::string_view x64{"x86_64"};
-        constexpr std::string_view arm64{"aarch64"};
+        constexpr std::string_view x64{"amd64"};
+        constexpr std::string_view arm64{"arm64"};
         struct utsname sysinfo{};
         uname(&sysinfo);
-        sPath =  std::string(sysinfo.machine) == arm64
+        sPath =  std::string(sysinfo.machine) == "aarch64"
                                             ? arm64
                                             : x64;
         
@@ -216,7 +216,7 @@ PackageInventory PmPlatformDiscovery::DiscoverInstalledPackages( const std::vect
         }
     }
     packagesDiscovered.architecture = sArchForDiscovery;
-    packagesDiscovered.platform = "linux";
+    packagesDiscovered.platform = "darwin";
 
     lastDetectedPackages_ = packagesDiscovered;  
     return packagesDiscovered;

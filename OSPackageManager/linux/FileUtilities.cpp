@@ -51,8 +51,7 @@ int32_t FileUtilities::FileSearchWithWildCard(const std::filesystem::path& searc
     
     if (dwError == 0) {
         for (size_t i = 0; i < globResult.gl_pathc; ++i) {
-            std::filesystem::path filePath(globResult.gl_pathv[i]);
-            results.push_back(filePath);
+            results.emplace_back(globResult.gl_pathv[i]);
         }
         globfree(&globResult);
     } else {
