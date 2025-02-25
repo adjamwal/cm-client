@@ -164,7 +164,7 @@ void Daemon::mainTask()
         }
         agent.stop();
     }
-    catch(PackageUtilException& pe)
+    catch(PkgUtilException& pe)
     {
         PM_LOG_ERROR("Package Util Exception occured:%s ", pe.what());
     }
