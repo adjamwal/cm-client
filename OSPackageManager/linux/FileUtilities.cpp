@@ -98,9 +98,7 @@ bool FileUtilities::HasUserRestrictionsApplied(const std::filesystem::path &file
     const auto pathPermissions = std::filesystem::status(filePath).permissions();
     
     // Check if others have read permission
-    const bool bOthersHaveAccess = std::filesystem::perms::others_read == (pathPermissions & std::filesystem::perms::others_read);
-    
-    return bOthersHaveAccess;
+    return std::filesystem::perms::others_read == (pathPermissions & std::filesystem::perms::others_read);
 }
 
 bool FileUtilities::ApplyAdminRestrictions(const std::filesystem::path &filePath) {
