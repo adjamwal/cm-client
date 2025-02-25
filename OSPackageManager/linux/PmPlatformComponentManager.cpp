@@ -93,7 +93,6 @@ int32_t PmPlatformComponentManager::RestrictPathPermissionsToAdmins(const std::f
     if (!fileUtils_->PathIsValid(filePath))
         return  nRet;
 
-    //0 refers to ERROR_SUCCESS 0 (0x0) in WINAPI
     if ( !fileUtils_->HasAdminRestrictionsApplied(filePath) ) {
         nRet = fileUtils_->ApplyAdminRestrictions(filePath) ? 0 : -1;
     }
