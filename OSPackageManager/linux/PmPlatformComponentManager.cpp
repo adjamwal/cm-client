@@ -83,7 +83,13 @@ void PmPlatformComponentManager::NotifySystemRestart()
 
 int32_t PmPlatformComponentManager::ApplyBultinUsersReadPermissions(const std::filesystem::path &filePath)
 {
-    (void) filePath;
+    if (!fileUtils_->PathIsValid(filePath))
+        return -1;
+    
+    if ( !fileUtils_->HasUserRestrictionsApplied(filePath) ) {
+        return fileUtils_->ApplyUserRestrictions(filePath) ? 0 : -1;
+    }
+
     return 0;
 }
 
