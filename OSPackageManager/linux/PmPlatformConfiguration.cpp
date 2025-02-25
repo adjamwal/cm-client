@@ -179,7 +179,7 @@ cmid_result_t PmPlatformConfiguration::GetUrl( cmid_url_type_t urlType, std::str
             [[fallthrough]];
     }
 #endif // LOCAL_WEBSERVER_OVERRIDE
-
+    assert(cmidapi_);
     int urlSize = 0;
     result = cmidapi_->get_url( urlType, nullptr, &urlSize );
     if( result == CMID_RES_INSUFFICIENT_LEN ) {
