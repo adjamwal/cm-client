@@ -9,12 +9,9 @@
 class PackageUtilDEB : public IPackageUtil {
 public:
 
-    PackageUtilDEB() {
-    }
+    PackageUtilDEB() = default;
 
-    ~PackageUtilDEB() {
-        
-    }
+    ~PackageUtilDEB() = default;
 
     std::vector<std::string> listPackages() const override;
     PackageInfo getPackageInfo(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const override;

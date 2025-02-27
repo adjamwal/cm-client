@@ -32,10 +32,10 @@ void PmPlatformDiscovery::ResolveAndDiscover(
     out_knownFolderId = "";
     out_knownFolderIdConversion = "";
     out_discoveredFiles.clear();
-
+    assert(fileUtils_);
     if( unresolvedPath != resolvedPath )
     {
-        //Resolved path is deferent which means we must calculate the knownfolderid
+        //Resolved path is different which means we must calculate the knownfolderid
         std::string tempResolvedPath = resolvedPath.generic_u8string();
         std::string tempUnresolvedPath = unresolvedPath.generic_u8string();
         size_t first = tempUnresolvedPath.find( "<FOLDERID_" );
@@ -162,10 +162,10 @@ void PmPlatformDiscovery::ProcessPackageDiscovery(
     PKG_ID_TYPE pkgType,
     std::set<std::string>& uniquePks,
     PackageInventory& packagesDiscovered) {
-
-    const auto& pkgInfo = pkgUtilManager_->getPackageInfo(pkgType, pkgIdentifier);
     if (uniquePks.find(rule.product) != uniquePks.end())
         return;
+    const auto& pkgInfo = pkgUtilManager_->getPackageInfo(pkgType, pkgIdentifier);
+    
     if(pkgInfo.version.empty())
         return;
     uniquePks.insert(rule.product);  
