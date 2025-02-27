@@ -37,7 +37,8 @@
             "args": [
                 "killall",
                 "csccloudmanagement",
-                "cmpackagemanager"
+                "cmpackagemanager",
+                "csc_cmid"
             ],
             "group": {
                 "kind": "build",
@@ -53,7 +54,8 @@
                 "killall",
                 "-9",
                 "csccloudmanagement",
-                "cmpackagemanager"
+                "cmpackagemanager",
+                "csc_cmid"
             ],
             "group": {
                 "kind": "build",

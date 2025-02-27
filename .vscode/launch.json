@@ -27,6 +27,27 @@
                 }
             ],
             "postDebugTask": "Force kill csccloudmanagement"
-        }
+        },
+        {
+            "name": "attach to cmpackagemanager",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/debug/export/bin/cmpackagemanager",
+            "processId": "${command:pickProcess}",
+            "MIMode": "gdb",
+            "miDebuggerPath": "${workspaceFolder}/scripts/sgdb.sh",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Have gdb ignore SIGPIPE",
+                    "text": "handle SIGPIPE nostop noprint",
+                    "ignoreFailures": true
+                }
+            ]
+        },
     ]
 }
