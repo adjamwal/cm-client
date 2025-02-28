@@ -89,6 +89,15 @@ int32_t PmPlatformComponentManager::ApplyBultinUsersReadPermissions(const std::f
 
 int32_t PmPlatformComponentManager::RestrictPathPermissionsToAdmins(const std::filesystem::path &filePath)
 {
-    (void) filePath;
-    return -1;
+    int32_t nRet = -1;
+    if (!fileUtils_->PathIsValid(filePath))
+        return  nRet;
+
+    if ( !fileUtils_->HasAdminRestrictionsApplied(filePath) ) {
+        nRet = fileUtils_->ApplyAdminRestrictions(filePath) ? 0 : -1;
+    }
+    else
+        nRet = 0;
+
+    return nRet;
 }
