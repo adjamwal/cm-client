@@ -16,9 +16,9 @@ typedef enum
 
 }PKG_ID_TYPE;
 
-class PackageUtilException : public std::runtime_error {
+class PkgUtilException : public std::runtime_error {
 public:
-    PackageUtilException(const std::string& message) : std::runtime_error(message) {}
+    PkgUtilException(const std::string& message) : std::runtime_error(message) {}
 };
 
 class IPackageUtil {

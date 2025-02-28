@@ -27,7 +27,7 @@ public:
      */
     PackageUtilRPM() {
         if(!loadLibRPM()) {
-            throw PackageUtilException("Failed to load librpm for RPM package operations.");
+            throw PkgUtilException("Failed to load librpm for RPM package operations.");
         }
     }
 

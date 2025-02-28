@@ -6,6 +6,7 @@
 
 #include "FileUtilities.hpp"
 #include "PmLogger.hpp"
+#include <glob.h>
 #include <pwd.h>
 #include <utmp.h>
 #include <signal.h>
@@ -92,9 +93,19 @@ bool FileUtilities::ApplyUserRestrictions(const std::filesystem::path &filePath)
 
 int32_t FileUtilities::FileSearchWithWildCard(const std::filesystem::path& searchPath, std::vector<std::filesystem::path>& results) {
 
-    (void) searchPath;
-    (void) results;  
-    int32_t dwError = 0;
+    const std::string searchPattern = searchPath.string();
+    glob_t globResult;
+    int32_t dwError = glob(searchPattern.c_str(), 0, nullptr, &globResult);
+    
+    if (dwError == 0) {
+        for (size_t i = 0; i < globResult.gl_pathc; ++i) {
+            results.emplace_back(globResult.gl_pathv[i]);
+        }
+        globfree(&globResult);
+    } else {
+        PM_LOG_ERROR("glob with searchPattern=%s returns %d", searchPattern.c_str(), dwError);
+    }
+    
     return dwError;
 }
 

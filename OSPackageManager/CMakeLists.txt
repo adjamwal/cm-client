@@ -57,12 +57,16 @@ else()
         linux/FileUtilities.hpp
         $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.cpp>
         $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.hpp>
+        $<$<BOOL:${is_debian_based}>:linux/PackageUtilDEB.cpp>
+        $<$<BOOL:${is_debian_based}>:linux/PackageUtilDEB.hpp>
         linux/PmPlatformComponentManager.cpp
         linux/PmPlatformComponentManager.hpp
         linux/PmPlatformConfiguration.cpp
         linux/PmPlatformConfiguration.hpp
         linux/PmPlatformDependencies.cpp
         linux/PmPlatformDependencies.hpp
+        linux/PmPlatformDiscovery.hpp
+        linux/PmPlatformDiscovery.cpp
     )
     set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/common/PmLogger.cpp PROPERTIES COMPILE_FLAGS "-Wno-maybe-uninitialized")
 endif()

@@ -142,25 +142,36 @@ void Daemon::mainTask()
     umask(0077);
     
     assert(GetPMLogger() != nullptr);
-    PmPlatformDependencies deps;
-    Agent::PackageManagerAgent agent(bootstrap_, configFile_, deps, PmLogger::getLogger());
-    agent.start();
+    try
+    {
+        PmPlatformDependencies deps;
+        Agent::PackageManagerAgent agent(bootstrap_, configFile_, deps, PmLogger::getLogger());
+        agent.start();
 
-    //! TODO: Just busy wait??
-    //!
-    //! Change as needed...
-    while(isRunning_) {
-        using namespace std;
-        using namespace std::chrono_literals;
+        //! TODO: Just busy wait??
+        //!
+        //! Change as needed...
+        while(isRunning_) {
+            using namespace std;
+            using namespace std::chrono_literals;
 
-        cout << "PM Just chillin here..." << endl;
-        //auto start = chrono::high_resolution_clock::now();
-        (void) chrono::high_resolution_clock::now();
-        this_thread::sleep_for(1000ms);
-        //auto end = chrono::high_resolution_clock::now();
-        (void) chrono::high_resolution_clock::now();
+            cout << "PM Just chillin here..." << endl;
+            //auto start = chrono::high_resolution_clock::now();
+            (void) chrono::high_resolution_clock::now();
+            this_thread::sleep_for(1000ms);
+            //auto end = chrono::high_resolution_clock::now();
+            (void) chrono::high_resolution_clock::now();
+        }
+        agent.stop();
     }
-    agent.stop();
+    catch(PkgUtilException& pe)
+    {
+        PM_LOG_ERROR("Package Util Exception occured:%s ", pe.what());
+    }
+    catch(std::exception& ex)
+    {
+        PM_LOG_ERROR("Exception occured: %s", ex.what());
+    }
 }
 
 } // namespace PackageManager
