@@ -39,6 +39,12 @@ public:
     }
 
     /**
+     * @brief Validate the package installer type
+     * @return True if the package installer type is valid, false otherwise.
+     */
+    bool isValidInstallerType(const std::string &installerType) const override;
+
+    /**
      * @brief Lists the packages installed.
      * @return A vector of package identifiers.
      */

@@ -121,6 +121,7 @@ public:
     * @return 0 on success
     */
     int32_t RestrictPathPermissionsToAdmins(const std::filesystem::path &filePath);
+    
 private:
     std::shared_ptr<IPackageUtil> pkgUtil_;
     PmPlatformDiscovery discovery_;
