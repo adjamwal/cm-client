@@ -36,8 +36,7 @@ public:
     /**
      * @brief This API will be used to install a package. The package will provide the following:
      *   - Installation binary
-     *   - Installation location
-     *   - Installation command line
+     *   - Installer type
      *   This API should rollback the installation if the package could not be installed
      *
      * @param[in] package - The package details
@@ -108,19 +107,20 @@ public:
 
     /**
     * @brief (Optional)Provides Generic Read Access to file
-    *   Used on windows to give read permissions to the Builtin users groups. Similar to chmod +r
+    *   Similar to chmod o+r
     *
     * @return 0 on success
     */
     int32_t ApplyBultinUsersReadPermissions(const std::filesystem::path &filePath);
 
     /**
-    * @brief Provides Full Access for Admins and System to file/folder, and read-only access to authenticated users
-    *   Used on windows to give full permissions to administrators and system users. Similar to chmod +rw
+    * @brief Provides Full Access for owner, and read-only access to group and others.
+    *  Similar to chmod 644
     *
     * @return 0 on success
     */
     int32_t RestrictPathPermissionsToAdmins(const std::filesystem::path &filePath);
+    
 private:
     std::shared_ptr<IPackageUtil> pkgUtil_;
     PmPlatformDiscovery discovery_;

@@ -13,6 +13,7 @@ public:
 
     ~PackageUtilDEB() = default;
 
+    bool isValidInstallerType(const std::string &installerType) const override;
     std::vector<std::string> listPackages() const override;
     PackageInfo getPackageInfo(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const override;
     std::vector<std::string> listPackageFiles(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const override;
