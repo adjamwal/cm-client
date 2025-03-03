@@ -40,11 +40,11 @@ int32_t PmPlatformComponentManager::GetCachedInventory(PackageInventory &cachedI
 
 int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package) {
     // To-Do: Implement CodeSign Verification later.
+    int32_t ret = -1;
 
     if (!fileUtils_->PathIsValid(package.downloadedInstallerPath))
-        return -1;
+        return ret;
 
-    int32_t ret = -1;
     
     if( pkgUtil_->isValidInstallerType(package.installerType) ) {
         const bool success = pkgUtil_->installPackage(package.downloadedInstallerPath);
