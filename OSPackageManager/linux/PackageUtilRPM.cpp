@@ -14,7 +14,7 @@ namespace { //anonymous namespace
 
 bool PackageUtilRPM::loadLibRPM() {
 
-    libRPMhandle_ = dlmopen(LM_ID_NEWLM, rpmLibPath.c_str(), RTLD_LAZY);
+    libRPMhandle_ = dlopen(rpmLibPath.c_str(), RTLD_NOW);
     if (!libRPMhandle_) {
         PM_LOG_ERROR("Failed to load librpm: %s", dlerror());
         return false;

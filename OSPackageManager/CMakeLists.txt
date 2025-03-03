@@ -110,8 +110,11 @@ target_link_libraries(${component_name}
     pmutil
     jsoncpp
     curl
-    crypto
-    ssl
+    $<$<BOOL:${APPLE}>:crypto>
+    $<$<BOOL:${APPLE}>:ssl>
+    # static linking of ssl and crypto to use dlopen for librpm (NOTE: Order is important)
+    $<$<BOOL:${LINUX}>${CM_THIRDPARTY_EXPORT}/lib/libssl.a>
+    $<$<BOOL:${LINUX}>${CM_THIRDPARTY_EXPORT}/lib/libcrypto.a>
     util
     configshared
     pthread
