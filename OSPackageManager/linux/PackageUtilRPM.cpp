@@ -9,6 +9,7 @@ namespace { //anonymous namespace
     const std::string rpmListPkgFilesOption {"-ql"};
     const std::string rpmInstallPkgOption {"-U"}; //Supports both install and upgrade
     const std::string rpmUninstallPkgOption {"-e"};
+    const std::string rpmPackageInstaller {"rpm"};
 }
 
 bool PackageUtilRPM::loadLibRPM() {
@@ -50,6 +51,10 @@ bool PackageUtilRPM::unloadLibRPM() {
 
     libRPMhandle_ = nullptr;
     return true;
+}
+
+bool PackageUtilRPM::isValidInstallerType(const std::string &installerType) const {
+    return installerType == rpmPackageInstaller;
 }
 
 std::vector<std::string> PackageUtilRPM::listPackages() const {
