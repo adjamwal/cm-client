@@ -1,5 +1,10 @@
 #include "PackageUtilDEB.hpp"
 
+bool PackageUtilDEB::isValidInstallerType(const std::string &installerType) const {
+    (void) installerType;
+    return true;
+}
+
 std::vector<std::string> PackageUtilDEB::listPackages() const {
     std::vector<std::string>result;
     return result;

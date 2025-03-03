@@ -25,6 +25,7 @@ class IPackageUtil {
 public:
     virtual ~IPackageUtil() = default;
     
+    virtual bool isValidInstallerType(const std::string &installerType) const = 0;
     virtual std::vector<std::string> listPackages() const = 0;
     virtual PackageInfo getPackageInfo(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const = 0;
     virtual std::vector<std::string> listPackageFiles(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const = 0;
