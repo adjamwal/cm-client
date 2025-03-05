@@ -7,7 +7,7 @@ namespace { //anonymous namespace
     const std::string rpmBinStr {"/bin/rpm"};
     const std::string rpmListPkgOption {"-qa"};
     const std::string rpmListPkgFilesOption {"-ql"};
-    const std::string rpmInstallPkgOption {"-i"};
+    const std::string rpmInstallPkgOption {"-U"}; //Supports both install and upgrade
     const std::string rpmUninstallPkgOption {"-e"};
     const std::string rpmPackageInstaller {"rpm"};
 }
