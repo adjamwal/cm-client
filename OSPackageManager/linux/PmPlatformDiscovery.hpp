@@ -52,6 +52,6 @@ private:
         PackageInventory& packagesDiscovered);
     std::shared_ptr<IPackageUtil> pkgUtilManager_; /**< The IPackageUtil instance for package management operations. */
     std::shared_ptr<PackageManager::IFileUtilities> fileUtils_;
-    PackageInventory lastDetectedPackages_;
+    PackageInventory lastDetectedPackages_ {};
 };
 

@@ -58,14 +58,13 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
 }
 
 IPmPlatformComponentManager::PmInstallResult PmPlatformComponentManager::UpdateComponent(const PmComponent &package, std::string &error) {
-    (void) package;
     (void) error;
-
+    //TODO: Re-start required handling if needed
     IPmPlatformComponentManager::PmInstallResult result = {
-        .pmResult = IPmPlatformComponentManager::PM_INSTALL_FAILURE,
+        .pmResult = (InstallComponent(package) == 0)
+                    ? IPmPlatformComponentManager::PM_INSTALL_SUCCESS : IPmPlatformComponentManager::PM_INSTALL_FAILURE,
         .platformResult = 0
     };
-
     return result;
 }
 
@@ -80,14 +79,13 @@ int32_t PmPlatformComponentManager::DeployConfiguration(const PackageConfigInfo 
 }
 
 std::string PmPlatformComponentManager::ResolvePath(const std::string &basePath) {
-    (void) basePath;
-    return std::string{};
+    assert(fileUtils_);
+    return fileUtils_->ResolvePath(basePath);
 }
 
 int32_t PmPlatformComponentManager::FileSearchWithWildCard(const std::filesystem::path &searchPath, std::vector<std::filesystem::path> &results) {
-    (void) searchPath;
-    (void) results;
-    return 0;
+    assert(fileUtils_);
+    return fileUtils_->FileSearchWithWildCard(searchPath, results);
 }
 
 void PmPlatformComponentManager::NotifySystemRestart() {
