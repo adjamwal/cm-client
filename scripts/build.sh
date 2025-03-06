@@ -90,9 +90,9 @@ if [ "${release}" = "true"  ]; then
     CMAKE_EXTRA_ARGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
     CMAKE_BUILD_DIR="${CM_BUILD_DIR_PREFIX}release"
 fi
-if [ "${BUILD_SUBMODULES_FROM_SRC}" = "YES" ]; then
+# if [ "${BUILD_SUBMODULES_FROM_SRC}" = "YES" ]; then
     CMAKE_EXTRA_ARGS="-DBUILD_ALL_THIRD_PARTY:BOOL=ON ${CMAKE_EXTRA_ARGS}"
-fi
+# fi
 if [ "${development_only}" = "true" ]; then
     CMAKE_EXTRA_ARGS="-DBUILD_DEV_ONLY:BOOL=ON ${CMAKE_EXTRA_ARGS}"
 
