@@ -169,6 +169,7 @@ build_ciscossl_linux()
 {
     rm -rf "${CISCOSSL_EXPORT_DIR}"
 
+    # Call with no arguments, on Linux we only build for x86_64
     build_ciscossl_forarch
 
     mkdir "${CISCOSSL_EXPORT_DIR}"
