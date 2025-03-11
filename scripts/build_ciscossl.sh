@@ -62,6 +62,9 @@ build_ciscossl_forarch()
         local SDK_RANLIB="${BIN_ROOT}/ranlib"
         local CURR_ARCH="linux-$(arch)"
 
+        # Append arch to EXPORT_DIR
+        EXPORT_DIR=${EXPORT_DIR}-$(arch)
+
     else
         echo "Unsupported system! Aborting"
         exit 1
@@ -164,8 +167,26 @@ build_ciscossl_mac()
 
 build_ciscossl_linux()
 {
+    rm -rf "${CISCOSSL_EXPORT_DIR}"
+
     # Call with no arguments, on Linux we only build for x86_64
     build_ciscossl_forarch
+
+    mkdir "${CISCOSSL_EXPORT_DIR}"
+    cp -a "${CISCOSSL_EXPORT_DIR}-$(arch)/include" "${CISCOSSL_EXPORT_DIR}"
+
+    mkdir "${CISCOSSL_EXPORT_DIR}/lib"
+    cp "${CISCOSSL_EXPORT_DIR}-$(arch)/lib/libcrypto.a" "${CISCOSSL_EXPORT_DIR}/lib/libcrypto.a"
+    cp "${CISCOSSL_EXPORT_DIR}-$(arch)/lib/libssl.a" "${CISCOSSL_EXPORT_DIR}/lib/libssl.a"
+
+    mkdir "${CISCOSSL_EXPORT_DIR}/libshared"
+    cp "${CISCOSSL_EXPORT_DIR}-$(arch)/lib/libcrypto.so.1.1" "${CISCOSSL_EXPORT_DIR}/libshared/libcrypto.so.1.1"
+    ln -s "${CISCOSSL_EXPORT_DIR}/libshared/libcrypto.so.1.1" "${CISCOSSL_EXPORT_DIR}/libshared/libcrypto.so"
+    cp "${CISCOSSL_EXPORT_DIR}-$(arch)/lib/libssl.so.1.1" "${CISCOSSL_EXPORT_DIR}/libshared/libssl.so.1.1"
+    ln -s "${CISCOSSL_EXPORT_DIR}/libshared/libssl.so.1.1" "${CISCOSSL_EXPORT_DIR}/libshared/libssl.so"
+
+    # Clean up
+    rm -fr "${CISCOSSL_EXPORT_DIR}-$(arch)"
 }
 
 build_ciscossl()
