@@ -110,7 +110,7 @@ target_link_libraries(${component_name}
     pmutil
     jsoncpp
     curl
-    ssl
+    ssl # Order should be maintained for ssl and crypto
     crypto
     util
     configshared
