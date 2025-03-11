@@ -14,11 +14,32 @@ set(GTEST_LIBS
     gmockd
 )
 
+set(component_byproducts
+    "${CMAKE_CURRENT_BINARY_DIR}/export/lib/gtest_maind.a"
+    "${CMAKE_CURRENT_BINARY_DIR}/export/lib/gtestd.a"
+    "${CMAKE_CURRENT_BINARY_DIR}/export/lib/gmock_maind.a"
+    "${CMAKE_CURRENT_BINARY_DIR}/export/lib/gmockd.a"
+)
+
 if(NOT BUILD_ALL_THIRD_PARTY)
-    download_component(${component_name} ${component_dst_dir})
+    download_component(${component_name} ${component_dst_dir} ${component_byproducts})
 endif()
 
 if(NOT TARGET "third-party-${component_name}")
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(GTEST_LIBS
+            gtest_main
+            gtest
+            gmock_main
+            gmock
+        )
+        set(component_byproducts
+            "${CMAKE_CURRENT_BINARY_DIR}/export/lib/gtest_main.a"
+            "${CMAKE_CURRENT_BINARY_DIR}/export/lib/gtest.a"
+            "${CMAKE_CURRENT_BINARY_DIR}/export/lib/gmock_main.a"
+            "${CMAKE_CURRENT_BINARY_DIR}/export/lib/gmock.a"
+        )
+    endif()
     #
     # TODO Be more specific about tool chain
     ExternalProject_Add(
@@ -31,16 +52,17 @@ if(NOT TARGET "third-party-${component_name}")
             -DCMAKE_INSTALL_LIBDIR=lib
             -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES_}
             -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        BUILD_BYPRODUCTS ${component_byproducts}
     )
 
     upload_component(${component_name} not_used)
 
-    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(GTEST_LIBS
-            gtest_main
-            gtest
-            gmock_main
-            gmock
-        )
-    endif()
+
 endif()
+
+foreach(LIB IN LISTS GTEST_LIBS)
+    add_library(${LIB} STATIC IMPORTED)
+    set_target_properties(${LIB} PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/export/lib/lib${LIB}.a")
+    add_dependencies(${LIB} third-party-${component_name})
+endforeach()
+

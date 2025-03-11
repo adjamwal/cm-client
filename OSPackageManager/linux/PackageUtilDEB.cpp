@@ -34,3 +34,8 @@ bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) cons
     (void) packageIdentifier;
     return true;
 }
+
+bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier) const {
+    (void) packageIdentifier;
+    return true;
+}

@@ -49,5 +49,28 @@
                 }
             ]
         },
+        {
+            "name": "debug package-util-test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug/OSPackageManager/tests/linux/package-util-test",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "${workspaceFolder}/scripts/sgdb.sh",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Have gdb ignore SIGPIPE",
+                    "text": "handle SIGPIPE nostop noprint",
+                    "ignoreFailures": true
+                }
+            ]
+        },
     ]
 }

@@ -8,6 +8,8 @@
 #include "PmPlatformConfiguration.hpp"
 
 #include "PackageManager/IPmPlatformDependencies.h"
+#include "Gpg/include/GpgUtil.hpp"
+#include "OSPackageManager/common/CommandExec.hpp"
 
 class IPmPkgUtil;
 
@@ -19,6 +21,8 @@ public:
     IPmPlatformComponentManager &ComponentManager();
 
 private:
+    std::shared_ptr<IGpgUtil>   gpgUtil_;
+    std::shared_ptr<ICommandExec> commandExec_;
     std::shared_ptr<IPackageUtil> pmPkgUtil_;
     PmPlatformConfiguration pmConfiguration_;
     PmPlatformComponentManager pmComponentManager_;

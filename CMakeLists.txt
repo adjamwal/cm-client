@@ -140,6 +140,10 @@ add_subdirectory(OSPackageManager)
 ## The Cloud Management Connector client
 add_subdirectory(client)
 
+if(LINUX)
+    add_subdirectory("Gpg")
+endif()
+
 if(APPLE)
 ##
 ##

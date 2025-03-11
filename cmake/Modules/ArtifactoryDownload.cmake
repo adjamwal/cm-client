@@ -26,6 +26,7 @@ function(get_artifactory_url component output)
 endfunction()
 
 function(download_component component_name component_dst_dir)
+    set(component_byproducts ${ARGN})
     get_artifactory_url(${component_name} artifactory_url)
     if (NOT ${artifactory_url} STREQUAL "")
 
@@ -35,9 +36,10 @@ function(download_component component_name component_dst_dir)
             CONFIGURE_COMMAND echo "Configuration not necessary."
             BUILD_COMMAND echo "Build not necessary."
             INSTALL_COMMAND
-	        COMMAND cp -aR "${component_dst_dir}/." "${CM_THIRDPARTY_EXPORT}"
-		COMMAND echo "Purging pkgconfig which references paths from build slave"
-	        COMMAND rm -fr "${CM_THIRDPARTY_EXPORT}/lib/pkgconfig"
+                COMMAND cp -aR "${component_dst_dir}/." "${CM_THIRDPARTY_EXPORT}"
+                COMMAND echo "Purging pkgconfig which references paths from build slave"
+                COMMAND rm -fr "${CM_THIRDPARTY_EXPORT}/lib/pkgconfig"
+            BUILD_BYPRODUCTS ${component_byproducts}
         )
 
     endif()

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "IPackageUtil.hpp"
+#include "Gpg/include/IGpgUtil.hpp"
+#include "OSPackageManager/common/ICommandExec.hpp"
 #include <dlfcn.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
@@ -25,11 +27,7 @@ public:
     /**
      * @brief Constructor to load librpm for RPM package operations.
      */
-    PackageUtilRPM() {
-        if(!loadLibRPM()) {
-            throw PkgUtilException("Failed to load librpm for RPM package operations.");
-        }
-    }
+    PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil);
 
     /**
      * @brief Destructor to unload librpm for RPM package operations.
@@ -83,8 +81,13 @@ public:
      */
     bool uninstallPackage(const std::string& packageIdentifier) const override;
 
+    bool verifyPackage(const std::string& packageIdentifier) const override;
+
 private:
     void* libRPMhandle_ = nullptr; // Handle for the load and unload of libRPM library.
+
+    ICommandExec &commandExecutor_;
+    IGpgUtil &gpgUtil_;
 
     // Function pointers for librpm functions
     fpRpmReadConfigFiles_t fpRpmReadConfigFiles_ = nullptr;
@@ -107,4 +110,6 @@ private:
      * @return True if successfully unloaded, false otherwise. 
      */
     bool unloadLibRPM();
+
+    bool is_trusted_by_system(std::string keyId) const;
 };

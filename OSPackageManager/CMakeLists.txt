@@ -116,6 +116,7 @@ target_link_libraries(${component_name}
     configshared
     pthread
     z
+    $<$<BOOL:${LINUX}>:gpg>
     $<$<BOOL:${LINUX}>:stdc++fs>
     $<$<BOOL:${LINUX}>:dl>
     $<$<BOOL:${APPLE}>:xar>
