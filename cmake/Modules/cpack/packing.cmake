@@ -9,7 +9,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cisco Cloud Management for Linux")
 set(CPACK_PACKAGE_VENDOR "Cisco")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://www.cisco.com/site/us/en/products/security/secure-client/index.html")
 set(CPACK_PACKAGE_VERSION $ENV{CM_BUILD_VER})
-set(CPACK_PACKAGE_ARCHITECURE ${arch})
+set(CPACK_PACKAGE_ARCHITECTURE ${arch})
 set(CPACK_PACKAGE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Installer)
 set(CPACK_PACKAGE_LICENSE "Proprietary")
 set(CPACK_PACKAGE_GROUP "Applications/Security")
@@ -70,11 +70,7 @@ set(CPACK_DEBIAN_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}.${CPA
 
 # Will override umask settings for DEB packages.
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "systemd")
-if(is_suse_based)
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, cron")
-else()
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, crontabs")
-endif()
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, cron")
 
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "maintainer@cisco.com")
 
