@@ -4,6 +4,8 @@
 enable_testing()
 
 if(APPLE)
-add_subdirectory(cmpackagemanager)
-add_subdirectory(controlplugin)
+    add_subdirectory(cmpackagemanager)
+    add_subdirectory(controlplugin)
+elseif(LINUX)
+    add_subdirectory(linux)
 endif()

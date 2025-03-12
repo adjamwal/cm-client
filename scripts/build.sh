@@ -225,15 +225,11 @@ else
         echo " NOTE: CMake install targets may sometimes be unreliable and a manual run on the command"
         echo "       line may be necessary for some third-party components"
     else
-        if command -v ninja > /dev/null 2> /dev/null; then
-            echo "****Build using Ninja"
-            CMAKE_EXTRA_ARGS="-G Ninja ${CMAKE_EXTRA_ARGS}"
-        fi
         pushd "${CMAKE_BUILD_DIR}"
             if [ "${sign}" = "true" ]; then
-                cmake ${CMAKE_EXTRA_ARGS} -DSIGNING_CERT="${SIGNING_CERT}" ../
+                cmake -G "Unix Makefiles" ${CMAKE_EXTRA_ARGS} -DSIGNING_CERT="${SIGNING_CERT}" ../
             else
-                cmake ${CMAKE_EXTRA_ARGS} ../
+                cmake -G "Unix Makefiles" ${CMAKE_EXTRA_ARGS} ../
             fi
 	    # Optionally add --verbose for debugging build issues
             cmake --build .
