@@ -1,6 +1,32 @@
 #!/bin/bash
 
 CM_SERVICE="csccloudmanagement"
+PREFIX="/opt/cisco/secureclient"
+CM_DIR="${PREFIX}/cloudmanagement"
+ETC_DIR="${CM_DIR}/etc"
+TMP_DIR="${PREFIX}/tmp"
+BOOTSTRAP_FILE="bs.json"
+CONFIG_FILE="cm_config.json"
+
+if [[ -d "${TMP_DIR}"  &&  ( -f "${TMP_DIR}/${BOOTSTRAP_FILE}" || -f "${TMP_DIR}/${CONFIG_FILE}" ) ]]; then
+    
+    echo "copying existing config files."
+    
+    if [ -f "${TMP_DIR}/${BOOTSTRAP_FILE}" ]; then
+        cp -f "${TMP_DIR}/${BOOTSTRAP_FILE}" "${ETC_DIR}"
+    else
+        echo "${BOOTSTRAP_FILE} not found."
+    fi
+    
+    if [ -f "${TMP_DIR}/${CONFIG_FILE}" ]; then
+        cp -f "${TMP_DIR}/${CONFIG_FILE}" "${ETC_DIR}"
+    else
+        echo "${CONFIG_FILE} not found."
+    fi
+
+    rm -rf "${TMP_DIR}"
+
+fi
 
 systemctl daemon-reload
 systemctl enable ${CM_SERVICE}
