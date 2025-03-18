@@ -66,7 +66,7 @@ else()
     set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES}, crontabs")
 endif()
 
-#CPack DEB specific variables
+# CPack DEB specific variables
 # Explicit setting the architecture to amd64 when `arch` is x86_64 to avoid architecture mismatch while installation.
 if( ${arch} STREQUAL "x86_64" )
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
@@ -75,10 +75,12 @@ else()
 endif()
 set(CPACK_DEBIAN_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}.${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Cisco Systems, Inc.")
+set(CPACK_PACKAGE_CONTACT "support@cisco.com")
 
 # Will override umask settings for DEB packages.
 set(CPACK_DEBIAN_DEFAULT_DIR_PERMISSIONS ${CPACK_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS})
 set(CPACK_DEBIAN_COMPONENT_INSTALL ON)
+set(CPACK_DEBIAN_PACKAGE_SECTION "non-free/utils")
 
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "systemd , cron")
 
