@@ -1,4 +1,5 @@
 #include "PackageUtilDEB.hpp"
+#include "PmLogger.hpp"
 #include <string.h>
 
 namespace {
@@ -7,7 +8,10 @@ namespace {
     const std::string dpkgGetPkgInfoOption {"-s"};
     const std::string dpkgListPkgFilesOption {"-L"};
     const std::string dpkgInstallPkgOption {"-i"}; //Supports both install and upgrade
-    const std::string dpkgUninstallPkgOption {"-r"};
+    const std::string dpkgUninstallPkgOption {"-P"}; // -P: Purge (Removes configuration files also), -r: Remove (Keeps configuration files)
+}
+
+PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor) : commandExecutor_( commandExecutor ) {
 }
 
 bool PackageUtilDEB::isValidInstallerType(const std::string &installerType) const {
@@ -21,7 +25,7 @@ std::vector<std::string> PackageUtilDEB::listPackages() const {
 }
 
 PackageInfo PackageUtilDEB::getPackageInfo(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const {
-    if(identifierType != PKG_ID_TYPE::PKG_NAME) {
+    if(identifierType != PKG_ID_TYPE::NAME) {
         PM_LOG_ERROR("Invalid identifier type. Currently only PKG_NAME is supported.");
         return {};
     }
@@ -52,12 +56,12 @@ PackageInfo PackageUtilDEB::getPackageInfo(const PKG_ID_TYPE& identifierType, co
                 packageArchitecture = line.substr(strlen("Architecture: "));
             }
         }
-    }
 
-    // Populate the packageInfo with the obtained values.
-    packageInfo.packageIdentifier = packageName + "-" + packageVersion + "." + packageArchitecture;
-    packageInfo.packageName = packageName;
-    packageInfo.version = packageVersion;
+        // Populate the packageInfo with the obtained values.
+        packageInfo.packageIdentifier = packageName + "-" + packageVersion + "." + packageArchitecture;
+        packageInfo.packageName = packageName;
+        packageInfo.version = packageVersion;
+    }
 
     return packageInfo;
 }

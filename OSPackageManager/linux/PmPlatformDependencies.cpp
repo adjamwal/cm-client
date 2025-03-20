@@ -20,7 +20,8 @@ PmPlatformDependencies::PmPlatformDependencies()
         commandExec_(std::make_shared<CommandExec>()),
         pmPkgUtil_(std::make_shared<PackageUtilRPM>(*std::move(commandExec_), *std::move(gpgUtil_))),
 #else
-        pmPkgUtil_(std::make_shared<PackageUtilDEB>()),
+        commandExec_(std::make_shared<CommandExec>()),
+        pmPkgUtil_(std::make_shared<PackageUtilDEB>(*std::move(commandExec_))),
 #endif
         pmConfiguration_ { PmPlatformConfiguration(std::make_shared<CMIDAPIProxy>()) },
         pmComponentManager_{PmPlatformComponentManager(pmPkgUtil_, std::make_shared<PackageManager::FileUtilities>())}
