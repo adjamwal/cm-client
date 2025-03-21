@@ -1,0 +1,42 @@
+#!/bin/bash
+
+PREFIX="/opt/cisco/secureclient"
+CM_DIR="${PREFIX}/cloudmanagement"
+ETC_DIR="${CM_DIR}/etc"
+TMP_DIR="${PREFIX}/tmp"
+BOOTSTRAP_FILE="bs.json"
+CM_CONFIG_FILE="cm_config.json"
+CM_PACKAGE_ID="cisco-secure-client-cloudmanagement-client"
+
+# Detect package manager
+if command -v rpm &>/dev/null; then
+    # RPM-based system (RHEL, CentOS, Fedora)
+    INSTALLED=$( rpm -qa | grep -E "^${CM_PACKAGE_ID}-" )
+elif command -v dpkg &>/dev/null; then
+    # Debian-based system (Ubuntu, Debian)
+    INSTALLED=$( dpkg -l | awk '{print $2}' | grep -E "^${CM_PACKAGE_ID}$" )
+else
+    echo "Unsupported package manager. Exiting."
+    exit 1
+fi
+
+if [[ -n "${INSTALLED}" ]]; then
+    echo "previous installation found."
+    echo "saving config files to a temporary location"
+
+    rm -rf "${TMP_DIR}"
+    mkdir -p "${TMP_DIR}"
+
+    if [ -f "${ETC_DIR}/${BOOTSTRAP_FILE}" ]; then
+        cp -f "${ETC_DIR}/${BOOTSTRAP_FILE}" "${TMP_DIR}"
+    else
+        echo "${BOOTSTRAP_FILE} not found."
+    fi
+    if [ -f "${ETC_DIR}/${CM_CONFIG_FILE}" ]; then
+        cp -f "${ETC_DIR}/${CM_CONFIG_FILE}" "${TMP_DIR}" 
+    else
+        echo "${CM_CONFIG_FILE} not found."
+    fi
+fi
+
+exit 0
