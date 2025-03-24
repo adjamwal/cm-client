@@ -103,6 +103,7 @@ set(CPACK_RPM_USER_FILELIST
 
 # Create symlinks for postinstall and preuninstall scripts
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${INSTALL_SCRIPT_DIR}/postinstall ${INSTALL_SCRIPT_DIR}/postinst)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${INSTALL_SCRIPT_DIR}/preinstall ${INSTALL_SCRIPT_DIR}/preinst)
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${INSTALL_SCRIPT_DIR}/preuninstall ${INSTALL_SCRIPT_DIR}/prerm)
 
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
