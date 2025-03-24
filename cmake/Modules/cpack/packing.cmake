@@ -108,6 +108,7 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${INSTALL_SCRIPT_DIR}
 
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
     "${INSTALL_SCRIPT_DIR}/postinst"
+    "${INSTALL_SCRIPT_DIR}/preinst"
     "${INSTALL_SCRIPT_DIR}/prerm"
 )
 
