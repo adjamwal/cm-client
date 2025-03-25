@@ -15,9 +15,9 @@
 
 PmPlatformDependencies::PmPlatformDependencies()
         :
-#ifdef IS_RHEL
         gpgUtil_(std::make_shared<GpgUtil>()),
         commandExec_(std::make_shared<CommandExec>()),
+#ifdef IS_RHEL
         pmPkgUtil_(std::make_shared<PackageUtilRPM>(*std::move(commandExec_), *std::move(gpgUtil_))),
 #else
         commandExec_(std::make_shared<CommandExec>()),
