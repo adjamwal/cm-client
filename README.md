@@ -76,6 +76,7 @@ To be able to build cm-client, the following software packages are required:
 - libuuid-devel or uuid-devel (on Red Hat distributions), uuid-dev (on Debian)
 - libgpgme-dev on Debian based systems, or gpgme-devel on Red Hat distributions
 - libarchive, if not already installed
+- Supports both x86_64 and ARM based environments
 
 # Build
 
