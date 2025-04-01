@@ -20,7 +20,7 @@ PmPlatformDependencies::PmPlatformDependencies()
 #ifdef IS_RHEL
         pmPkgUtil_(std::make_shared<PackageUtilRPM>(*std::move(commandExec_), *std::move(gpgUtil_))),
 #else
-        pmPkgUtil_(std::make_shared<PackageUtilDEB>()),
+        pmPkgUtil_(std::make_shared<PackageUtilDEB>(*std::move(commandExec_))),
 #endif
         pmConfiguration_ { PmPlatformConfiguration(std::make_shared<CMIDAPIProxy>()) },
         pmComponentManager_{PmPlatformComponentManager(pmPkgUtil_, std::make_shared<PackageManager::FileUtilities>())}
