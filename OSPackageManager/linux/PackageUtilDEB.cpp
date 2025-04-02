@@ -2,13 +2,36 @@
 #include "PmLogger.hpp"
 #include <string.h>
 
-namespace {
+namespace { //anonymous namespace
     const std::string debPackageInstaller {"deb"};
     const std::string dpkgBinStr {"/bin/dpkg"};
     const std::string dpkgGetPkgInfoOption {"-s"};
     const std::string dpkgListPkgFilesOption {"-L"};
     const std::string dpkgInstallPkgOption {"-i"}; //Supports both install and upgrade
     const std::string dpkgUninstallPkgOption {"-P"}; // -P: Purge (Removes configuration files also), -r: Remove (Keeps configuration files)
+    const std::string dpkgSigBinStr {"/bin/dpkg-sig"};
+    const std::string dpkgSigVerifyOption {"--verify"};
+    typedef enum {
+        SIG_GOOD = 0,
+        SIG_BAD = 1,
+        SIG_UNKNOWN = 2,
+        SIG_NOT_SIGNED = 3,
+        SIG_ERROR = 4
+    } SIG_STATUS;
+
+    SIG_STATUS getSigVerificationStatus(const std::string& sigVerifyOutput) {
+        if (sigVerifyOutput.find("GOODSIG") == 0) {
+            return SIG_GOOD;
+        } else if (sigVerifyOutput.find("BADSIG") == 0) {
+            return SIG_BAD;
+        } else if (sigVerifyOutput.find("UNKNOWNSIG") == 0) {
+            return SIG_UNKNOWN;
+        } else if (sigVerifyOutput.find("NOSIG") == 0) {
+            return SIG_NOT_SIGNED;
+        } else {
+            return SIG_ERROR;
+        }
+    };
 }
 
 PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor) : commandExecutor_( commandExecutor ) {
@@ -121,6 +144,42 @@ bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) cons
 }
 
 bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier) const {
-    (void) packageIdentifier;
-    return true;
+    int exit_code = 0;
+    std::string sigVerifyOutput;
+    std::vector<std::string> sigVerifyLines;
+    SIG_STATUS sigStatus = SIG_ERROR;
+    std::vector<std::string> package_check_argv{ dpkgSigBinStr, dpkgSigVerifyOption, packageIdentifier };
+
+    int ret = commandExecutor_.ExecuteCommandCaptureOutput(dpkgSigBinStr, package_check_argv, exit_code, sigVerifyOutput);
+    if(ret != 0){
+        PM_LOG_ERROR("Failed to execute verify package command.");
+        return false;
+    } else { // No need to check exit code as different exit codes represent different signature status which already is taken care by parsing.
+        commandExecutor_.ParseOutput(sigVerifyOutput, sigVerifyLines);
+    }
+
+    if(sigVerifyLines.size() < 2) {
+        PM_LOG_ERROR("Invalid output from dpkg-sig: %s", sigVerifyOutput.c_str());
+        return false;
+    }
+
+    int lastLine = sigVerifyLines.size() - 1;
+    sigStatus = getSigVerificationStatus(sigVerifyLines[lastLine]);
+    switch (sigStatus) {
+        case SIG_GOOD:
+            PM_LOG_INFO("Package %s is signed and verified.", packageIdentifier.c_str());
+            return true;
+        case SIG_BAD:
+            PM_LOG_ERROR("Package %s verification failed due to corrupted signature.", packageIdentifier.c_str());
+            return false;
+        case SIG_UNKNOWN:
+            PM_LOG_ERROR("Package %s verification failed due to unknown signature.", packageIdentifier.c_str());
+            return false;
+        case SIG_NOT_SIGNED:
+            PM_LOG_INFO("Package %s is not signed.", packageIdentifier.c_str());
+            return false;
+        default:
+            PM_LOG_ERROR("Package %s verification failed with unknown error.", packageIdentifier.c_str());
+            return false;
+    }
 }
