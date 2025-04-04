@@ -13,25 +13,10 @@ namespace { //anonymous namespace
     const std::string dpkgSigVerifyOption {"--verify"};
     typedef enum {
         SIG_GOOD = 0,
-        SIG_BAD = 1,
-        SIG_UNKNOWN = 2,
-        SIG_NOT_SIGNED = 3,
-        SIG_ERROR = 4
-    } SIG_STATUS;
-
-    SIG_STATUS getSigVerificationStatus(const std::string& sigVerifyOutput) {
-        if (sigVerifyOutput.find("GOODSIG") == 0) {
-            return SIG_GOOD;
-        } else if (sigVerifyOutput.find("BADSIG") == 0) {
-            return SIG_BAD;
-        } else if (sigVerifyOutput.find("UNKNOWNSIG") == 0) {
-            return SIG_UNKNOWN;
-        } else if (sigVerifyOutput.find("NOSIG") == 0) {
-            return SIG_NOT_SIGNED;
-        } else {
-            return SIG_ERROR;
-        }
-    };
+        SIG_BAD = 2,
+        SIG_UNKNOWN = 3,
+        SIG_NOT_SIGNED = 4
+    } SIG_STATUS; // based on the return code of dpkg-sig command
 }
 
 PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor) : commandExecutor_( commandExecutor ) {
@@ -145,27 +130,15 @@ bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) cons
 
 bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier) const {
     int exit_code = 0;
-    std::string sigVerifyOutput;
-    std::vector<std::string> sigVerifyLines;
-    SIG_STATUS sigStatus = SIG_ERROR;
     std::vector<std::string> package_check_argv{ dpkgSigBinStr, dpkgSigVerifyOption, packageIdentifier };
 
-    int ret = commandExecutor_.ExecuteCommandCaptureOutput(dpkgSigBinStr, package_check_argv, exit_code, sigVerifyOutput);
+    int ret = commandExecutor_.ExecuteCommand(dpkgSigBinStr, package_check_argv, exit_code);
     if(ret != 0){
         PM_LOG_ERROR("Failed to execute verify package command.");
         return false;
-    } else { // No need to check exit code as different exit codes represent different signature status which already is taken care by parsing.
-        commandExecutor_.ParseOutput(sigVerifyOutput, sigVerifyLines);
     }
 
-    if(sigVerifyLines.size() < 2) {
-        PM_LOG_ERROR("Invalid output from dpkg-sig: %s", sigVerifyOutput.c_str());
-        return false;
-    }
-
-    int lastLine = sigVerifyLines.size() - 1;
-    sigStatus = getSigVerificationStatus(sigVerifyLines[lastLine]);
-    switch (sigStatus) {
+    switch (exit_code) {
         case SIG_GOOD:
             PM_LOG_INFO("Package %s is signed and verified.", packageIdentifier.c_str());
             return true;
