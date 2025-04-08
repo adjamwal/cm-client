@@ -123,13 +123,13 @@ int32_t PmPlatformConfiguration::ReloadSslCertificates()
 {
     int32_t result = certmgr_->FreeSystemSslCertificates() ? 0 : -1;
     if (0 != result) {
-        //TODO: LOG_ERROR
+        PM_LOG_ERROR("Failed to free system SSL certificates");
         return false;
     }
     
     result = certmgr_->LoadSystemSslCertificates() ? 0 : -1;
     if (0 != result) {
-        //TODO: LOG_ERROR
+        PM_LOG_ERROR("Failed to load system SSL certificates");
         return false;
     }
 
