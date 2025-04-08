@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IPackageUtil.hpp"
+#include "OSPackageManager/common/ICommandExec.hpp"
 
 /**
  * @brief A class that implements the 'PackageUtil' utility to perform package-related operations for DEB.
@@ -9,7 +10,10 @@
 class PackageUtilDEB : public IPackageUtil {
 public:
 
-    PackageUtilDEB() = default;
+    /**
+     * @brief Constructor to load librpm for RPM package operations.
+     */
+    PackageUtilDEB(ICommandExec &commandExecutor);
 
     ~PackageUtilDEB() = default;
 
@@ -20,4 +24,7 @@ public:
     bool installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions = {}) const override;
     bool uninstallPackage(const std::string& packageIdentifier) const override;
     bool verifyPackage(const std::string& packageIdentifier) const override;
+
+private:
+    ICommandExec &commandExecutor_;
 };

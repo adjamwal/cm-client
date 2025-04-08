@@ -21,6 +21,7 @@ def linuxBuildPlatforms() {
     "alma8": ["tag": "el8"],
     "alma9": ["tag": "el9"],
     "ubuntu20": ["tag": "ubuntu20"],
+    "ubuntu20arm": ["tag": "ubuntu20arm"],
     "mac14arm": ["tag": "mac14arm"],
   ]
 }

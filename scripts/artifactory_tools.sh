@@ -284,7 +284,11 @@ get_artifactory_filename(){
     exit 1
   fi
 
-  file_name_local="${prereq_description}_${cmake_file_commit_hash}${prereq_platform}${dependency_string}.tar.gz"
+  if [ "$(uname)" != "Darwin" ] && is_platform_arm; then
+    file_name_local="${prereq_description}-arm_${cmake_file_commit_hash}${prereq_platform}${dependency_string}.tar.gz"
+  else
+    file_name_local="${prereq_description}_${cmake_file_commit_hash}${prereq_platform}${dependency_string}.tar.gz"
+  fi
 
   echo "${file_name_local}"
 }
@@ -304,11 +308,16 @@ get_artifactory_key(){
     exit 1
   fi
 
+  local arch_extra=""
+  if [ "$(uname)" != "Darwin" ] && is_platform_arm; then
+    arch_extra="-arm"
+  fi
+
   if [ -z "$cmake_file_commit_hash" ];
   then
-    search_key="sccm_${component}_${prereq_platform}_${head_commit_fullhash}${dependency_string}"
+    search_key="sccm_${component}_${prereq_platform}${arch_extra}_${head_commit_fullhash}${dependency_string}"
   else
-    search_key="sccm_${component}_${prereq_platform}_${head_commit_fullhash}_${cmake_file_commit_hash}${dependency_string}"
+    search_key="sccm_${component}_${prereq_platform}${arch_extra}_${head_commit_fullhash}_${cmake_file_commit_hash}${dependency_string}"
   fi
 
   echo "${search_key}"
@@ -494,6 +503,12 @@ get_artifactory_download_url(){
 
 exec_action=$(basename $0)
 prereq_platform="${PLATFORM}"
+if [ "${prereq_platform}" = "ubuntu22" ] || [ "${prereq_platform}" = "ubuntu24" ]; then
+    #
+    # Ubuntu 22.04 and 24.04 use the same artifacts as Ubuntu 20.04
+    #
+    prereq_platform=ubuntu20
+fi
 if [ "${exec_action}" = "get_artifactory_url.sh" ]; then
     if [ $# -ge 1 ]; then
       get_prereq_download_url "${1}"
