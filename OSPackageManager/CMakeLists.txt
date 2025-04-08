@@ -55,6 +55,11 @@ else()
         common/CommandExec.hpp
         linux/FileUtilities.cpp
         linux/FileUtilities.hpp
+        linux/IPmCertRetriever.hpp
+        linux/PmCertManager.cpp
+        linux/PmCertManager.hpp
+        linux/PmCertRetrieverImpl.cpp
+        linux/PmCertRetrieverImpl.hpp
         $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.cpp>
         $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.hpp>
         $<$<BOOL:${is_debian_based}>:linux/PackageUtilDEB.cpp>
