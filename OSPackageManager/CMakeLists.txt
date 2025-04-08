@@ -17,16 +17,16 @@ add_executable(${component_name}
     common/PmLogger.cpp
     common/PmLogger.hpp
     common/IFileUtilities.hpp
+    common/IPmCertRetriever.hpp
+    common/PmCertManager.cpp
+    common/PmCertManager.hpp
 )
 
 if(APPLE)
     target_sources(${component_name} PRIVATE
-        macOS/IPmCertRetriever.hpp
         macOS/FileUtilities.cpp
         macOS/FileUtilities.mm
         macOS/FileUtilities.hpp
-        macOS/PmCertManager.cpp
-        macOS/PmCertManager.hpp
         macOS/PmCertRetrieverImpl.cpp
         macOS/PmCertRetrieverImpl.hpp
         macOS/PmPlatformComponentManager.cpp
@@ -55,9 +55,6 @@ else()
         common/CommandExec.hpp
         linux/FileUtilities.cpp
         linux/FileUtilities.hpp
-        linux/IPmCertRetriever.hpp
-        linux/PmCertManager.cpp
-        linux/PmCertManager.hpp
         linux/PmCertRetrieverImpl.cpp
         linux/PmCertRetrieverImpl.hpp
         $<$<BOOL:${is_rhel_based}>:linux/PackageUtilRPM.cpp>
