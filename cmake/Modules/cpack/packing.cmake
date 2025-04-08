@@ -92,6 +92,10 @@ set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE ${INSTALL_SCRIPT_DIR}/postinstall)
 set(CPACK_RPM_PRE_INSTALL_SCRIPT_FILE ${INSTALL_SCRIPT_DIR}/preinstall)
 set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE ${INSTALL_SCRIPT_DIR}/preuninstall)
 
+set(CPACK_RPM_PACKAGE_PROVIDES "cm")
+set(CPACK_RPM_PACKAGE_CONFLICTS "cm < ${CPACK_PACKAGE_VERSION}")
+set(CPACK_RPM_PACKAGE_OBSOLETES "cm < ${CPACK_PACKAGE_VERSION}")
+
 set(CPACK_RPM_USER_FILELIST
 "%ghost %{_localstatedir}/log/cisco/secureclient/cloudmanagement/csc_cms.log"
 "%ghost %{_localstatedir}/log/cisco/secureclient/cloudmanagement/cmpackagemanager.log"

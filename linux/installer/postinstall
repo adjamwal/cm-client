@@ -30,6 +30,9 @@ fi
 
 systemctl daemon-reload
 systemctl enable ${CM_SERVICE}
-systemctl start ${CM_SERVICE}
-
+if systemctl is-active --quiet ${CM_SERVICE}; then
+    systemctl restart ${CM_SERVICE}
+else
+    systemctl start ${CM_SERVICE}
+fi
 exit 0

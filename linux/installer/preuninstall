@@ -2,7 +2,9 @@
 
 CM_SERVICE="csccloudmanagement"
 
-systemctl stop ${CM_SERVICE}
-systemctl disable ${CM_SERVICE}
-
+# stop the service only during uninstall and not during upgrades
+if [$1 -eq 0]; then
+    systemctl stop ${CM_SERVICE}
+    systemctl disable ${CM_SERVICE}
+fi
 exit 0
