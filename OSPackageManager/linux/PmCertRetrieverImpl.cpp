@@ -6,6 +6,7 @@
 #include "util/ScopedGuard.hpp"
 #include "PmCertRetrieverImpl.hpp"
 #include "PmLogger.hpp"
+#include <openssl/x509_vfy.h>
 #include <string>
 
 

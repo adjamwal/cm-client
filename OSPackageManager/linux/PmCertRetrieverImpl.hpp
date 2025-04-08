@@ -6,8 +6,6 @@
 #pragma once
 
 #include "IPmCertRetriever.hpp"
-#include <openssl/x509.h>
-#include <openssl/x509_vfy.h>
 #include <vector>
 
 namespace PackageManager

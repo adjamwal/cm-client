@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include <openssl/ssl.h>
+#include <openssl/x509.h>
 #include <vector>
 
 namespace PackageManager

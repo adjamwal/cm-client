@@ -5,8 +5,6 @@
 
 #include "PmCertManager.hpp"
 #include "PmLogger.hpp"
-#include <openssl/x509.h>
-#include <openssl/x509_vfy.h>
 #include <string>
 #include <vector>
 
