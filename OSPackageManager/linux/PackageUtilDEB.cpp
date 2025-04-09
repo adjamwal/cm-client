@@ -2,13 +2,21 @@
 #include "PmLogger.hpp"
 #include <string.h>
 
-namespace {
+namespace { //anonymous namespace
     const std::string debPackageInstaller {"deb"};
     const std::string dpkgBinStr {"/bin/dpkg"};
     const std::string dpkgGetPkgInfoOption {"-s"};
     const std::string dpkgListPkgFilesOption {"-L"};
     const std::string dpkgInstallPkgOption {"-i"}; //Supports both install and upgrade
     const std::string dpkgUninstallPkgOption {"-P"}; // -P: Purge (Removes configuration files also), -r: Remove (Keeps configuration files)
+    const std::string dpkgSigBinStr {"/bin/dpkg-sig"};
+    const std::string dpkgSigVerifyOption {"--verify"};
+    typedef enum {
+        SIG_GOOD = 0,
+        SIG_BAD = 2,
+        SIG_UNKNOWN = 3,
+        SIG_NOT_SIGNED = 4
+    } SIG_STATUS; // based on the return code of dpkg-sig command
 }
 
 PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor) : commandExecutor_( commandExecutor ) {
@@ -120,7 +128,32 @@ bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) cons
     return true;
 }
 
+// NOTE: packageIdentifier is expected to be the complete path to the debian package (e.g., "/home/Downloads/package-1.0.0-1.x86_64.deb")
 bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier) const {
-    (void) packageIdentifier;
-    return true;
+    int exit_code = 0;
+    std::vector<std::string> package_check_argv{ dpkgSigBinStr, dpkgSigVerifyOption, packageIdentifier };
+
+    int ret = commandExecutor_.ExecuteCommand(dpkgSigBinStr, package_check_argv, exit_code);
+    if(ret != 0){
+        PM_LOG_ERROR("Failed to execute verify package command.");
+        return false;
+    }
+
+    switch (exit_code) {
+        case SIG_GOOD:
+            PM_LOG_INFO("Package %s is signed and verified.", packageIdentifier.c_str());
+            return true;
+        case SIG_BAD:
+            PM_LOG_ERROR("Package %s verification failed due to corrupted signature.", packageIdentifier.c_str());
+            return false;
+        case SIG_UNKNOWN:
+            PM_LOG_ERROR("Package %s verification failed due to unknown signature.", packageIdentifier.c_str());
+            return false;
+        case SIG_NOT_SIGNED:
+            PM_LOG_INFO("Package %s is not signed.", packageIdentifier.c_str());
+            return false;
+        default:
+            PM_LOG_ERROR("Package %s verification failed with unknown error.", packageIdentifier.c_str());
+            return false;
+    }
 }
