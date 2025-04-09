@@ -13,7 +13,7 @@
 #include "crashpad/CrashpadTuner.h"
 #endif
 #include "ThreadTimer.hpp"
-
+#include "util/PathUtil.hpp"
 #include <sys/stat.h>
 #include <chrono>
 #include <iostream>
@@ -74,7 +74,7 @@ void Daemon::start()
 {
     using namespace std::chrono_literals;
     std::error_code ecode;
-    CM_LOG_DEBUG("Starting cloud management");
+    CM_LOG_DEBUG("Starting cloud management version %s",util::getApplicationVersion().c_str());
     CM_LOG_INFO( "CM: Using config path: %s, exists: %s, code: %d, msg: %s", ConfigShared::Config::cmConfigPath.c_str(),
                  std::filesystem::exists(ConfigShared::Config::cmConfigPath) ? "Yes" : "No", ecode.value(), ecode.message().c_str() );
 
