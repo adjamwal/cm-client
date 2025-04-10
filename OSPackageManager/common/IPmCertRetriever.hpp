@@ -1,11 +1,11 @@
 /**
  * @file
  *
- * @copyright (c) 2023 Cisco Systems, Inc. All rights reserved
+ * @copyright (c) 2025 Cisco Systems, Inc. All rights reserved
  */
 #pragma once
 
-#include <openssl/ssl.h>
+#include <openssl/x509.h>
 #include <vector>
 
 namespace PackageManager
@@ -21,7 +21,7 @@ public:
     /**
      * @brief (Optional) Retrieves the clients system certs
      *
-     *  @param[out] certificates - Vector of certs returned. The platfrom should allocated these
+     *  @param[out] certificates - Vector of certs returned. The platfrom should allocate these.
      */
     virtual int32_t GetSslCertificates(std::vector<X509*> &certificates) = 0;
 };

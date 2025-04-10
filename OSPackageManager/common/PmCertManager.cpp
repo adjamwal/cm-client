@@ -1,13 +1,10 @@
 /**
  * @file
- * @copyright (c) 2023 Cisco Systems, Inc. All rights reserved
+ * @copyright (c) 2025 Cisco Systems, Inc. All rights reserved
  */
 
 #include "PmCertManager.hpp"
 #include "PmLogger.hpp"
-
-#include <CoreFoundation/CFArray.h>
-#include <Security/Security.h>
 #include <string>
 #include <vector>
 
