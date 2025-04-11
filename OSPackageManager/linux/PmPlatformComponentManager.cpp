@@ -50,7 +50,7 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
     }
 
 #ifdef ENABLE_CODE_SIGN_VERIFICATION
-    if( !pkgUtil_->verifyPackage(package.downloadedInstallerPath) ) {
+    if( !pkgUtil_->verifyPackage(package.downloadedInstallerPath, package.signerName) ) {
         PM_LOG_ERROR("Package verification failed: %s", package.downloadedInstallerPath.c_str());
         return ret;
     }

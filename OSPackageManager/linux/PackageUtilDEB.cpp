@@ -129,7 +129,7 @@ bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) cons
 }
 
 // NOTE: packageIdentifier is expected to be the complete path to the debian package (e.g., "/home/Downloads/package-1.0.0-1.x86_64.deb")
-bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier) const {
+bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier, const std::string& signerKeyID) const {
     int exit_code = 0;
     std::vector<std::string> package_check_argv{ dpkgSigBinStr, dpkgSigVerifyOption, packageIdentifier };
 

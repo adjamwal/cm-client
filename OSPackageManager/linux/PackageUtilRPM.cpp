@@ -267,7 +267,7 @@ static std::string _rpm_get_keyid(std::string pgpsig)
     return std::string(pgpsig_keyid);
 }
 
-bool PackageUtilRPM::verifyPackage(const std::string& packageIdentifier) const {
+bool PackageUtilRPM::verifyPackage(const std::string& packageIdentifier, const std::string& signerKeyID) const {
     int exit_code;
     std::string keyId;
     std::string pgpkey;
@@ -292,7 +292,10 @@ bool PackageUtilRPM::verifyPackage(const std::string& packageIdentifier) const {
         return false;
     }
 
-    if (is_trusted_by_system(keyId)) {
+    PM_LOG_INFO("#adisaini: RPM package key id: %s", keyId.c_str());
+    PM_LOG_INFO("#adisaini: RPM package signer key id: %s", signerKeyID.c_str());
+
+    if (is_trusted_by_system(keyId) && signerKeyID == keyId) {
         return true;
     }
     PM_LOG_INFO("RPM package failed trusted key check: %s", packageIdentifier);

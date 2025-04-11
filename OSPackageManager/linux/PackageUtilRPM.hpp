@@ -77,11 +77,12 @@ public:
     /**
      * @brief Uninstalls a package with the specified identifier.
      * @param packageIdentifier The identifier of the package.
+     * @param signerKeyID The keyID of the signer for which we have to explicitly check against.
      * @return True if the uninstallation was successful, false otherwise.
      */
     bool uninstallPackage(const std::string& packageIdentifier) const override;
 
-    bool verifyPackage(const std::string& packageIdentifier) const override;
+    bool verifyPackage(const std::string& packageIdentifier, const std::string& signerKeyID) const override;
 
 private:
     void* libRPMhandle_ = nullptr; // Handle for the load and unload of libRPM library.
