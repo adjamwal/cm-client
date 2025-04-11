@@ -292,9 +292,6 @@ bool PackageUtilRPM::verifyPackage(const std::string& packageIdentifier, const s
         return false;
     }
 
-    PM_LOG_INFO("#adisaini: RPM package key id: %s", keyId.c_str());
-    PM_LOG_INFO("#adisaini: RPM package signer key id: %s", signerKeyID.c_str());
-
     if (is_trusted_by_system(keyId) && signerKeyID == keyId) {
         return true;
     }
