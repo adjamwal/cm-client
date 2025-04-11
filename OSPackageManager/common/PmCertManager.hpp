@@ -1,12 +1,11 @@
 /**
  * @file
  *
- * @copyright (c) 2023 Cisco Systems, Inc. All rights reserved
+ * @copyright (c) 2025 Cisco Systems, Inc. All rights reserved
  */
 #pragma once
 
 #include "IPmCertRetriever.hpp"
-#include <openssl/ssl.h>
 #include <memory>
 
 namespace PackageManager

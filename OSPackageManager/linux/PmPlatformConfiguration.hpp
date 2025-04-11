@@ -8,11 +8,13 @@
 #include "PackageManager/IPmPlatformConfiguration.h"
 #include "CMIDAPIProxyAbstract.hpp"
 #include "cmid/CMIDAPI.h"
+#include "PmCertManager.hpp"
 
 class PmPlatformConfiguration : public IPmPlatformConfiguration
 {
 public:
-    explicit PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi);
+    explicit PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
+                                     std::shared_ptr<PackageManager::PmCertManager> certmgr);
 
     /**
      * @brief Retrieves the clients identity token. This token is used to identifcation/authentication when
@@ -129,4 +131,5 @@ protected:
 
 private:
     std::shared_ptr<CMIDAPIProxyAbstract> cmidapi_;
+    std::shared_ptr<PackageManager::PmCertManager> certmgr_;
 };

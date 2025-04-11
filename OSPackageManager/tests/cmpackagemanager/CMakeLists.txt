@@ -17,7 +17,7 @@ add_executable(${component_name}
   # Dependencies
   ${TESTEE_DIR}/macOS/PmPkgUtilWrapper.cpp
   ${TESTEE_DIR}/macOS/PmPlatformConfiguration.cpp
-  ${TESTEE_DIR}/macOS/PmCertManager.cpp
+  ${TESTEE_DIR}/common/PmCertManager.cpp
   ${TESTEE_DIR}/macOS/PmPlatformComponentManager.cpp
   ${TESTEE_DIR}/macOS/PmPlatformDiscovery.cpp
   ${TESTEE_DIR}/common/PmLogger.cpp
