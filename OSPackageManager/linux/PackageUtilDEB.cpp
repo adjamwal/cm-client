@@ -21,7 +21,6 @@ namespace { //anonymous namespace
 
     bool matchSignerKeyID(const std::string& outputLine, const std::string& signerKeyID) {
         // Check if the output line contains the expected signer key ID.
-        // keyID is the 3rd value in the o/p line.
         size_t pos = 0;
         size_t wordCnt = 0;
         while(wordCnt < signer_keyID_pos - 1) {
@@ -174,7 +173,7 @@ bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier, const s
             if(outputLines.empty() || outputLines.size() < 2) {
                 PM_LOG_ERROR("Failed to parse output from dpkg-sig.");
                 return false;
-            } else if (!matchSignerKeyID(outputLines[1], signerKeyID)) {
+            } else if (!matchSignerKeyID(outputLines[outputLines.size()-1], signerKeyID)) {
                 PM_LOG_ERROR("Signer key ID mismatch.");
                 return false;
             }
