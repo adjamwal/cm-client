@@ -11,12 +11,39 @@ namespace { //anonymous namespace
     const std::string dpkgUninstallPkgOption {"-P"}; // -P: Purge (Removes configuration files also), -r: Remove (Keeps configuration files)
     const std::string dpkgSigBinStr {"/bin/dpkg-sig"};
     const std::string dpkgSigVerifyOption {"--verify"};
+    const int signer_keyID_pos = 3; // The position of the key ID in the output line of dpkg-sig
     typedef enum {
         SIG_GOOD = 0,
         SIG_BAD = 2,
         SIG_UNKNOWN = 3,
         SIG_NOT_SIGNED = 4
     } SIG_STATUS; // based on the return code of dpkg-sig command
+
+    bool matchSignerKeyID(const std::string& outputLine, const std::string& signerKeyID) {
+        // Check if the output line contains the expected signer key ID.
+        // keyID is the 3rd value in the o/p line.
+        size_t pos = 0;
+        size_t wordCnt = 0;
+        while(wordCnt < signer_keyID_pos - 1) {
+            pos = outputLine.find(' ', pos);
+            if(pos == std::string::npos) {
+                break;
+            }
+            ++wordCnt;
+            ++pos; // Move past the space
+        }
+
+        size_t end = outputLine.find(' ', pos);
+        if(end == std::string::npos) {
+            end = outputLine.length();
+        }
+        std::string fingerprint = outputLine.substr(pos, end - pos);
+        std::string keyID {};
+        if (fingerprint.length() > 16) {
+            keyID = fingerprint.substr(fingerprint.length() - 16);
+        }
+        return keyID == signerKeyID;
+    }
 }
 
 PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor) : commandExecutor_( commandExecutor ) {
@@ -132,8 +159,10 @@ bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) cons
 bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier, const std::string& signerKeyID) const {
     int exit_code = 0;
     std::vector<std::string> package_check_argv{ dpkgSigBinStr, dpkgSigVerifyOption, packageIdentifier };
+    std::string outputBuffer {};
+    std::vector<std::string> outputLines {};
 
-    int ret = commandExecutor_.ExecuteCommand(dpkgSigBinStr, package_check_argv, exit_code);
+    int ret = commandExecutor_.ExecuteCommandCaptureOutput(dpkgSigBinStr, package_check_argv, exit_code, outputBuffer);
     if(ret != 0){
         PM_LOG_ERROR("Failed to execute verify package command.");
         return false;
@@ -141,6 +170,14 @@ bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier, const s
 
     switch (exit_code) {
         case SIG_GOOD:
+            commandExecutor_.ParseOutput(outputBuffer, outputLines);
+            if(outputLines.empty() || outputLines.size() < 2) {
+                PM_LOG_ERROR("Failed to parse output from dpkg-sig.");
+                return false;
+            } else if (!matchSignerKeyID(outputLines[1], signerKeyID)) {
+                PM_LOG_ERROR("Signer key ID mismatch.");
+                return false;
+            }
             PM_LOG_INFO("Package %s is signed and verified.", packageIdentifier.c_str());
             return true;
         case SIG_BAD:
