@@ -9,7 +9,7 @@ set(PM_KEY "pm")
 set(component_name "cmpackagemanager")
 
 if(LINUX)
-    add_definitions(/DENABLE_CODE_SIGN_VERIFICATION)
+    add_definitions(/DENABLE_CODESIGN_VERIFICATION)
 endif()
 
 add_executable(${component_name} 

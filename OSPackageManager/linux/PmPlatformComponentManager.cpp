@@ -49,15 +49,14 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
         return ret;
     }
 
-#ifdef ENABLE_CODE_SIGN_VERIFICATION
+#ifdef ENABLE_CODESIGN_VERIFICATION
     if( !pkgUtil_->verifyPackage(package.downloadedInstallerPath, package.signerName) ) {
         PM_LOG_ERROR("Package verification failed: %s", package.downloadedInstallerPath.c_str());
         return ret;
     }
 #endif
 
-    const bool success = pkgUtil_->installPackage(package.downloadedInstallerPath);
-    ret = success ? 0 : -1;
+    ret = (pkgUtil_->installPackage(package.downloadedInstallerPath)) ? 0 : -1;
     
     PM_LOG_INFO("Package installation status %d", ret);
     return ret;
