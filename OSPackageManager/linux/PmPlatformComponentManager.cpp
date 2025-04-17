@@ -45,13 +45,13 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
         return ret;
 
     if( !pkgUtil_->isValidInstallerType(package.installerType)) {
-        PM_LOG_ERROR("Invalid Installer Type: %s", package.installerType.c_str());
+        PM_LOG_ERROR("Invalid Installer Type: %s for package(%s)", package.installerType.c_str(), package.productAndVersion.c_str());
         return ret;
     }
 
 #ifdef ENABLE_CODESIGN_VERIFICATION
     if( !pkgUtil_->verifyPackage(package.downloadedInstallerPath, package.signerName) ) {
-        PM_LOG_ERROR("Package verification failed: %s", package.downloadedInstallerPath.c_str());
+        PM_LOG_ERROR("Package verification failed for package(%s)", package.productAndVersion.c_str());
         return ret;
     }
 #endif

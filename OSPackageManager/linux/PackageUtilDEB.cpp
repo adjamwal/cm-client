@@ -153,10 +153,15 @@ bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) cons
     return true;
 }
 
-// NOTE: packageIdentifier is expected to be the complete path to the debian package (e.g., "/home/Downloads/package-1.0.0-1.x86_64.deb")
-bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier, const std::string& signerKeyID) const {
+// NOTE: packagePath is expected to be the complete path to the debian package (e.g., "/home/Downloads/package-1.0.0-1.x86_64.deb")
+bool PackageUtilDEB::verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const {
+    if (signerKeyID.empty()) {
+        PM_LOG_ERROR("Invalid Signer key ID provided.");
+        return false;
+    }
+
     int exit_code = 0;
-    std::vector<std::string> package_check_argv{ dpkgSigBinStr, dpkgSigVerifyOption, packageIdentifier };
+    std::vector<std::string> package_check_argv{ dpkgSigBinStr, dpkgSigVerifyOption, packagePath };
     std::string outputBuffer {};
     std::vector<std::string> outputLines {};
     std::string fingerprint {};
@@ -173,9 +178,6 @@ bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier, const s
             if(outputLines.empty() || outputLines.size() < 2) {
                 PM_LOG_ERROR("Failed to parse output from dpkg-sig.");
                 return false;
-            } else if (signerKeyID.empty()) {
-                PM_LOG_ERROR("Invalid Signer key ID provided.");
-                return false;
             }
 
             retrieveFingerprint(outputLines[outputLines.size()-1], fingerprint);
@@ -184,19 +186,19 @@ bool PackageUtilDEB::verifyPackage(const std::string& packageIdentifier, const s
                 return false;
             }
 
-            PM_LOG_INFO("Package %s is signed and verified.", packageIdentifier.c_str());
+            PM_LOG_INFO("Package %s is signed and verified.", packagePath.c_str());
             return true;
         case SIG_BAD:
-            PM_LOG_ERROR("Package %s verification failed due to corrupted signature.", packageIdentifier.c_str());
+            PM_LOG_ERROR("Package %s verification failed due to corrupted signature.", packagePath.c_str());
             return false;
         case SIG_UNKNOWN:
-            PM_LOG_ERROR("Package %s verification failed due to unknown signature.", packageIdentifier.c_str());
+            PM_LOG_ERROR("Package %s verification failed due to unknown signature.", packagePath.c_str());
             return false;
         case SIG_NOT_SIGNED:
-            PM_LOG_INFO("Package %s is not signed.", packageIdentifier.c_str());
+            PM_LOG_INFO("Package %s is not signed.", packagePath.c_str());
             return false;
         default:
-            PM_LOG_ERROR("Package %s verification failed with unknown error.", packageIdentifier.c_str());
+            PM_LOG_ERROR("Package %s verification failed with unknown error.", packagePath.c_str());
             return false;
     }
 }

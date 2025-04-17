@@ -8,6 +8,9 @@ set(PM_KEY "pm")
 
 set(component_name "cmpackagemanager")
 
+# CodeSign verification is enabled by default (Normal Behaviour)
+# Comment the macro definition for disabling codesign verification to test with unverified pacakges.
+# NOTE: This macro should be removed eventually.
 if(LINUX)
     add_definitions(/DENABLE_CODESIGN_VERIFICATION)
 endif()

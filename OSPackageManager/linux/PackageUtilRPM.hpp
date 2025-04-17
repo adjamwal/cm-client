@@ -82,7 +82,7 @@ public:
      */
     bool uninstallPackage(const std::string& packageIdentifier) const override;
 
-    bool verifyPackage(const std::string& packageIdentifier, const std::string& signerKeyID) const override;
+    bool verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const override;
 
 private:
     void* libRPMhandle_ = nullptr; // Handle for the load and unload of libRPM library.

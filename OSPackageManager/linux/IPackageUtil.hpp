@@ -31,5 +31,5 @@ public:
     virtual std::vector<std::string> listPackageFiles(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const = 0;
     virtual bool installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions = {}) const = 0;
     virtual bool uninstallPackage(const std::string& packageIdentifier) const = 0;
-    virtual bool verifyPackage(const std::string& packageIdentifier, const std::string& signerKeyID) const = 0;
+    virtual bool verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const = 0;
 };

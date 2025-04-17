@@ -267,34 +267,34 @@ static std::string _rpm_get_keyid(std::string pgpsig)
     return std::string(pgpsig_keyid);
 }
 
-bool PackageUtilRPM::verifyPackage(const std::string& packageIdentifier, const std::string& signerKeyID) const {
+bool PackageUtilRPM::verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const {
     int exit_code;
     std::string keyId;
     std::string pgpkey;
 
-    std::vector<std::string> package_check_argv{ rpmBinStr, "-q", "--queryformat", rpmKeyFormatStr, "-p", packageIdentifier };
+    std::vector<std::string> package_check_argv{ rpmBinStr, "-q", "--queryformat", rpmKeyFormatStr, "-p", packagePath };
 
     if (commandExecutor_.ExecuteCommandCaptureOutput(
             rpmBinStr, package_check_argv, exit_code, pgpkey) ||
         (exit_code != 0)) {
-        PM_LOG_ERROR("Query package %s for pgpkey failed (%d)", packageIdentifier.c_str(), exit_code);
+        PM_LOG_ERROR("Query package %s for pgpkey failed (%d)", packagePath.c_str(), exit_code);
         return false;
     } else if (rpmNotSignedStr == pgpkey) {
         PM_LOG_ERROR("No key available to validate RPM package - verification failed %s",
-            packageIdentifier.c_str());
+            packagePath.c_str());
         return false;
     }
 
     keyId = _rpm_get_keyid(pgpkey);
 
     if (keyId.empty()) {
-        PM_LOG_INFO("RPM package is not signed: %s", packageIdentifier);
+        PM_LOG_INFO("RPM package is not signed: %s", packagePath.c_str());
         return false;
     }
 
     if (is_trusted_by_system(keyId) && signerKeyID == keyId) {
         return true;
     }
-    PM_LOG_INFO("RPM package failed trusted key check: %s", packageIdentifier);
+    PM_LOG_INFO("RPM package failed trusted key check: %s", packagePath.c_str());
     return false;
 }
