@@ -29,12 +29,12 @@ def linuxBuildPlatforms() {
 // CI Helpers
 // ##### CI & Build Nodes Setup start.
 def setup_ephemeral_nodes(platformList) {
-  type = pipeline_utils.isBranch() ? "release" : "ci"
-  parallelDeployNodes = [:]
+  def parallelDeployNodes = [:]
 
   platformList.each { platform ->
     parallelDeployNodes[platform] = {
-      def node = pipeline_utils.filter_nodes(platform, type, false)
+      def node_label = pipeline_utils.isBranch() ? pipeline_utils.getReleaseNodeLabel(platform) : pipeline_utils.getCINodeLabel(platform)
+      def node = pipeline_utils.filter_nodes(node_label, false)
       if (node.size()) {
         env."${platform}" = node.first()
       } else {
@@ -268,7 +268,7 @@ def run_cmclient_ci() {
     println build_platforms.collectEntries { ["${it}" : env."${it}"] }
   }
   stage('Checkout') {
-    parallel_checkout = build_platforms.collectEntries {
+    def parallel_checkout = build_platforms.collectEntries {
       ["${it}" : generate_checkout(it, env.CHANGE_FORK, env.CHANGE_BRANCH)]
     }
     parallel parallel_checkout
@@ -392,7 +392,7 @@ pipeline {
         }
       }
     }
-    
+
   }
   post {
     success {
