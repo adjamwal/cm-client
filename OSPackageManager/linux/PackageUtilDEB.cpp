@@ -59,7 +59,7 @@ std::vector<std::string> PackageUtilDEB::listPackages() const {
 
 PackageInfo PackageUtilDEB::getPackageInfo(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const {
     if(identifierType != PKG_ID_TYPE::NAME) {
-        PM_LOG_ERROR("Invalid identifier type. Currently only PKG_NAME is supported.");
+        PM_LOG_ERROR("Invalid identifier type for value(%s). Currently only pkgname is supported.", packageIdentifier.c_str());
         return {};
     }
 
