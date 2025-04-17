@@ -50,70 +50,70 @@ TEST_F(PackageUtilTest, verifyInvalid)
 
    // 1. get pgpkey command fails
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_)).WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(error), Return(success)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 2. rpm not signed
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_)).WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>("(none)"), Return(success)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 3. cant get key id from string
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_)).WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>("Invalid"), Return(success)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 4. " Key ID " is found but actual key is truncated
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_)).WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(keyIdPrefix), Return(success)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 5. fail to get rpm pubkeys
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(testKeyId), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(error), ::testing::SetArgReferee<output_index>(""), Return(1)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 6. fail to get pubkey block 
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(testKeyId), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(pubkeys), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(error), ::testing::SetArgReferee<output_index>(""), Return(success)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
    
    // 7. gpg fingerprint command fails
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(testKeyId), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(""), Return(success))) // empty pubkey block to skip iterating through it
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(error), ::testing::SetArgReferee<output_index>(""), Return(success)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 8. gpg fingerprint command succeeds but there is no public key
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(testKeyId), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(""), Return(success))) // empty pubkey block to skip iterating through it
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(error), ::testing::SetArgReferee<output_index>("gpg: error reading key: No public key"), Return(success)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 9. first command exec call returns error
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_)).WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), Return(error)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 10. second command exec call returns error
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(testKeyId), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(""), Return(error)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 11. third command exec call returns error 
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(testKeyId), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(pubkeys), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(""), Return(error)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
    // 12. fourth command exec call fails
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(testKeyId), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(""), Return(success))) // empty pubkey block to skip iterating through it (skips 3rd command exec call)
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(""), Return(error)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsFalse());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsFalse());
 
 }
 
@@ -128,7 +128,7 @@ TEST_F(PackageUtilTest, verifyValid)
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>(pubkeys), Return(success)))
       .WillOnce(::testing::DoAll(::testing::SetArgReferee<error_code_index>(success), ::testing::SetArgReferee<output_index>("Imaginary Pubkey Block"), Return(success)));
    EXPECT_CALL(gpgUtil, get_pubkey_fingerprint(_)).WillOnce(Return(GpgKeyId(trustedKeyId)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsTrue());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsTrue());
 
    //finds matching key id after iterating through list
    EXPECT_CALL(commandExecutor, ExecuteCommandCaptureOutput(_,_,_,_))
@@ -139,7 +139,7 @@ TEST_F(PackageUtilTest, verifyValid)
    EXPECT_CALL(gpgUtil, get_pubkey_fingerprint(_))
       .WillOnce(Return(GpgKeyId(notTrustedKeyId)))
       .WillOnce(Return(GpgKeyId(trustedKeyId)));
-   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage), ::testing::IsTrue());
+   ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsTrue());
 
 
 }
