@@ -39,19 +39,24 @@ int32_t PmPlatformComponentManager::GetCachedInventory(PackageInventory &cachedI
 }
 
 int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package) {
-    // To-Do: Implement CodeSign Verification later.
     int32_t ret = -1;
 
     if (!fileUtils_->PathIsValid(package.downloadedInstallerPath))
         return ret;
 
-    
-    if( pkgUtil_->isValidInstallerType(package.installerType) ) {
-        const bool success = pkgUtil_->installPackage(package.downloadedInstallerPath);
-        ret = success ? 0 : -1;
-    } else {
-        PM_LOG_ERROR("Invalid Package Type: %s", package.installerType.c_str());
+    if( !pkgUtil_->isValidInstallerType(package.installerType)) {
+        PM_LOG_ERROR("Invalid Installer Type: %s for package(%s)", package.installerType.c_str(), package.productAndVersion.c_str());
+        return ret;
     }
+
+#ifdef ENABLE_CODESIGN_VERIFICATION
+    if( !pkgUtil_->verifyPackage(package.downloadedInstallerPath, package.signerName) ) {
+        PM_LOG_ERROR("Package verification failed for package(%s)", package.productAndVersion.c_str());
+        return ret;
+    }
+#endif
+
+    ret = (pkgUtil_->installPackage(package.downloadedInstallerPath)) ? 0 : -1;
     
     PM_LOG_INFO("Package installation status %d", ret);
     return ret;

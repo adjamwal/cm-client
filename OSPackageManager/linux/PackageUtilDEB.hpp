@@ -23,7 +23,7 @@ public:
     std::vector<std::string> listPackageFiles(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const override;
     bool installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions = {}) const override;
     bool uninstallPackage(const std::string& packageIdentifier) const override;
-    bool verifyPackage(const std::string& packageIdentifier) const override;
+    bool verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const override;
 
 private:
     ICommandExec &commandExecutor_;
