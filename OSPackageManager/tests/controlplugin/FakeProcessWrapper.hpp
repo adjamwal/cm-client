@@ -51,7 +51,11 @@ public:
     pid_t fork() override;
     void kill(pid_t pid) override;
     std::vector<pid_t> getRunningProcesses() override;
+#ifdef __APPLE__
     bool getProcessInfo(pid_t pid, proc_bsdinfo* pProcInfo) override;
+#else
+    bool getProcessInfo(pid_t pid, void* pProcInfo) override;
+#endif
     //should throw FakeProcessException if no error
     void execv(const std::vector<char *>& processArgs) override;
     void exit(int nStatus) override;

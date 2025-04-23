@@ -24,6 +24,14 @@ target_link_libraries(
   ${GTEST_LIBS}
 )
 
+if(LINUX)
+    target_link_libraries(
+        ${component_name}
+        stdc++fs
+        pthread
+    )
+endif()
+
 target_compile_definitions(
     ${component_name}
     PUBLIC
