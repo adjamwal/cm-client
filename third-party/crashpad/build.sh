@@ -1,6 +1,5 @@
 #!/bin/bash
 # shellcheck source=/dev/null
-
 # If we're building on Jenkins then WORKSPACE is defined, used that to derive the path to WORKSPACE_ROOT
 if [ ! -z "${WORKSPACE}" ]; then
     WORKSPACE_ROOT=${WORKSPACE}/cm-client
@@ -72,6 +71,46 @@ sync() {
     popd || exit 1
 }
 
+get_prereq_version() {
+    local prereq="${1}"
+    local head_commit_fullhash="${2}"
+    local description
+    description="$(get_prereq_description "${prereq}" "${head_commit_fullhash}")"
+    # Everything after the first dash in the description is the version.
+    # Obtaining the version is done this way because some third party modules
+    # include their project name as part of the Git tag read by `git describe`.
+    echo "${description#*-}"
+}
+
+get_prereq_description(){
+    local prereq="${1}"
+    local head_commit_fullhash="${2}"
+    local prereq_description
+    prereq_description=''
+    if [ -f "version.txt" ]; then
+        local local_version
+        local num_commits
+        local_version=$(<version.txt)
+        num_commits=$(num_commit_on_base_branch)
+        #Git describe adds a "g" to the start of the hash, adding it here for consistency
+        prereq_description="${prereq}-${local_version}-${num_commits}-g${head_commit_fullhash:0:10}"
+    elif allow_describe_all_tags "${prereq}"; then
+        #Allow all tags to be included not just annotated ones
+        prereq_description=$(git describe --long --tag --abbrev=10 | tr -d '\n')
+    else
+        prereq_description=$(git describe --long --abbrev=10 | tr -d '\n')
+    fi
+
+    if [ -z "${prereq_description}" ]; then
+        # No version.txt and no "git describe" tag, default to using similar form as
+        # version.txt case but use x's for unknown version info.
+        local num_commits
+        num_commits=$(git rev-list --all --no-merges --count | tr -d '\n')
+        prereq_description="${prereq}-x.x.x-${num_commits}-g${head_commit_fullhash:0:10}"
+    fi
+    echo "${prereq_description}"
+}
+
 build() {
     echo '================================================================================'
     echo 'Building crashpad'
@@ -86,7 +125,7 @@ build() {
     local CRASHPAD_VERSION
     local GN_SCRIPT_EXECUTABLE
     CRASHPAD_HASH="$(git rev-parse HEAD | tr -d '\n')"
-    CRASHPAD_VERSION="0.8.0"
+    CRASHPAD_VERSION="$(get_prereq_version crashpad "${CRASHPAD_HASH}")"
     sed -i -e 's/PACKAGE_VERSION ".*"/PACKAGE_VERSION "'$CRASHPAD_VERSION'"/' package.h
 
     # Python 2.7 was removed in macOS Monterey 12.3
@@ -157,6 +196,7 @@ build() {
         [ ! -e libcrashpad_handler_lib.a ] && ln -s ./obj/handler/libhandler.a libcrashpad_handler_lib.a
         [ ! -e libcrashpad_context.a ] && ln -s ./obj/snapshot/libcontext.a libcrashpad_context.a
         [ ! -e libcrashpad_snapshot.a ] && ln -s ./obj/snapshot/libsnapshot.a libcrashpad_snapshot.a
+        cp -rf ./gen/build "${CRASHPAD_DIR}/third_party/mini_chromium/mini_chromium"
     popd || exit 1
 
     # Reset version file
