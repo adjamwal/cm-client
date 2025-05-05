@@ -102,6 +102,7 @@ target_include_directories(${component_name}
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/util
     ${CMAKE_CURRENT_SOURCE_DIR}/proxy
+    ${PROJECT_SOURCE_DIR}
 )
 
 target_link_directories(${component_name} BEFORE
@@ -111,7 +112,7 @@ target_link_directories(${component_name} BEFORE
 
 target_link_libraries(${component_name}
     PUBLIC
-    $<$<BOOL:${APPLE}>:ProxyDiscovery>
+    ProxyDiscovery
     cmidapi
     pmclient
     pmcloud

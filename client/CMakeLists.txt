@@ -26,9 +26,12 @@ add_executable(${component_name}
     $<$<BOOL:${APPLE}>:${cm-client_SOURCE_DIR}/common/macOS/FileWatcher.hpp>
     $<$<BOOL:${APPLE}>:${cm-client_SOURCE_DIR}/common/macOS/ProxyWatcher.cpp>
     $<$<BOOL:${APPLE}>:${cm-client_SOURCE_DIR}/common/macOS/ProxyWatcher.hpp>
-    $<$<BOOL:${APPLE}>:crashpad/CrashpadTuner.h>
-    $<$<BOOL:${APPLE}>:crashpad/CrashpadTuner.cpp>
+    crashpad/CrashpadTuner.h
+    crashpad/CrashpadTuner.cpp
+    $<$<BOOL:${LINUX}>:${cm-client_SOURCE_DIR}/common/linux/ProxyWatcher.cpp>
+    $<$<BOOL:${LINUX}>:${cm-client_SOURCE_DIR}/common/linux/ProxyWatcher.hpp>
 )
+
 
 add_dependencies(${component_name}
     third-party-ciscossl
@@ -37,22 +40,17 @@ add_dependencies(${component_name}
     third-party-EndpointIdentity
     third-party-PackageManager
     third-party-spdlog
+    third-party-crashpad
+    third-party-ProxyDiscovery-Mac
 )
-
-if(APPLE)
-    add_dependencies(${component_name}
-        third-party-crashpad
-        third-party-ProxyDiscovery-Mac
-    )
-endif()
 
 target_include_directories(${component_name}
     PUBLIC
     ${cm-client_SOURCE_DIR}
     ${CM_THIRDPARTY_EXPORT}/include
-    $<$<BOOL:${APPLE}>:${CM_THIRDPARTY_EXPORT}/include/crashpad>
-    $<$<BOOL:${APPLE}>:${CM_THIRDPARTY_EXPORT}/include/crashpad/third_party/mini_chromium/mini_chromium>
-    $<$<BOOL:${APPLE}>:${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery>
+    ${CM_THIRDPARTY_EXPORT}/include/crashpad
+    ${CM_THIRDPARTY_EXPORT}/include/crashpad/third_party/mini_chromium/mini_chromium
+    ${CM_THIRDPARTY_EXPORT}/include/ProxyDiscovery
     ${cm-client_SOURCE_DIR}/util
 )
 
@@ -68,22 +66,27 @@ target_link_libraries(${component_name}
     cmidcontrolplugin
     common
     pmcontrolplugin
-    $<$<BOOL:${APPLE}>:ProxyDiscovery>
+    ProxyDiscovery
     jsoncpp
-    $<$<BOOL:${APPLE}>:crashpad_client>
-    $<$<BOOL:${APPLE}>:crashpad_common>
-    $<$<BOOL:${APPLE}>:crashpad_context>
-    $<$<BOOL:${APPLE}>:crashpad_handler_lib>
-    $<$<BOOL:${APPLE}>:crashpad_minidump>
-    $<$<BOOL:${APPLE}>:crashpad_net>
-    $<$<BOOL:${APPLE}>:crashpad_snapshot>
-    $<$<BOOL:${APPLE}>:crashpad_util>
+    crashpad_client
+    crashpad_common
+    crashpad_context
+    crashpad_handler_lib
+    crashpad_minidump
+    crashpad_net
+    crashpad_snapshot
+    crashpad_util
     $<$<BOOL:${APPLE}>:mig_output>
-    $<$<BOOL:${APPLE}>:crashpad_base>
+    crashpad_base
     $<$<BOOL:${APPLE}>:bsm>
     util
     pthread
     $<$<BOOL:${LINUX}>:stdc++fs>
+    $<$<BOOL:${LINUX}>:curl>
+    $<$<BOOL:${LINUX}>:ssl>
+    $<$<BOOL:${LINUX}>:crypto>
+    $<$<BOOL:${LINUX}>:z>
+    $<$<BOOL:${LINUX}>:dl>
     "$<$<BOOL:${APPLE}>:-framework SystemConfiguration>"
     "$<$<BOOL:${APPLE}>:-framework IOKit>"
     "$<$<BOOL:${APPLE}>:-framework CoreServices>"

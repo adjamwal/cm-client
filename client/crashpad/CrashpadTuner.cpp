@@ -29,7 +29,11 @@ constexpr std::string_view kNoRateLimit{"--no-rate-limit"};
 constexpr std::string_view kNoUploadGZip{"--no-upload-gzip"};
 constexpr std::string_view kMinidumpFormat{"minidump"};
 constexpr std::string_view kCrashPadExecutable{"cmreport_handler"};
-constexpr std::string_view kSecureClientCloudManagementMacClient{"sccm_mac"};
+#ifdef __APPLE__
+constexpr std::string_view kSecureClientCloudManagementClient{"sccm_mac"};
+#elif __linux__
+constexpr std::string_view kSecureClientCloudManagementClient{"sccm_linux"};
+#endif
 constexpr uint32_t kPruneDays{14};
 constexpr size_t kDatabaseDefaultPruneSizeKB{50000};
 constexpr std::string_view kNotUsedUrl{"https://default.not.used.url/"};
@@ -128,7 +132,7 @@ CrashpadTuner::CrashpadTuner():
     proxy_(makeEmptyProxy()),
     pProxyEngine_(proxy::createProxyEngine())
 {
-    pProxyEngine_->addObserver(this);
+    pProxyEngine_->addObserver(*this);
 }
 
 CrashpadTuner* CrashpadTuner::getInstance()
@@ -203,7 +207,7 @@ void CrashpadTuner::fillAnnotations()
     std::string strAppName = util::getApplicationName();
     annotations_["database"] = "database_" + strAppName;
     annotations_["product"] = strAppName;
-    annotations_["module"] = static_cast<std::string>(kSecureClientCloudManagementMacClient);
+    annotations_["module"] = static_cast<std::string>(kSecureClientCloudManagementClient);
     annotations_["version"] = util::getApplicationVersion();
 }
 
@@ -326,7 +330,7 @@ void CrashpadTuner::setAgentGuid(const std::string& strGuid)
 
 void CrashpadTuner::setPruneAge(uint32_t nDays)
 {
-    if (nDays > std::numeric_limits<int>::max())
+    if (nDays > static_cast<uint32_t>(std::numeric_limits<int>::max()))
     {
         CM_LOG_ERROR("Input prune period value is bigger than INT_MAX: %d", nDays);
         return;

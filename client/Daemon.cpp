@@ -53,12 +53,12 @@ void Daemon::applyCrashpadSettings() {
 
 //! @todo creation of PM, should also load the process
 Daemon::Daemon() :
-    config_ { std::make_unique<ConfigShared::Config>(&CMLogger::getInstance().getConfigLogger()) },
-    cmidLoader_ { std::make_unique<CMIDLoader>() },
-    pmLoader_ { std::make_unique<PMLoader>() }
+    config_ { std::make_unique<ConfigShared::Config>(&CMLogger::getInstance().getConfigLogger()) }
+    , cmidLoader_ { std::make_unique<CMIDLoader>() }
+    , pmLoader_ { std::make_unique<PMLoader>() }
+    , proxyWatcher_ { std::make_unique<ProxyWatcher>() }
 #ifdef __APPLE__
     , fileWatcher_ { std::make_unique<FileWatcher>(fileWatcherName) }
-    , proxyWatcher_ { std::make_unique<ProxyWatcher>() }
 #endif
 {
     applyLoggerSettings();

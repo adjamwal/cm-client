@@ -7,6 +7,7 @@
 #include <string>
 #include <cassert>
 #include <sys/utsname.h>
+#include "ProxyDiscovery/ProxyDiscoveryEngine.hpp"
 #include "PmPlatformConfiguration.hpp"
 #include "PmLogger.hpp"
 #include "GuidUtil.hpp"
@@ -60,11 +61,23 @@ static std::string sArchForConfig = determineArch();
 
 }
 
+std::list<PmProxy> convertProxyList(const std::list<proxy::ProxyRecord>& inputList)
+{
+    std::list<PmProxy> outputList;
+    for (const auto& rec: inputList)
+    {
+        outputList.push_back({rec.url, rec.port, rec.getProxyTypeName()});
+    }
+    return outputList;
+}
+
 PmPlatformConfiguration::PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
                                                  std::shared_ptr<PackageManager::PmCertManager> certmgr)
     :   cmidapi_(std::move(cmidapi)),
+        pProxyEngine_(proxy::createProxyEngine()),
         certmgr_(std::move(certmgr))
 {
+    pProxyEngine_->addObserver(*this);
     certmgr_->LoadSystemSslCertificates();
 }
 
@@ -242,18 +255,41 @@ bool PmPlatformConfiguration::UpdateCertStoreForUrl(const std::string &url)
 
 std::list<PmProxy> PmPlatformConfiguration::StartProxyDiscovery(const std::string &testUrl, const std::string &pacUrl)
 {
-    (void) testUrl;
-    (void) pacUrl;
-    return std::list<PmProxy>();
+    return convertProxyList(pProxyEngine_->getProxies(testUrl, pacUrl));
 }
 
 bool PmPlatformConfiguration::StartProxyDiscoveryAsync(const std::string &testUrl, const std::string &pacUrl, AsyncProxyDiscoveryCb cb, void *context)
 {
-    (void) testUrl;
-    (void) pacUrl;
-    (void) cb;
-    (void) context;
+    pProxyEngine_->waitPrevOpCompleted();
+    std::string guid = util::generateGUID();
+    proxyCallbacks_[guid] = std::make_pair(context, cb);
+    pProxyEngine_->requestProxiesAsync(testUrl, pacUrl, guid);
     return true;
+}
+
+void PmPlatformConfiguration::updateProxyList(const std::list<proxy::ProxyRecord>& proxies, const std::string& guid)
+{
+    auto it = proxyCallbacks_.find(guid);
+    if (it == proxyCallbacks_.end())
+    {
+        PM_LOG_ERROR("Unable to find proxy callback with the guid %s in a callbacks map.", guid.c_str());
+        return;
+    }
+    std::pair<void*, AsyncProxyDiscoveryCb> proxyCbPair = it->second;
+    proxyCallbacks_.erase(it);
+    
+    {
+        //Log output for verification.
+        PM_LOG_NOTICE("Obtained proxy list: ");
+        for (const auto& proxy: proxies)
+        {
+            PM_LOG_NOTICE("Proxy: URL: [%s], Type: [%s], Port: [%d].", proxy.url.c_str(),
+                          proxy.getProxyTypeName().c_str(), proxy.port);
+        }
+        PM_LOG_NOTICE("End of the proxy list.");
+    }
+    
+    proxyCbPair.second(proxyCbPair.first, convertProxyList(proxies));
 }
 
 std::string PmPlatformConfiguration::GetPmPlatform()

@@ -30,6 +30,10 @@ if(APPLE)
         PRIVATE
             "-framework Foundation"
     )
+elseif(LINUX)
+    target_link_libraries(${component_name} PRIVATE
+        uuid
+    )
 endif()
 
 target_include_directories(${component_name}

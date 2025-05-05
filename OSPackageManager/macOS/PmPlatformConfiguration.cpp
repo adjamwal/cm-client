@@ -83,7 +83,7 @@ PmPlatformConfiguration::PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbs
         pProxyEngine_(proxy::createProxyEngine())
 {
     certmgr_->LoadSystemSslCertificates();
-    pProxyEngine_->addObserver(this);
+    pProxyEngine_->addObserver(*this);
 }
 
 bool PmPlatformConfiguration::GetIdentityToken(std::string& token)

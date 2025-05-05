@@ -10,6 +10,11 @@
 #include "common/macOS/FileWatcher.hpp"
 #include "common/macOS/ProxyWatcher.hpp"
 #endif
+
+#ifdef __linux__
+#include "common/linux/ProxyWatcher.hpp"
+#endif
+
 #include "Config.hpp"
 
 #include <atomic>
@@ -39,10 +44,10 @@ private:
     std::unique_ptr<ConfigShared::Config> config_;
     std::unique_ptr<CMIDLoader> cmidLoader_;
     std::unique_ptr<PMLoader> pmLoader_;
+    std::unique_ptr<ProxyWatcher> proxyWatcher_;
 
 #ifdef __APPLE__
     std::unique_ptr<FileWatcher> fileWatcher_;
-    std::unique_ptr<ProxyWatcher> proxyWatcher_;
 #endif
 
     std::atomic<bool> isRunning_;

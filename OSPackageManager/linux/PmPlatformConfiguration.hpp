@@ -8,9 +8,10 @@
 #include "PackageManager/IPmPlatformConfiguration.h"
 #include "CMIDAPIProxyAbstract.hpp"
 #include "cmid/CMIDAPI.h"
+#include "ProxyDiscovery/IProxyDiscoveryEngine.h"
 #include "PmCertManager.hpp"
 
-class PmPlatformConfiguration : public IPmPlatformConfiguration
+class PmPlatformConfiguration : public IPmPlatformConfiguration, public proxy::IProxyObserver
 {
 public:
     explicit PmPlatformConfiguration(std::shared_ptr<CMIDAPIProxyAbstract> cmidapi,
@@ -126,10 +127,21 @@ public:
      */
     bool StartProxyDiscoveryAsync(const std::string &testUrl, const std::string &pacUrl, AsyncProxyDiscoveryCb cb, void *context) override;
 
+    /**
+     * @brief callback that is called by pProxyEngine_ when discovery process is completed.
+     *
+     * @param[in] proxies - list of the discovered proxies
+     *
+     * @return void
+     */
+    void updateProxyList(const std::list<proxy::ProxyRecord>& proxies, const std::string& guid) override;
+
 protected:
     cmid_result_t GetUrl( cmid_url_type_t urlType, std::string& url );
 
 private:
     std::shared_ptr<CMIDAPIProxyAbstract> cmidapi_;
+    std::shared_ptr<proxy::IProxyDiscoveryEngine> pProxyEngine_;
+    std::unordered_map<std::string, std::pair<void*, AsyncProxyDiscoveryCb>> proxyCallbacks_;
     std::shared_ptr<PackageManager::PmCertManager> certmgr_;
 };

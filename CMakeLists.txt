@@ -1,7 +1,7 @@
 # CMakeLists.txt
 # Copyright 2022, Cisco Systems, Inc.
 
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.25)
 
 # Specify search path for CMake modules to be loaded by include()
 # and find_package()
@@ -49,7 +49,6 @@ endif()
 
 # remove ZERO_CHECK target from xcode
 set(CMAKE_SUPPRESS_REGENERATION true)
-
 
 if(DEFINED BUILD_ALL_THIRD_PARTY AND BUILD_ALL_THIRD_PARTY)
     set(BUILD_ALL_THIRD_PARTY true)
@@ -106,10 +105,9 @@ include(ExternalProject_spdlog)
 include(ExternalProject_ciscossl)
 include(ExternalProject_curl)
 include(ExternalProject_jsoncpp)
+include(ExternalProject_ProxyDiscovery-Mac)
 include(ExternalProject_crashpad)
-if(APPLE)
-    include(ExternalProject_ProxyDiscovery-Mac)
-else()
+if(LINUX)
     include(ExternalProject_boost)
     include(ExternalProject_libxml2)
 endif()
@@ -141,11 +139,9 @@ add_subdirectory(OSPackageManager)
 add_subdirectory(client)
 
 if(LINUX)
-    add_subdirectory("Gpg")
+    add_subdirectory(Gpg)
 endif()
 
 if(APPLE)
-##
-##
-add_subdirectory(Uninstaller)
+    add_subdirectory(Uninstaller)
 endif()

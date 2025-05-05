@@ -21,13 +21,14 @@ endif()
 if(NOT TARGET "third-party-${component_name}")
     ExternalProject_Add(
         third-party-${component_name}
-        DEPENDS third-party-gtest
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${component_name}/
         PREFIX ${component_install_prefix}
         CMAKE_GENERATOR ${CMAKE_GENERATOR}
         CMAKE_ARGS
             -Dgtest_INCLUDE_DIRS=${CM_THIRDPARTY_EXPORT}/include
             -Dgtest_LIBRARY=${CM_THIRDPARTY_EXPORT}/lib
+            $<$<BOOL:${LINUX}>:-DCURL_LIBRARY_DIR=${CM_THIRDPARTY_EXPORT}/lib>
+            $<$<BOOL:${LINUX}>:-DCURL_INCLUDE_DIR=${CM_THIRDPARTY_EXPORT}/include>
             -DSKIP_TESTS=FALSE
             -DCMAKE_CXX_STANDARD=17
             -DCMAKE_CXX_EXTENSIONS=OFF
@@ -39,4 +40,9 @@ if(NOT TARGET "third-party-${component_name}")
     )
 
     upload_component(${component_name} not_used)
+
+    add_dependencies(third-party-${component_name} third-party-gtest)
+    if(LINUX)
+        add_dependencies(third-party-${component_name} third-party-curl)
+    endif()
 endif()
