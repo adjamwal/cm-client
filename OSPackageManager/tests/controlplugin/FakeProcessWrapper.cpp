@@ -161,6 +161,7 @@ std::vector<pid_t> FakeProcessWrapper::getRunningProcesses()
     return ret;
 }
 
+#ifdef __APPLE__
 bool FakeProcessWrapper::getProcessInfo(pid_t pid, proc_bsdinfo* pProcInfo)
 {
     if (!pProcInfo)
@@ -177,6 +178,16 @@ bool FakeProcessWrapper::getProcessInfo(pid_t pid, proc_bsdinfo* pProcInfo)
     std::strncpy(pProcInfo->pbi_name, it->getName().c_str(), sizeof(pProcInfo->pbi_name));
     return true;
 }
+#else
+bool FakeProcessWrapper::getProcessInfo(pid_t pid, void* pProcInfo)
+{
+    if (pProcInfo == nullptr)
+    {
+        return false;
+    }
+    return false;
+}
+#endif //__APPLE__
 
 pid_t FakeProcessWrapper::createProcess(const std::string& strName)
 {

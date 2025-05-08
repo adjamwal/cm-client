@@ -15,6 +15,7 @@ if (${is_rhel_based})
     target_link_libraries(${component_name}
         gpg
         pthread
+        stdc++fs
         ${GTEST_LIBS}
         ${CMAKE_DL_LIBS}
     )
