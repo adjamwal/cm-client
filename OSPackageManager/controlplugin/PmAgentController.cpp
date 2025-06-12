@@ -12,13 +12,6 @@
 #include <vector>
 #include <system_error>
 
-#define PROC_DIR "/proc/"
-#include <dirent.h>
-#define MAX_LENGTH 1024
-#include <unistd.h>
-#include <signal.h>
-#define PATH_DELIMITER "/"
-
 using namespace std::chrono_literals;
 
 namespace
@@ -191,18 +184,14 @@ PM_STATUS PmAgentController::killIfRunning()
             }
         }
     }
-#endif
-#ifdef __linux__
+#elif __linux__
     PM_STATUS status = PM_STATUS::PM_ERROR;
     auto pids =  pProcessWrapper_->getRunningProcesses();
-    CM_LOG_DEBUG("[rajatga] logc searching for [%s]", PM_AGENT_BINARY);
     for (pid_t pid : pids) {
         std::string exeName;
         if (pProcessWrapper_->getProcessInfo(pid, exeName)) {
-            CM_LOG_DEBUG("[rajatga] loga process name [%s] and pid [%d]", exeName.c_str(), pid);
             std::string exeNameString = exeName.c_str();
             if(PM_AGENT_BINARY == exeNameString) {
-                CM_LOG_DEBUG("[rajatga] logb kill called");
                 try {
                     pProcessWrapper_->kill(pid);
                     CM_LOG_DEBUG("Process name = [%s] with pid = [%d] terminated.", PM_AGENT_BINARY, pid );
