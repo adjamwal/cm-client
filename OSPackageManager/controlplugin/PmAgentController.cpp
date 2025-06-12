@@ -12,6 +12,13 @@
 #include <vector>
 #include <system_error>
 
+#define PROC_DIR "/proc/"
+#include <dirent.h>
+#define MAX_LENGTH 1024
+#include <unistd.h>
+#include <signal.h>
+#define PATH_DELIMITER "/"
+
 using namespace std::chrono_literals;
 
 namespace
@@ -161,7 +168,6 @@ void PmAgentController::cleanup()
 PM_STATUS PmAgentController::killIfRunning()
 {
     /** @todo Implement for Linux */
-
 #ifdef __APPLE__
     std::vector<pid_t> processIDs = pProcessWrapper_->getRunningProcesses();
     for (auto&& pid: processIDs)
@@ -182,6 +188,29 @@ PM_STATUS PmAgentController::killIfRunning()
                     CM_LOG_ERROR( "Process name = [%s] failed to terminate. Error code: [%d], meaning: [%s]", procInfo.pbi_name, e.code().value(), e.code().message().c_str() );
                 }
                 return PM_STATUS::PM_ERROR;
+            }
+        }
+    }
+#endif
+#ifdef __linux__
+    PM_STATUS status = PM_STATUS::PM_ERROR;
+    auto pids =  pProcessWrapper_->getRunningProcesses();
+    CM_LOG_DEBUG("[rajatga] logc searching for [%s]", PM_AGENT_BINARY);
+    for (pid_t pid : pids) {
+        std::string exeName;
+        if (pProcessWrapper_->getProcessInfo(pid, exeName)) {
+            CM_LOG_DEBUG("[rajatga] loga process name [%s] and pid [%d]", exeName.c_str(), pid);
+            std::string exeNameString = exeName.c_str();
+            if(PM_AGENT_BINARY == exeNameString) {
+                CM_LOG_DEBUG("[rajatga] logb kill called");
+                try {
+                    pProcessWrapper_->kill(pid);
+                    CM_LOG_DEBUG("Process name = [%s] with pid = [%d] terminated.", PM_AGENT_BINARY, pid );
+                    return PM_STATUS::PM_OK;
+                } catch (const std::runtime_error& e) {
+                    CM_LOG_ERROR("Failed to terminate process with pid = [%d]: %s", pid, e.what());
+                    return PM_STATUS::PM_ERROR;
+                }
             }
         }
     }

@@ -21,7 +21,7 @@ public:
 #ifdef __APPLE__
     bool getProcessInfo(pid_t pid, proc_bsdinfo* pProcInfo) override;
 #else
-    bool getProcessInfo(pid_t pid, void* pProcInfo) override;
+    bool getProcessInfo(pid_t pid, std::string& exeName) override;
 #endif
     void execv(const std::vector<char *>& processArgs) override;
     void exit(int nStatus) override;
