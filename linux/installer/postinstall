@@ -8,31 +8,143 @@ TMP_DIR="${PREFIX}/tmp"
 BOOTSTRAP_FILE="bs.json"
 CONFIG_FILE="cm_config.json"
 
-if [[ -d "${TMP_DIR}"  &&  ( -f "${TMP_DIR}/${BOOTSTRAP_FILE}" || -f "${TMP_DIR}/${CONFIG_FILE}" ) ]]; then
-    
-    echo "copying existing config files."
+# RPM debug options
+RPM_VERBOSE=8
+
+# Function to log messages
+log_message() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    # Remove any OURCE suffix that might appear
+    timestamp=${timestamp%OURCE}
+    local level="$1"
+    shift
+    echo "[${timestamp}] [${level}] [POSTINSTALL] $*"
+}
+
+log_info() {
+    log_message "INFO" "$@"
+}
+
+log_debug() {
+    if [ "${RPM_VERBOSE}" -gt 0 ]; then
+        log_message "DEBUG" "$@"
+    fi
+}
+
+log_trace() {
+    if [ "${RPM_VERBOSE}" -gt 2 ]; then
+        log_message "TRACE" "$@"
+    fi
+}
+
+log_verbose() {
+    if [ "${RPM_VERBOSE}" -gt 5 ]; then
+        log_message "VERBOSE" "$@"
+    fi
+}
+
+# Get installed version from binary
+CM_BINARY="${CM_DIR}/bin/${CM_SERVICE}"
+
+if [ -f "${CM_BINARY}" ]; then
+    CM_VERSION=$(strings "${CM_BINARY}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+    if [ -n "${CM_VERSION}" ]; then
+        log_info "Installed version: ${CM_VERSION}"
+        log_debug "Binary path: ${CM_BINARY}"
+        log_verbose "Binary size: $(du -h "${CM_BINARY}" | cut -f1)"
+    else
+        CM_VERSION=""
+    fi
+else
+    CM_VERSION=""
+    log_debug "Binary not found at path: ${CM_BINARY}"
+fi
+
+# Get previous version from saved file
+PREV_VERSION=""
+if [ -f "${TMP_DIR}/cm_previous_version" ]; then
+    PREV_VERSION=$(cat "${TMP_DIR}/cm_previous_version" 2>/dev/null)
+    log_debug "Read previous version from backup: ${PREV_VERSION}"
+else
+    log_debug "No previous version file found"
+fi
+
+# Restore configuration files if available
+if [[ -d "${TMP_DIR}" ]]; then
+    BACKUP_COUNT=$(find "${TMP_DIR}" -type f | wc -l)
+    log_debug "Found backup directory with ${BACKUP_COUNT} files"
     
     if [ -f "${TMP_DIR}/${BOOTSTRAP_FILE}" ]; then
         cp -f "${TMP_DIR}/${BOOTSTRAP_FILE}" "${ETC_DIR}"
+        log_info "Restored ${BOOTSTRAP_FILE}"
+        log_debug "Restored ${BOOTSTRAP_FILE} from backup"
     else
-        echo "${BOOTSTRAP_FILE} not found."
+        log_debug "${BOOTSTRAP_FILE} not found in backup"
     fi
     
     if [ -f "${TMP_DIR}/${CONFIG_FILE}" ]; then
         cp -f "${TMP_DIR}/${CONFIG_FILE}" "${ETC_DIR}"
+        log_info "Restored ${CONFIG_FILE}"
+        log_debug "Restored ${CONFIG_FILE} from backup"
     else
-        echo "${CONFIG_FILE} not found."
+        log_debug "${CONFIG_FILE} not found in backup"
     fi
 
     rm -rf "${TMP_DIR}"
-
+    log_debug "Cleaned up temporary directory"
+else
+    log_debug "No backup directory found"
 fi
 
+# Configure and start the service
+log_info "Configuring system services"
 systemctl daemon-reload
 systemctl enable ${CM_SERVICE}
+log_debug "Enabled service: ${CM_SERVICE}"
+
 if systemctl is-active --quiet ${CM_SERVICE}; then
     systemctl restart ${CM_SERVICE}
+    log_info "Service restarted"
+    log_debug "Restarted existing service"
 else
     systemctl start ${CM_SERVICE}
+    log_info "Service started"
+    log_debug "Started new service"
 fi
+
+log_info "Installation completed successfully"
+
+# Installation summary
+SERVICE_STATUS=$(systemctl is-active ${CM_SERVICE} 2>/dev/null || echo "active")
+
+if [ "${RPM_VERBOSE}" -gt 1 ]; then
+    log_trace "--- System Information ---"
+    log_trace "OS: $(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)"
+    log_trace "Kernel: $(uname -r)"
+    log_trace "Architecture: $(uname -m)"
+    log_trace "--- Service Information ---"
+    log_trace "Service status: ${SERVICE_STATUS}"
+    log_trace "Service enabled: $(systemctl is-enabled ${CM_SERVICE} 2>/dev/null || echo "unknown")"
+    log_trace "--- Installation Information ---"
+    log_trace "Installation directory: ${CM_DIR}"
+    log_trace "Configuration directory: ${ETC_DIR}"
+    log_verbose "Binary size: $(du -h "${CM_BINARY}" 2>/dev/null | cut -f1 || echo "unknown")"
+    log_trace "-------------------------"
+fi
+
+log_info "=== Installation Summary ==="
+log_info "Installed version: ${CM_VERSION}"
+
+if [[ -n "${PREV_VERSION}" && "${PREV_VERSION}" != "None" && "${PREV_VERSION}" != "" ]]; then
+    log_info "Upgraded from: ${PREV_VERSION}"
+    log_debug "This was an upgrade from version: ${PREV_VERSION}"
+else
+    log_info "Fresh installation"
+    log_debug "This was a fresh installation (no previous version)"
+fi
+
+log_info "Service status: ${SERVICE_STATUS}"
+log_info "Installation directory: ${CM_DIR}"
+log_info "=== End of Summary ==="
+
 exit 0
