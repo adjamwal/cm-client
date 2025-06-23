@@ -12,8 +12,8 @@ CM_PACKAGE_ID="cisco-secure-client-cloudmanagement-client"
 log() {
     # Detect if running inside RPM build environment by checking for RPM_BUILD_ROOT or similar env var
     if [ -n "$RPM_BUILD_ROOT" ] || command -v rpm &>/dev/null; then
-        # Use date format without % signs to avoid RPM macro parsing issues
-        local timestamp=$(date '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date '+%F %T')
+        # Use double %% to escape RPM macro parsing
+        local timestamp=$(date '+%%Y-%%m-%%d %%H:%%M:%%S' 2>/dev/null || date '+%%F %%T')
     else
         # Normal date format for non-RPM systems
         local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
