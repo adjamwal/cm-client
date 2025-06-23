@@ -17,6 +17,7 @@ log() {
     echo "[${timestamp}] [PREINSTALL] $*"
 }
 
+
 log "Installing Cisco Secure Client CM"
 log "Script started with PID: $$"
 log "Current user: $(whoami)"
@@ -63,27 +64,11 @@ if command -v rpm &>/dev/null; then
         log "Version extraction regex matched successfully"
         log "Full package name analysis: ${INSTALLED}"
         
-        # Additional package metadata
-        INSTALL_DATE=$(rpm -q --qf "%{INSTALLTIME:date}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Installation date: ${INSTALL_DATE}"
-        
-        PACKAGE_SIZE=$(rpm -q --qf "%{SIZE}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Package size: ${PACKAGE_SIZE} bytes"
-        PACKAGE_ARCH=$(rpm -q --qf "%{ARCH}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Package architecture: ${PACKAGE_ARCH}"
-        PACKAGE_VENDOR=$(rpm -q --qf "%{VENDOR}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Package vendor: ${PACKAGE_VENDOR}"
-        PACKAGE_RELEASE=$(rpm -q --qf "%{RELEASE}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Package release: ${PACKAGE_RELEASE}"
-        
-        PACKAGE_SUMMARY=$(rpm -q --qf "%{SUMMARY}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Package summary: ${PACKAGE_SUMMARY}"
-        PACKAGE_URL=$(rpm -q --qf "%{URL}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Package URL: ${PACKAGE_URL}"
-        PACKAGE_LICENSE=$(rpm -q --qf "%{LICENSE}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Package license: ${PACKAGE_LICENSE}"
-        PACKAGE_BUILDTIME=$(rpm -q --qf "%{BUILDTIME:date}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Package build date: ${PACKAGE_BUILDTIME}"
+        # Get comprehensive package information in one command
+        log "Package information from rpm -qi:"
+        rpm -qi ${CM_PACKAGE_ID} 2>/dev/null | while read line; do
+            log "  $line"
+        done
         
         # Check if any CM-related processes are running
         CM_PROCESSES=$(pgrep -f "${CM_SERVICE}" 2>/dev/null | wc -l)
@@ -111,14 +96,16 @@ elif command -v dpkg &>/dev/null; then
         log "Found previous installation: ${INSTALLED}"
         log "Debian package version extracted successfully"
         
-        # Get installation date for Debian packages
+        # Get comprehensive package information in one command
+        log "Package information from dpkg -s:"
+        dpkg -s ${CM_PACKAGE_ID} 2>/dev/null | while read line; do
+            log "  $line"
+        done
+        
+        # Get installation date separately (not included in dpkg -s)
         INSTALL_DATE=$(stat -c %y /var/lib/dpkg/info/${CM_PACKAGE_ID}.list 2>/dev/null | cut -d'.' -f1 || echo "unknown")
         log "Installation date: ${INSTALL_DATE}"
         
-        PACKAGE_STATUS=$(dpkg-query -W -f='${Status}' ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Package status: ${PACKAGE_STATUS}"
-        PACKAGE_SIZE=$(dpkg-query -W -f='${Installed-Size}' ${CM_PACKAGE_ID} 2>/dev/null)
-        log "Installed size: ${PACKAGE_SIZE} KB"
     else
         INSTALLED_VERSION="None"
         log "No packages matching ${CM_PACKAGE_ID} found in DPKG database"

@@ -17,7 +17,6 @@ log() {
     echo "[${timestamp}] [POSTINSTALL] $*"
 }
 
-
 log "Postinstall script started with PID: $$"
 log "Current user: $(whoami)"
 log "Script started at: $(date)"
@@ -28,6 +27,26 @@ log "System load at start: $(cat /proc/loadavg 2>/dev/null || echo 'unknown')"
 CM_BINARY="${CM_DIR}/bin/${CM_SERVICE}"
 log "Binary detection phase started"
 log "Checking binary at path: ${CM_BINARY}"
+
+# Get current package information after installation
+CM_PACKAGE_ID="cisco-secure-client-cloudmanagement-client"
+if command -v rpm &>/dev/null; then
+    log "Current package information from rpm -qi:"
+    # Get only the most recently installed package to avoid duplicates during upgrade
+    LATEST_PACKAGE=$(rpm -qa --qf "%{INSTALLTIME} %{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n" | grep "${CM_PACKAGE_ID}" | sort -n | tail -1 | awk '{print $2}')
+    if [ -n "${LATEST_PACKAGE}" ]; then
+        rpm -qi ${LATEST_PACKAGE} 2>/dev/null | while read line; do
+            log "  $line"
+        done
+    else
+        log "  Package not found in RPM database"
+    fi
+elif command -v dpkg &>/dev/null; then
+    log "Current package information from dpkg -s:"
+    dpkg -s ${CM_PACKAGE_ID} 2>/dev/null | while read line; do
+        log "  $line"
+    done
+fi
 
 # Verify installation directory structure
 if [ -d "${CM_DIR}" ]; then
@@ -44,14 +63,11 @@ fi
 if [ -f "${CM_BINARY}" ]; then
     log "Binary file found, extracting version information"
     
+    # Keep only essential binary info not covered by package info
     BINARY_PERMS=$(stat -c %a "${CM_BINARY}" 2>/dev/null || stat -f %A "${CM_BINARY}")
     log "Binary permissions: ${BINARY_PERMS}"
     BINARY_OWNER=$(stat -c %U:%G "${CM_BINARY}" 2>/dev/null || stat -f %Su:%Sg "${CM_BINARY}")
     log "Binary owner: ${BINARY_OWNER}"
-    BINARY_MODIFIED=$(stat -c %y "${CM_BINARY}" 2>/dev/null || stat -f %Sm "${CM_BINARY}")
-    log "Binary last modified: ${BINARY_MODIFIED}"
-    BINARY_SIZE_BYTES=$(stat -c %s "${CM_BINARY}" 2>/dev/null || stat -f %z "${CM_BINARY}")
-    log "Binary size in bytes: ${BINARY_SIZE_BYTES}"
     
     # Check if binary is executable
     if [ -x "${CM_BINARY}" ]; then
@@ -69,24 +85,17 @@ if [ -f "${CM_BINARY}" ]; then
     if [ -n "${CM_VERSION}" ]; then
         log "Installed version: ${CM_VERSION}"
         log "Binary path: ${CM_BINARY}"
-        log "Binary size: $(du -h "${CM_BINARY}" | cut -f1)"
         log "Version extracted successfully using strings command"
         
+        # Keep MD5 and file type for verification
         BINARY_MD5=$(md5sum "${CM_BINARY}" 2>/dev/null | cut -d' ' -f1 || md5 -q "${CM_BINARY}")
         log "Binary MD5 checksum: ${BINARY_MD5}"
         BINARY_TYPE=$(file "${CM_BINARY}" 2>/dev/null)
         log "Binary file type: ${BINARY_TYPE}"
         
-        # Additional binary analysis
-        if command -v ldd >/dev/null 2>&1; then
-            LDD_OUTPUT=$(ldd "${CM_BINARY}" 2>/dev/null | wc -l)
-            log "Linked libraries count: ${LDD_OUTPUT}"
-        fi
-        
     else
         CM_VERSION=""
         log "Version extraction failed - no version string found in binary"
-        log "Strings command did not find version pattern"
         
         # Try alternative version extraction methods
         VERSION_STRINGS=$(strings "${CM_BINARY}" 2>/dev/null | grep -i version | head -3)
@@ -98,7 +107,6 @@ else
     CM_VERSION=""
     log "Binary not found at path: ${CM_BINARY}"
     log "Binary file missing - possible installation issue"
-    log "File existence check failed for: ${CM_BINARY}"
     
     # Check if directory exists
     if [ -d "${CM_DIR}/bin" ]; then
@@ -304,7 +312,6 @@ log "Service restart count: ${SERVICE_RESTART_COUNT}"
 log "--- Installation Information ---"
 log "Installation directory: ${CM_DIR}"
 log "Configuration directory: ${ETC_DIR}"
-log "Binary size: $(du -h "${CM_BINARY}" 2>/dev/null | cut -f1 || echo "unknown")"
 
 TOTAL_INSTALL_SIZE=$(du -sh "${CM_DIR}" 2>/dev/null | cut -f1)
 log "Total installation size: ${TOTAL_INSTALL_SIZE}"
