@@ -9,103 +9,261 @@ CM_CONFIG_FILE="cm_config.json"
 CM_PACKAGE_ID="cisco-secure-client-cloudmanagement-client"
 
 # Function to log messages
-log_message() {
+log() {
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     # Remove any OURCE suffix that might appear
     timestamp=${timestamp%OURCE}
-    local level="$1"
-    shift
-    echo "[${timestamp}] [${level}] [PREINSTALL] $*"
+    echo "[${timestamp}] [PREINSTALL] $*"
 }
 
-log_info() {
-    log_message "INFO" "$@"
-}
-
-log_error() {
-    log_message "ERROR" "$@"
-}
-
-log_debug() {
-    log_message "DEBUG" "$@"
-}
-
-log_trace() {
-    log_message "TRACE" "$@"
-}
-
-log_info "Installing Cisco Secure Client CM"
+log "Installing Cisco Secure Client CM"
+log "Script started with PID: $$"
+log "Current user: $(whoami)"
+log "Current working directory: $(pwd)"
+log "Environment PATH: ${PATH}"
+log "Script arguments: $@"
+log "Script name: $0"
+log "System hostname: $(hostname)"
+log "Available disk space in /tmp: $(df -h /tmp 2>/dev/null | tail -1 | awk '{print $4}' || echo 'unknown')"
 
 # Detect package manager and check for previous installation
+log "System detection phase started"
+log "Total system memory: $(free -h 2>/dev/null | grep '^Mem:' | awk '{print $2}' || echo 'unknown')"
+log "CPU information: $(grep 'model name' /proc/cpuinfo 2>/dev/null | head -1 | cut -d: -f2 | xargs || echo 'unknown')"
+
 if command -v rpm &>/dev/null; then
-    log_info "Detected RPM-based system"
+    log "Detected RPM-based system"
+    log "RPM binary location: $(which rpm)"
+    log "RPM version: $(rpm --version)"
+    log "RPM database location: $(rpm --eval '%_dbpath' 2>/dev/null || echo '/var/lib/rpm')"
     
-    log_debug "Searching for installed packages matching: ${CM_PACKAGE_ID}"
+    # Check RPM database health
+    RPM_DB_CHECK=$(rpm -qa --quiet 2>&1 | wc -l)
+    log "RPM database check result: ${RPM_DB_CHECK} potential issues"
+    
+    log "Searching for installed packages matching: ${CM_PACKAGE_ID}"
+    log "Executing: rpm -qa | grep -E '^${CM_PACKAGE_ID}-'"
+    
+    # Measure time for RPM query
+    START_TIME=$(date +%s)
     INSTALLED=$(rpm -qa | grep -E "^${CM_PACKAGE_ID}-")
+    END_TIME=$(date +%s)
+    QUERY_TIME=$((END_TIME - START_TIME))
+    log "RPM query completed with exit code: $?"
+    log "RPM query execution time: ${QUERY_TIME} seconds"
+    
+    # Count total installed packages for context
+    TOTAL_PACKAGES=$(rpm -qa | wc -l)
+    log "Total packages installed on system: ${TOTAL_PACKAGES}"
     
     if [[ -n "${INSTALLED}" ]]; then
         INSTALLED_VERSION=$(echo "${INSTALLED}" | sed -n 's/.*-\([0-9]\+\.[0-9]\+\.[0-9]\+\)-[0-9]\+\..*/\1/p')
-        log_info "Found previous installation: ${INSTALLED}"
-        log_debug "Previous installed version: ${INSTALLED_VERSION}"
+        log "Found previous installation: ${INSTALLED}"
+        log "Version extraction regex matched successfully"
+        log "Full package name analysis: ${INSTALLED}"
         
+        # Additional package metadata
         INSTALL_DATE=$(rpm -q --qf "%{INSTALLTIME:date}" ${CM_PACKAGE_ID} 2>/dev/null)
-        log_trace "Installation date: ${INSTALL_DATE}"
+        log "Installation date: ${INSTALL_DATE}"
+        
+        PACKAGE_SIZE=$(rpm -q --qf "%{SIZE}" ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Package size: ${PACKAGE_SIZE} bytes"
+        PACKAGE_ARCH=$(rpm -q --qf "%{ARCH}" ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Package architecture: ${PACKAGE_ARCH}"
+        PACKAGE_VENDOR=$(rpm -q --qf "%{VENDOR}" ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Package vendor: ${PACKAGE_VENDOR}"
+        PACKAGE_RELEASE=$(rpm -q --qf "%{RELEASE}" ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Package release: ${PACKAGE_RELEASE}"
+        
+        PACKAGE_SUMMARY=$(rpm -q --qf "%{SUMMARY}" ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Package summary: ${PACKAGE_SUMMARY}"
+        PACKAGE_URL=$(rpm -q --qf "%{URL}" ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Package URL: ${PACKAGE_URL}"
+        PACKAGE_LICENSE=$(rpm -q --qf "%{LICENSE}" ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Package license: ${PACKAGE_LICENSE}"
+        PACKAGE_BUILDTIME=$(rpm -q --qf "%{BUILDTIME:date}" ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Package build date: ${PACKAGE_BUILDTIME}"
+        
+        # Check if any CM-related processes are running
+        CM_PROCESSES=$(pgrep -f "${CM_SERVICE}" 2>/dev/null | wc -l)
+        log "Running CM processes: ${CM_PROCESSES}"
+        if [ "${CM_PROCESSES}" -gt 0 ]; then
+            log "CM process PIDs: $(pgrep -f "${CM_SERVICE}" 2>/dev/null | tr '\n' ' ')"
+        fi
+        
     else
         INSTALLED_VERSION="None"
-        log_debug "No packages matching ${CM_PACKAGE_ID} found in RPM database"
+        log "No packages matching ${CM_PACKAGE_ID} found in RPM database"
+        log "Fresh installation detected - no previous package found"
+        log "RPM database search completed with no matches"
     fi
 elif command -v dpkg &>/dev/null; then
-    log_info "Detected Debian-based system"
+    log "Detected Debian-based system"
+    log "DPKG binary location: $(which dpkg)"
+    log "DPKG version: $(dpkg --version | head -1)"
     
     INSTALLED=$(dpkg -l | awk '{print $2}' | grep -E "^${CM_PACKAGE_ID}$")
+    log "DPKG query completed"
     
     if [[ -n "${INSTALLED}" ]]; then
         INSTALLED_VERSION=$(dpkg-query -W -f='${Version}' ${CM_PACKAGE_ID} 2>/dev/null | sed 's/-[0-9]\+$//')
-        log_info "Found previous installation: ${INSTALLED}"
-        log_debug "Previous installed version: ${INSTALLED_VERSION}"
+        log "Found previous installation: ${INSTALLED}"
+        log "Debian package version extracted successfully"
+        
+        # Get installation date for Debian packages
+        INSTALL_DATE=$(stat -c %y /var/lib/dpkg/info/${CM_PACKAGE_ID}.list 2>/dev/null | cut -d'.' -f1 || echo "unknown")
+        log "Installation date: ${INSTALL_DATE}"
+        
+        PACKAGE_STATUS=$(dpkg-query -W -f='${Status}' ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Package status: ${PACKAGE_STATUS}"
+        PACKAGE_SIZE=$(dpkg-query -W -f='${Installed-Size}' ${CM_PACKAGE_ID} 2>/dev/null)
+        log "Installed size: ${PACKAGE_SIZE} KB"
     else
         INSTALLED_VERSION="None"
+        log "No packages matching ${CM_PACKAGE_ID} found in DPKG database"
+        log "Fresh Debian installation detected"
     fi
 else
-    log_error "Unsupported package manager. Exiting."
+    log "Unsupported package manager. Exiting."
+    log "No supported package manager (rpm/dpkg) found in PATH"
     exit 1
+fi
+
+log "Package detection phase completed"
+log "Detected version: ${INSTALLED_VERSION}"
+
+# Determine installation type early
+if [[ -n "${INSTALLED}" ]]; then
+    log "This is an upgrade installation - previous version: ${INSTALLED_VERSION}"
+else
+    log "This is a fresh installation"
 fi
 
 # Backup configuration if previous installation exists
 if [[ -n "${INSTALLED}" ]]; then
-    log_info "Backing up configuration files to ${TMP_DIR}"
+    log "Backing up configuration files to ${TMP_DIR}"
+    log "Starting configuration backup process"
+    log "Backup target directory: ${TMP_DIR}"
     
+    # Check available space before backup
+    AVAILABLE_SPACE=$(df "${PREFIX}" 2>/dev/null | tail -1 | awk '{print $4}' || echo "0")
+    log "Available space in ${PREFIX}: ${AVAILABLE_SPACE} KB"
+    
+    # Check if CM service is currently running before backup
+    if systemctl is-active --quiet "${CM_SERVICE}" 2>/dev/null; then
+        log "CM service is currently running"
+        SERVICE_UPTIME=$(systemctl show "${CM_SERVICE}" -p ActiveEnterTimestamp --value 2>/dev/null)
+        log "Service uptime since: ${SERVICE_UPTIME}"
+    else
+        log "CM service is not currently running"
+    fi
+    
+    log "Cleaning existing temporary directory"
+    if [ -d "${TMP_DIR}" ]; then
+        OLD_BACKUP_SIZE=$(du -sh "${TMP_DIR}" 2>/dev/null | cut -f1 || echo "0")
+        log "Removing existing backup directory (size: ${OLD_BACKUP_SIZE})"
+    fi
     rm -rf "${TMP_DIR}"
+    log "Temporary directory removed"
+    
+    log "Creating fresh temporary directory"
     mkdir -p "${TMP_DIR}"
+    log "Temporary directory created with permissions: $(stat -c %a "${TMP_DIR}" 2>/dev/null || stat -f %A "${TMP_DIR}")"
     
     # Save version information for postinstall
     echo "${INSTALLED_VERSION}" > "${TMP_DIR}/cm_previous_version" 2>/dev/null || true
+    log "Version information saved to file"
+    
+    # Save additional metadata for troubleshooting
+    echo "$(date)" > "${TMP_DIR}/backup_timestamp" 2>/dev/null || true
+    echo "$(whoami)" > "${TMP_DIR}/backup_user" 2>/dev/null || true
+    log "Backup metadata saved"
     
     # Backup configuration files
+    log "Checking for bootstrap configuration file"
     if [ -f "${ETC_DIR}/${BOOTSTRAP_FILE}" ]; then
+        BOOTSTRAP_SIZE=$(du -h "${ETC_DIR}/${BOOTSTRAP_FILE}" 2>/dev/null | cut -f1)
+        log "Bootstrap file size: ${BOOTSTRAP_SIZE}"
+        BOOTSTRAP_AGE=$(find "${ETC_DIR}/${BOOTSTRAP_FILE}" -printf '%TY-%Tm-%Td %TH:%TM:%TS' 2>/dev/null || stat -c %y "${ETC_DIR}/${BOOTSTRAP_FILE}" 2>/dev/null || echo "unknown")
+        log "Bootstrap file last modified: ${BOOTSTRAP_AGE}"
+        
         cp -f "${ETC_DIR}/${BOOTSTRAP_FILE}" "${TMP_DIR}"
-        log_info "Backed up ${BOOTSTRAP_FILE}"
-        log_debug "Backed up bootstrap file from ${ETC_DIR}/${BOOTSTRAP_FILE}"
+        COPY_STATUS=$?
+        log "Backed up bootstrap file from ${ETC_DIR}/${BOOTSTRAP_FILE} (exit code: ${COPY_STATUS})"
+        
+        BOOTSTRAP_PERMS=$(stat -c %a "${ETC_DIR}/${BOOTSTRAP_FILE}" 2>/dev/null || stat -f %A "${ETC_DIR}/${BOOTSTRAP_FILE}")
+        log "Bootstrap file permissions: ${BOOTSTRAP_PERMS}"
+        BOOTSTRAP_OWNER=$(stat -c %U:%G "${ETC_DIR}/${BOOTSTRAP_FILE}" 2>/dev/null || stat -f %Su:%Sg "${ETC_DIR}/${BOOTSTRAP_FILE}")
+        log "Bootstrap file owner: ${BOOTSTRAP_OWNER}"
+        
+        # Verify backup integrity
+        if [ -f "${TMP_DIR}/${BOOTSTRAP_FILE}" ]; then
+            BACKUP_SIZE=$(du -h "${TMP_DIR}/${BOOTSTRAP_FILE}" 2>/dev/null | cut -f1)
+            log "Backup file verification - size: ${BACKUP_SIZE}"
+        fi
     else
-        log_debug "Bootstrap file not found at ${ETC_DIR}/${BOOTSTRAP_FILE}"
+        log "Bootstrap file not found at ${ETC_DIR}/${BOOTSTRAP_FILE}"
+        log "Bootstrap file backup skipped - file does not exist"
+        
+        # Check if directory exists but is empty
+        if [ -d "${ETC_DIR}" ]; then
+            ETC_FILE_COUNT=$(find "${ETC_DIR}" -type f 2>/dev/null | wc -l)
+            log "Files in etc directory: ${ETC_FILE_COUNT}"
+        fi
     fi
     
+    log "Checking for CM configuration file"
     if [ -f "${ETC_DIR}/${CM_CONFIG_FILE}" ]; then
+        CONFIG_SIZE=$(du -h "${ETC_DIR}/${CM_CONFIG_FILE}" 2>/dev/null | cut -f1)
+        log "Config file size: ${CONFIG_SIZE}"
+        
         cp -f "${ETC_DIR}/${CM_CONFIG_FILE}" "${TMP_DIR}"
-        log_info "Backed up ${CM_CONFIG_FILE}"
-        log_debug "Backed up config file from ${ETC_DIR}/${CM_CONFIG_FILE}"
+        log "Backed up config file from ${ETC_DIR}/${CM_CONFIG_FILE}"
+        
+        CONFIG_PERMS=$(stat -c %a "${ETC_DIR}/${CM_CONFIG_FILE}" 2>/dev/null || stat -f %A "${ETC_DIR}/${CM_CONFIG_FILE}")
+        log "Config file permissions: ${CONFIG_PERMS}"
+        CONFIG_LINES=$(wc -l < "${ETC_DIR}/${CM_CONFIG_FILE}" 2>/dev/null)
+        log "Config file line count: ${CONFIG_LINES}"
     else
-        log_debug "Config file not found at ${ETC_DIR}/${CM_CONFIG_FILE}"
+        log "Config file not found at ${ETC_DIR}/${CM_CONFIG_FILE}"
+        log "Config file backup skipped - file does not exist"
     fi
     
-    log_debug "Backup complete"
+    log "Configuration backup process finished successfully"
+    
+    BACKUP_FILE_COUNT=$(find "${TMP_DIR}" -type f | wc -l)
+    log "Total files backed up: ${BACKUP_FILE_COUNT}"
+    BACKUP_DIR_SIZE=$(du -sh "${TMP_DIR}" 2>/dev/null | cut -f1)
+    log "Backup directory total size: ${BACKUP_DIR_SIZE}"
+    
+    # Verify backup directory integrity
+    BACKUP_PERMISSIONS=$(stat -c %a "${TMP_DIR}" 2>/dev/null || stat -f %A "${TMP_DIR}")
+    log "Backup directory permissions: ${BACKUP_PERMISSIONS}"
+    
 else
     # Create temp directory and save version info even for fresh installs
+    log "Preparing for fresh installation"
+    
+    # Check if any CM-related files exist from previous manual installations
+    if [ -d "${CM_DIR}" ]; then
+        EXISTING_FILES=$(find "${CM_DIR}" -type f 2>/dev/null | wc -l)
+        log "Found existing CM directory with ${EXISTING_FILES} files"
+        CM_DIR_SIZE=$(du -sh "${CM_DIR}" 2>/dev/null | cut -f1 || echo "0")
+        log "Existing CM directory size: ${CM_DIR_SIZE}"
+    fi
+    
     mkdir -p "${TMP_DIR}" 2>/dev/null || true
+    log "Created temporary directory for fresh install"
+    
     echo "${INSTALLED_VERSION}" > "${TMP_DIR}/cm_previous_version" 2>/dev/null || true
-    log_debug "No previous installation found, skipping configuration backup"
+    echo "$(date)" > "${TMP_DIR}/fresh_install_timestamp" 2>/dev/null || true
+    log "Fresh installation - no configuration to backup"
+    log "Version file created with 'None' value"
 fi
 
-log_info "Preinstall operations completed successfully"
-log_debug "Preinstall completed. Previous installed version: ${INSTALLED_VERSION}"
-exit 0
+log "Preinstall operations completed successfully"
+log "All preinstall operations finished without errors"
+SCRIPT_END_TIME=$(date +%s)
+TOTAL_EXECUTION_TIME=$((SCRIPT_END_TIME - START_TIME))
+log "Total script execution time: ${TOTAL_EXECUTION_TIME} seconds"
+log "Memory usage at completion: $(free -m 2>/dev/null | grep '^Mem:' | awk '{print $3"/"$2" MB"}' || echo 'unknown')"

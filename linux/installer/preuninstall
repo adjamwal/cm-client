@@ -1,10 +1,119 @@
 #!/bin/bash
 
 CM_SERVICE="csccloudmanagement"
+PREFIX="/opt/cisco/secureclient"
+CM_DIR="${PREFIX}/cloudmanagement"
 
-# stop the service only during uninstall and not during upgrades
-if [$1 -eq 0]; then
-    systemctl stop ${CM_SERVICE}
-    systemctl disable ${CM_SERVICE}
+# Function to log messages
+log() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    # Remove any OURCE suffix that might appear
+    timestamp=${timestamp%OURCE}
+    echo "[${timestamp}] [PREUNINSTALL] $*"
+}
+
+log "Starting CM uninstallation process"
+log "Script arguments: $*"
+log "Argument count: $#"
+log "First argument (action): $1"
+
+# Detect package manager and handle arguments accordingly
+SHOULD_STOP_SERVICE=false
+
+if command -v rpm &>/dev/null; then
+    log "Detected RPM-based system"
+    # RPM argument meanings:
+    # $1 = 0: package is being removed/uninstalled
+    # $1 = 1: package is being upgraded (old version being removed)
+    
+    if [ "$1" = "0" ]; then
+        log "Detected package removal/uninstallation (RPM)"
+        SHOULD_STOP_SERVICE=true
+    else
+        log "Detected package upgrade - removing old version (RPM)"
+        log "Service will remain running during upgrade"
+    fi
+    
+elif command -v dpkg &>/dev/null; then
+    log "Detected Debian-based system"
+    # DPKG argument meanings:
+    # $1 = "remove": package is being removed/uninstalled
+    # $1 = "upgrade": package is being upgraded
+    
+    if [ "$1" = "remove" ]; then
+        log "Detected package removal/uninstallation (DPKG)"
+        SHOULD_STOP_SERVICE=true
+    else
+        log "Detected package upgrade - removing old version (DPKG)"
+        log "Service will remain running during upgrade"
+    fi
+    
+else
+    log "Unknown package manager - assuming removal"
+    SHOULD_STOP_SERVICE=true
 fi
+
+# Stop and disable service only during actual uninstall (not upgrades)
+if [ "$SHOULD_STOP_SERVICE" = "true" ]; then
+    log "Stopping and disabling CM service"
+    
+    # Check current service status before stopping
+    if systemctl is-active --quiet ${CM_SERVICE}; then
+        SERVICE_UPTIME=$(systemctl show ${CM_SERVICE} -p ActiveEnterTimestamp --value 2>/dev/null)
+        log "Service is currently active since: ${SERVICE_UPTIME}"
+        
+        log "Stopping CM service"
+        systemctl stop ${CM_SERVICE}
+        STOP_EXIT_CODE=$?
+        log "Service stop completed with exit code: ${STOP_EXIT_CODE}"
+        
+        # Verify service stopped
+        sleep 1
+        if systemctl is-active --quiet ${CM_SERVICE}; then
+            log "Warning: Service still appears to be active after stop command"
+        else
+            log "Service successfully stopped"
+        fi
+    else
+        log "Service is not currently active"
+    fi
+    
+    # Check if service is enabled before disabling
+    SERVICE_ENABLED=$(systemctl is-enabled ${CM_SERVICE} 2>/dev/null || echo "unknown")
+    log "Service enabled status: ${SERVICE_ENABLED}"
+    
+    if [ "${SERVICE_ENABLED}" = "enabled" ]; then
+        log "Disabling CM service"
+        systemctl disable ${CM_SERVICE}
+        DISABLE_EXIT_CODE=$?
+        log "Service disable completed with exit code: ${DISABLE_EXIT_CODE}"
+    else
+        log "Service is not enabled, skipping disable"
+    fi
+    
+    # Log installation information for troubleshooting
+    if [ -d "${CM_DIR}" ]; then
+        INSTALL_SIZE=$(du -sh "${CM_DIR}" 2>/dev/null | cut -f1 || echo "unknown")
+        FILE_COUNT=$(find "${CM_DIR}" -type f 2>/dev/null | wc -l)
+        log "Installation directory size: ${INSTALL_SIZE}"
+        log "Total files in installation: ${FILE_COUNT}"
+    else
+        log "Installation directory not found: ${CM_DIR}"
+    fi
+    
+    log "Service cleanup completed for uninstallation"
+    
+else
+    log "Old package version being replaced during upgrade process"
+    
+    # During upgrade, we might want to log current service status for debugging
+    if systemctl is-active --quiet ${CM_SERVICE}; then
+        SERVICE_MEMORY=$(systemctl show ${CM_SERVICE} -p MemoryCurrent --value 2>/dev/null)
+        log "Current service memory usage: ${SERVICE_MEMORY} bytes"
+        SERVICE_PID=$(systemctl show ${CM_SERVICE} -p MainPID --value 2>/dev/null)
+        log "Current service PID: ${SERVICE_PID}"
+    fi
+fi
+
+log "Preuninstall operations completed"
 exit 0
