@@ -6,12 +6,8 @@ CM_DIR="${PREFIX}/cloudmanagement"
 
 # Function to log messages
 log() {
-    # Use double percent signs to escape RPM macros
-    if command -v rpm &>/dev/null; then
-        local timestamp=$(date '+%%Y-%%m-%%d %%H:%%M:%%S')
-    else
-        local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    fi
+    # Use double percent signs to work with both RPM and Debian
+    local timestamp=$(date '+%%Y-%%m-%%d %%H:%%M:%%S')
     # Remove any OURCE suffix that might appear
     timestamp=${timestamp%OURCE}
     echo "[${timestamp}] [PREUNINSTALL] $*"
