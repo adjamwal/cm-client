@@ -10,16 +10,11 @@ CM_PACKAGE_ID="cisco-secure-client-cloudmanagement-client"
 
 # Function to log messages
 log() {
-    # Detect if running inside RPM build environment by checking for RPM_BUILD_ROOT or similar env var
-    if [ -n "$RPM_BUILD_ROOT" ] || command -v rpm &>/dev/null; then
-        # Use double %% to escape RPM macro parsing
-        local timestamp=$(date '+%%Y-%%m-%%d %%H:%%M:%%S' 2>/dev/null || date '+%%F %%T')
-    else
-        # Normal date format for non-RPM systems
-        local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    fi
-    # Remove any OURCE suffix that might appear
-    timestamp=${timestamp%OURCE*}
+    # Get epoch seconds and convert to readable format with seconds (Linux only)
+    local epoch=$(date +%s)
+    local datetime=$(date -d "@${epoch}" '+%Y-%m-%d %H:%M')
+    local seconds=$((epoch % 60))
+    local timestamp="${datetime}:$(printf '%02d' ${seconds})"
     echo "[${timestamp}] [PREINSTALL] $*"
 }
 
