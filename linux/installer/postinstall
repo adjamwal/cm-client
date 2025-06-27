@@ -39,6 +39,21 @@ if command -v rpm &>/dev/null; then
         rpm -qi ${LATEST_PACKAGE} 2>/dev/null | while read line; do
             log "  $line"
         done
+        
+        # List all files installed by the package
+        log "Files installed by package (rpm -ql):"
+        rpm -ql ${CM_PACKAGE_ID} 2>/dev/null | while read file; do
+            if [ -f "${file}" ]; then
+                FILE_SIZE=$(stat -c %s "${file}" 2>/dev/null || echo "unknown")
+                FILE_PERMS=$(stat -c %a "${file}" 2>/dev/null || echo "unknown")
+                log "  ${file} (${FILE_SIZE} bytes, perms: ${FILE_PERMS})"
+            elif [ -d "${file}" ]; then
+                DIR_PERMS=$(stat -c %a "${file}" 2>/dev/null || echo "unknown")
+                log "  ${file}/ (directory, perms: ${DIR_PERMS})"
+            else
+                log "  ${file} (missing or special file)"
+            fi
+        done
     else
         log "  Package not found in RPM database"
     fi
@@ -46,6 +61,21 @@ elif command -v dpkg &>/dev/null; then
     log "Current package information from dpkg -s:"
     dpkg -s ${CM_PACKAGE_ID} 2>/dev/null | while read line; do
         log "  $line"
+    done
+    
+    # List all files installed by the package
+    log "Files installed by package (dpkg -L):"
+    dpkg -L ${CM_PACKAGE_ID} 2>/dev/null | while read file; do
+        if [ -f "${file}" ]; then
+            FILE_SIZE=$(stat -c %s "${file}" 2>/dev/null || echo "unknown")
+            FILE_PERMS=$(stat -c %a "${file}" 2>/dev/null || echo "unknown")
+            log "  ${file} (${FILE_SIZE} bytes, perms: ${FILE_PERMS})"
+        elif [ -d "${file}" ]; then
+            DIR_PERMS=$(stat -c %a "${file}" 2>/dev/null || echo "unknown")
+            log "  ${file}/ (directory, perms: ${DIR_PERMS})"
+        else
+            log "  ${file} (missing or special file)"
+        fi
     done
 fi
 
