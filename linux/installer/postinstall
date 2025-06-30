@@ -8,7 +8,7 @@ TMP_DIR="${PREFIX}/tmp"
 BOOTSTRAP_FILE="bs.json"
 CONFIG_FILE="cm_config.json"
 
-# Function to log messages
+# Function to log messages 
 log() {
     # Get epoch seconds and convert to readable format with seconds (Linux only)
     local epoch=$(date +%s)
@@ -18,11 +18,7 @@ log() {
     echo "[${timestamp}] [POSTINSTALL] $*"
 }
 
-log "Postinstall script started with PID: $$"
-log "Current user: $(whoami)"
-log "Script started at: $(date)"
-log "Parent process: $(ps -o comm= -p $PPID 2>/dev/null || echo 'unknown')"
-log "System load at start: $(cat /proc/loadavg 2>/dev/null || echo 'unknown')"
+log "Postinstall script started"
 
 # Get installed version from binary
 CM_BINARY="${CM_DIR}/bin/${CM_SERVICE}"
@@ -92,267 +88,85 @@ else
 fi
 
 if [ -f "${CM_BINARY}" ]; then
-    log "Binary file found, extracting version information"
-    
-    # Keep only essential binary info not covered by package info
-    BINARY_PERMS=$(stat -c %a "${CM_BINARY}" 2>/dev/null || stat -f %A "${CM_BINARY}")
-    log "Binary permissions: ${BINARY_PERMS}"
-    BINARY_OWNER=$(stat -c %U:%G "${CM_BINARY}" 2>/dev/null || stat -f %Su:%Sg "${CM_BINARY}")
-    log "Binary owner: ${BINARY_OWNER}"
-    
-    # Check if binary is executable
-    if [ -x "${CM_BINARY}" ]; then
-        log "Binary is executable"
-        # Try to get version from binary itself (if it supports --version)
-        BINARY_VERSION_OUTPUT=$(timeout 5 "${CM_BINARY}" --version 2>/dev/null || echo "No version flag supported")
-        log "Binary version output: ${BINARY_VERSION_OUTPUT}"
-    else
-        log "Binary is not executable"
-    fi
-    
     CM_VERSION=$(strings "${CM_BINARY}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-    log "Version extraction attempt completed"
-    
     if [ -n "${CM_VERSION}" ]; then
         log "Installed version: ${CM_VERSION}"
-        log "Binary path: ${CM_BINARY}"
-        log "Version extracted successfully using strings command"
-        
-        # Keep MD5 and file type for verification
-        BINARY_MD5=$(md5sum "${CM_BINARY}" 2>/dev/null | cut -d' ' -f1 || md5 -q "${CM_BINARY}")
-        log "Binary MD5 checksum: ${BINARY_MD5}"
-        BINARY_TYPE=$(file "${CM_BINARY}" 2>/dev/null)
-        log "Binary file type: ${BINARY_TYPE}"
-        
     else
-        CM_VERSION=""
         log "Version extraction failed - no version string found in binary"
-        
-        # Try alternative version extraction methods
-        VERSION_STRINGS=$(strings "${CM_BINARY}" 2>/dev/null | grep -i version | head -3)
-        if [ -n "${VERSION_STRINGS}" ]; then
-            log "Alternative version strings found: ${VERSION_STRINGS}"
-        fi
     fi
 else
-    CM_VERSION=""
     log "Binary not found at path: ${CM_BINARY}"
-    log "Binary file missing - possible installation issue"
-    
-    # Check if directory exists
-    if [ -d "${CM_DIR}/bin" ]; then
-        BIN_FILES=$(find "${CM_DIR}/bin" -type f 2>/dev/null)
-        log "Files in bin directory: ${BIN_FILES}"
-    fi
 fi
 
 # Get previous version from saved file
 PREV_VERSION=""
-log "Checking for previous version information"
-log "Looking for version file at: ${TMP_DIR}/cm_previous_version"
-
 if [ -f "${TMP_DIR}/cm_previous_version" ]; then
     PREV_VERSION=$(cat "${TMP_DIR}/cm_previous_version" 2>/dev/null)
-    log "Read previous version from backup: ${PREV_VERSION}"
-    log "Previous version file found and read successfully"
-    log "Version file content: '${PREV_VERSION}'"
-    
-    VERSION_FILE_SIZE=$(stat -c %s "${TMP_DIR}/cm_previous_version" 2>/dev/null || stat -f %z "${TMP_DIR}/cm_previous_version")
-    log "Version file size: ${VERSION_FILE_SIZE} bytes"
-else
-    log "No previous version file found"
-    log "Previous version file missing - likely fresh installation"
-    log "File not found at expected location"
+    log "Previous version: ${PREV_VERSION}"
 fi
 
-# Determine installation type early
+# Determine installation type
 if [[ -n "${PREV_VERSION}" && "${PREV_VERSION}" != "None" && "${PREV_VERSION}" != "" ]]; then
-    log "This is an upgrade installation - previous version: ${PREV_VERSION}"
+    log "This is an upgrade installation"
 else
     log "This is a fresh installation"
 fi
 
 # Restore configuration files if available
-log "Configuration restoration phase started"
-
 if [[ -d "${TMP_DIR}" ]]; then
-    BACKUP_COUNT=$(find "${TMP_DIR}" -type f | wc -l)
-    log "Found backup directory with ${BACKUP_COUNT} files"
-    log "Backup directory exists, proceeding with restoration"
-    log "Backup directory path: ${TMP_DIR}"
-    
     # Restore bootstrap file
-    log "Attempting to restore bootstrap configuration"
     if [ -f "${TMP_DIR}/${BOOTSTRAP_FILE}" ]; then
-        BOOTSTRAP_BACKUP_SIZE=$(du -h "${TMP_DIR}/${BOOTSTRAP_FILE}" 2>/dev/null | cut -f1)
-        log "Bootstrap backup file size: ${BOOTSTRAP_BACKUP_SIZE}"
-        
         cp -f "${TMP_DIR}/${BOOTSTRAP_FILE}" "${ETC_DIR}"
         log "Restored ${BOOTSTRAP_FILE} from backup"
-        
-        RESTORED_BOOTSTRAP_PERMS=$(stat -c %a "${ETC_DIR}/${BOOTSTRAP_FILE}" 2>/dev/null || stat -f %A "${ETC_DIR}/${BOOTSTRAP_FILE}")
-        log "Restored bootstrap file permissions: ${RESTORED_BOOTSTRAP_PERMS}"
-    else
-        log "${BOOTSTRAP_FILE} not found in backup"
-        log "Bootstrap file not available for restoration"
-        log "Expected file not found: ${TMP_DIR}/${BOOTSTRAP_FILE}"
     fi
     
     # Restore config file
-    log "Attempting to restore CM configuration"
     if [ -f "${TMP_DIR}/${CONFIG_FILE}" ]; then
-        CONFIG_BACKUP_SIZE=$(du -h "${TMP_DIR}/${CONFIG_FILE}" 2>/dev/null | cut -f1)
-        log "Config backup file size: ${CONFIG_BACKUP_SIZE}"
-        
         cp -f "${TMP_DIR}/${CONFIG_FILE}" "${ETC_DIR}"
         log "Restored ${CONFIG_FILE} from backup"
-        
-        RESTORED_CONFIG_LINES=$(wc -l < "${ETC_DIR}/${CONFIG_FILE}" 2>/dev/null)
-        log "Restored config file line count: ${RESTORED_CONFIG_LINES}"
-    else
-        log "${CONFIG_FILE} not found in backup"
-        log "Config file not available for restoration"
-        log "Expected file not found: ${TMP_DIR}/${CONFIG_FILE}"
     fi
 
-    log "Cleaning up backup directory"
     rm -rf "${TMP_DIR}"
-    log "Cleaned up temporary directory"
-else
-    log "No backup directory found"
-    log "Backup directory missing - no configuration to restore"
-    log "Directory not found: ${TMP_DIR}"
 fi
 
 # Configure and start the service
 log "Configuring system services"
-log "Service configuration phase started"
-log "Target service: ${CM_SERVICE}"
 
-# Check systemd version and status
-SYSTEMD_VERSION=$(systemctl --version 2>/dev/null | head -1 | awk '{print $2}' || echo "unknown")
-log "Systemd version: ${SYSTEMD_VERSION}"
-
-log "Reloading systemd daemon"
 systemctl daemon-reload
 DAEMON_RELOAD_EXIT=$?
-log "systemctl daemon-reload completed with exit code: ${DAEMON_RELOAD_EXIT}"
-
-# Check if service unit file exists
-SERVICE_UNIT_PATH="/etc/systemd/system/${CM_SERVICE}.service"
-if [ -f "${SERVICE_UNIT_PATH}" ]; then
-    log "Service unit file found at: ${SERVICE_UNIT_PATH}"
-    UNIT_FILE_SIZE=$(stat -c %s "${SERVICE_UNIT_PATH}" 2>/dev/null || echo "unknown")
-    log "Unit file size: ${UNIT_FILE_SIZE} bytes"
-else
-    # Check alternative locations
-    SYSTEM_UNIT_PATH="/usr/lib/systemd/system/${CM_SERVICE}.service"
-    if [ -f "${SYSTEM_UNIT_PATH}" ]; then
-        log "Service unit file found at: ${SYSTEM_UNIT_PATH}"
-    else
-        log "Service unit file not found in standard locations"
-    fi
+if [ ${DAEMON_RELOAD_EXIT} -ne 0 ]; then
+    log "systemctl daemon-reload failed with exit code: ${DAEMON_RELOAD_EXIT}"
 fi
 
-log "Enabling service for auto-start"
 systemctl enable ${CM_SERVICE}
 ENABLE_EXIT_CODE=$?
-log "Enabled service: ${CM_SERVICE}"
-log "systemctl enable completed with exit code: ${ENABLE_EXIT_CODE}"
+if [ ${ENABLE_EXIT_CODE} -ne 0 ]; then
+    log "systemctl enable failed with exit code: ${ENABLE_EXIT_CODE}"
+fi
 
-# Get detailed service information
-SERVICE_UNIT_FILE=$(systemctl show ${CM_SERVICE} -p FragmentPath --value 2>/dev/null)
-log "Service unit file: ${SERVICE_UNIT_FILE}"
-SERVICE_MAIN_PID=$(systemctl show ${CM_SERVICE} -p MainPID --value 2>/dev/null)
-log "Service main PID: ${SERVICE_MAIN_PID}"
-SERVICE_TYPE=$(systemctl show ${CM_SERVICE} -p Type --value 2>/dev/null)
-log "Service type: ${SERVICE_TYPE}"
-SERVICE_RESTART_POLICY=$(systemctl show ${CM_SERVICE} -p Restart --value 2>/dev/null)
-log "Service restart policy: ${SERVICE_RESTART_POLICY}"
-
-log "Checking current service status"
 INITIAL_SERVICE_STATUS=$(systemctl is-active ${CM_SERVICE} 2>/dev/null || echo "inactive")
-log "Initial service status: ${INITIAL_SERVICE_STATUS}"
 
 if systemctl is-active --quiet ${CM_SERVICE}; then
     log "Service is currently active, performing restart"
-    
-    # Get pre-restart metrics
-    PRE_RESTART_MEMORY=$(systemctl show ${CM_SERVICE} -p MemoryCurrent --value 2>/dev/null)
-    log "Memory usage before restart: ${PRE_RESTART_MEMORY} bytes"
-    
     systemctl restart ${CM_SERVICE}
     RESTART_EXIT_CODE=$?
-    log "Service restarted with exit code: ${RESTART_EXIT_CODE}"
+    if [ ${RESTART_EXIT_CODE} -ne 0 ]; then
+        log "Service restart failed with exit code: ${RESTART_EXIT_CODE}"
+    fi
 else
     log "Service is not active, performing start"
     systemctl start ${CM_SERVICE}
     START_EXIT_CODE=$?
-    log "Service started with exit code: ${START_EXIT_CODE}"
+    if [ ${START_EXIT_CODE} -ne 0 ]; then
+        log "Service start failed with exit code: ${START_EXIT_CODE}"
+    fi
 fi
 
-# Wait a moment for service to stabilize and collect metrics
+# Wait for service to stabilize
 sleep 2
-NEW_SERVICE_PID=$(systemctl show ${CM_SERVICE} -p MainPID --value 2>/dev/null)
-log "Service PID after start/restart: ${NEW_SERVICE_PID}"
-SERVICE_MEMORY=$(systemctl show ${CM_SERVICE} -p MemoryCurrent --value 2>/dev/null)
-log "Service memory usage: ${SERVICE_MEMORY} bytes"
-SERVICE_STATUS_DETAILED=$(systemctl status ${CM_SERVICE} --no-pager -l 2>/dev/null | head -10)
-log "Detailed service status: ${SERVICE_STATUS_DETAILED}"
-
-# Check if service is listening on expected ports (if applicable)
-if command -v netstat >/dev/null 2>&1; then
-    LISTENING_PORTS=$(netstat -tlnp 2>/dev/null | grep "${NEW_SERVICE_PID}" | awk '{print $4}' || echo "none")
-    log "Service listening ports: ${LISTENING_PORTS}"
-fi
-
-# Check service logs for any immediate errors
-SERVICE_LOGS=$(journalctl -u ${CM_SERVICE} --lines=5 --no-pager 2>/dev/null | tail -3 || echo "no logs available")
-log "Recent service logs: ${SERVICE_LOGS}"
-
-log "Installation completed successfully"
-log "All service operations completed successfully"
+SERVICE_STATUS=$(systemctl is-active ${CM_SERVICE} 2>/dev/null || echo "active")
 
 # Installation summary
-SERVICE_STATUS=$(systemctl is-active ${CM_SERVICE} 2>/dev/null || echo "active")
-log "Generating installation summary"
-log "Final service status: ${SERVICE_STATUS}"
-
-log "--- System Information ---"
-log "OS: $(cat /etc/os-release | grep PRETTY_NAME | cut -d'"' -f2)"
-log "Kernel: $(uname -r)"
-log "Architecture: $(uname -m)"
-
-log "System uptime: $(uptime)"
-log "Available memory: $(free -h | grep '^Mem:' | awk '{print $7}')"
-log "Disk space on root: $(df -h / | tail -1 | awk '{print $4}')"
-
-log "System load average: $(cat /proc/loadavg)"
-log "Number of CPU cores: $(nproc)"
-log "System timezone: $(date +%Z 2>/dev/null || cat /etc/timezone 2>/dev/null || echo 'unknown')"
-
-log "--- Service Information ---"
-log "Service status: ${SERVICE_STATUS}"
-log "Service enabled: $(systemctl is-enabled ${CM_SERVICE} 2>/dev/null || echo "unknown")"
-
-SERVICE_START_TIME=$(systemctl show ${CM_SERVICE} -p ActiveEnterTimestamp --value 2>/dev/null)
-log "Service start time: ${SERVICE_START_TIME}"
-SERVICE_RESTART_COUNT=$(systemctl show ${CM_SERVICE} -p NRestarts --value 2>/dev/null)
-log "Service restart count: ${SERVICE_RESTART_COUNT}"
-
-log "--- Installation Information ---"
-log "Installation directory: ${CM_DIR}"
-log "Configuration directory: ${ETC_DIR}"
-
-TOTAL_INSTALL_SIZE=$(du -sh "${CM_DIR}" 2>/dev/null | cut -f1)
-log "Total installation size: ${TOTAL_INSTALL_SIZE}"
-CONFIG_FILE_COUNT=$(find "${ETC_DIR}" -type f 2>/dev/null | wc -l)
-log "Configuration files count: ${CONFIG_FILE_COUNT}"
-BINARY_COUNT=$(find "${CM_DIR}/bin" -type f -executable 2>/dev/null | wc -l)
-log "Executable files count: ${BINARY_COUNT}"
-
-log "-------------------------"
-
 log "=== Installation Summary ==="
 log "Installed version: ${CM_VERSION}"
 
@@ -366,11 +180,5 @@ log "Service status: ${SERVICE_STATUS}"
 log "Installation directory: ${CM_DIR}"
 log "=== End of Summary ==="
 
-log "Installation summary generation completed"
-log "Script execution completed at: $(date)"
-FINAL_MEMORY=$(free -m 2>/dev/null | grep '^Mem:' | awk '{print $3"/"$2" MB"}' || echo 'unknown')
-log "Final memory usage: ${FINAL_MEMORY}"
-FINAL_LOAD=$(cat /proc/loadavg 2>/dev/null || echo 'unknown')
-log "Final system load: ${FINAL_LOAD}"
-
+log "Installation completed successfully"
 exit 0
