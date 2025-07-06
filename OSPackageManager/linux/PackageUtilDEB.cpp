@@ -25,32 +25,57 @@ namespace { //anonymous namespace
     
     // Extract package name and version from DEB file
     std::string extractPackageNameVersion(const std::string& packagePath, ICommandExec& commandExecutor) {
-        // Try to query the package name and version from the DEB file
-        std::vector<std::string> queryArgv = {dpkgBinStr, "-f", packagePath, "Package,Version"};
-        int exitCode = 0;
-        std::string packageNameVersion;
+        PM_LOG_DEBUG("Extracting package name and version from: %s", packagePath.c_str());
         
-        int ret = commandExecutor.ExecuteCommandCaptureOutput(dpkgBinStr, queryArgv, exitCode, packageNameVersion);
-        if (ret == 0 && exitCode == 0 && !packageNameVersion.empty()) {
-            // Parse output and format as name_version
-            std::stringstream ss(packageNameVersion);
-            std::string line;
+        // Try to query the package name and version from the DEB file
+        std::vector<std::string> queryArgv = {"/usr/bin/dpkg-deb", "-f", packagePath};
+        int exitCode = 0;
+        std::string dpkgOutput;
+        
+        int ret = commandExecutor.ExecuteCommandCaptureOutput("/usr/bin/dpkg-deb", queryArgv, exitCode, dpkgOutput);
+        PM_LOG_DEBUG("dpkg-deb command result: ret=%d, exitCode=%d, output length=%zu", ret, exitCode, dpkgOutput.length());
+        PM_LOG_DEBUG("dpkg-deb output: %s", dpkgOutput.c_str());
+        
+        if (ret == 0 && exitCode == 0 && !dpkgOutput.empty()) {
+            // Parse the output to extract name and version
             std::string packageName, version;
+            std::istringstream iss(dpkgOutput);
+            std::string line;
             
-            while (std::getline(ss, line)) {
+            while (std::getline(iss, line)) {
+                PM_LOG_DEBUG("Parsing line: %s", line.c_str());
                 if (line.find("Package: ") == 0) {
-                    packageName = line.substr(9);
+                    packageName = line.substr(9); // Remove "Package: "
+                    PM_LOG_DEBUG("Found package name: %s", packageName.c_str());
                 } else if (line.find("Version: ") == 0) {
-                    version = line.substr(9);
+                    version = line.substr(9); // Remove "Version: "
+                    PM_LOG_DEBUG("Found version: %s", version.c_str());
                 }
             }
             
             if (!packageName.empty() && !version.empty()) {
-                return packageName + "_" + version;
+                // Trim whitespace
+                packageName.erase(packageName.find_last_not_of(" \n\r\t") + 1);
+                version.erase(version.find_last_not_of(" \n\r\t") + 1);
+                
+                // Clean up version by removing build suffixes (e.g., "5.7.0-1.linux" -> "5.7.0")
+                size_t dashPos = version.find('-');
+                if (dashPos != std::string::npos) {
+                    version = version.substr(0, dashPos);
+                }
+                
+                std::string result = packageName + "_" + version;
+                PM_LOG_DEBUG("Successfully extracted package name_version: %s", result.c_str());
+                return result;
+            } else {
+                PM_LOG_DEBUG("Failed to extract package name or version from dpkg-deb output");
             }
+        } else {
+            PM_LOG_DEBUG("dpkg-deb command failed or returned empty output");
         }
         
         // Fallback: extract from filename if DEB query fails
+        PM_LOG_DEBUG("Using filename fallback for package path: %s", packagePath.c_str());
         size_t lastSlash = packagePath.find_last_of("/\\");
         std::string filename = (lastSlash != std::string::npos) ? 
                               packagePath.substr(lastSlash + 1) : packagePath;
@@ -61,6 +86,7 @@ namespace { //anonymous namespace
             filename = filename.substr(0, extPos);
         }
         
+        PM_LOG_DEBUG("Fallback filename result: %s", filename.c_str());
         return filename;
     }
     
@@ -201,6 +227,9 @@ std::vector<std::string> PackageUtilDEB::listPackageFiles(const PKG_ID_TYPE& ide
 bool PackageUtilDEB::installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions) const {
     (void) installOptions; // Currently this is of no use.
     
+    // Build tracking log to confirm we're using the latest version
+    PM_LOG_INFO("[BUILD_TRACK] PackageUtilDEB::installPackage - Version with debug logs and dpkg-deb fixes - 2025-07-05-16:09");
+    
     // Extract product name and version from DEB file for logging
     std::string packageNameVersion = extractPackageNameVersion(packagePath, commandExecutor_);
     std::string logFileName = packageNameVersion;
@@ -208,21 +237,26 @@ bool PackageUtilDEB::installPackage(const std::string& packagePath, const std::m
     
     PM_LOG_INFO("Installing package %s, logs will be saved to %s", packagePath.c_str(), logFilePath.c_str());
 
-    // Execute installation command
-    std::vector<std::string> installArgv = {dpkgBinStr, dpkgInstallPkgOption, "--verbose", packagePath};
+    // Execute installation command (using shell to capture stderr)
+    std::string installCmd = std::string(dpkgBinStr) + " " + dpkgInstallPkgOption + " --force-depends --force-confold '" + packagePath + "' 2>&1";
+    std::vector<std::string> installArgv = {"/bin/sh", "-c", installCmd};
     int exitCode = 0;
     std::string dpkgOutput;
 
-    int ret = commandExecutor_.ExecuteCommandCaptureOutput(dpkgBinStr, installArgv, exitCode, dpkgOutput);
+    PM_LOG_DEBUG("Executing dpkg command with shell: %s", installCmd.c_str());
+    int ret = commandExecutor_.ExecuteCommandCaptureOutput("/bin/sh", installArgv, exitCode, dpkgOutput);
     
-    // Always save the DPKG output to log file (success or failure)
+    PM_LOG_DEBUG("dpkg installation result: ret=%d, exitCode=%d, output length=%zu", ret, exitCode, dpkgOutput.length());
+    PM_LOG_DEBUG("dpkg installation output: %s", dpkgOutput.c_str());
+    
+    // Save the installation output to log file (matching RPM format)
     saveInstallerLog(logFilePath, dpkgOutput);
     
     if(ret != 0){
-        PM_LOG_ERROR("Failed to execute install package command.");
+        PM_LOG_ERROR("Failed to execute install package command. Return code: %d", ret);
         return false;
     } else if(exitCode != 0) {
-        PM_LOG_ERROR("Failed to install package. Exit code: %d", exitCode);
+        PM_LOG_ERROR("Failed to install package. Exit code: %d, Output: %s", exitCode, dpkgOutput.c_str());
         return false;
     }
     
