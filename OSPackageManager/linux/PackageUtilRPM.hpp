@@ -1,12 +1,15 @@
 #pragma once
 
 #include "IPackageUtil.hpp"
-#include "Gpg/include/IGpgUtil.hpp"
 #include "OSPackageManager/common/ICommandExec.hpp"
+#include "Gpg/include/IGpgUtil.hpp"
 #include <dlfcn.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmdb.h>
+
+// Forward declaration
+class IPmPlatformConfiguration;
 
 typedef int (*fpRpmReadConfigFiles_t)(const char*, const char*);
 typedef rpmts (*fpRpmTsCreate_t)(void);
@@ -28,6 +31,17 @@ public:
      * @brief Constructor to load librpm for RPM package operations.
      */
     PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil);
+    
+    /**
+     * @brief Constructor to load librpm for RPM package operations with platform configuration.
+     */
+    PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil, IPmPlatformConfiguration* platformConfig);
+
+    /**
+     * @brief Set platform configuration after construction.
+     * @param platformConfig Pointer to platform configuration interface
+     */
+    void setPlatformConfiguration(IPmPlatformConfiguration* platformConfig) override;
 
     /**
      * @brief Destructor to unload librpm for RPM package operations.
@@ -89,6 +103,7 @@ private:
 
     ICommandExec &commandExecutor_;
     IGpgUtil &gpgUtil_;
+    IPmPlatformConfiguration* platformConfig_;
 
     // Function pointers for librpm functions
     fpRpmReadConfigFiles_t fpRpmReadConfigFiles_ = nullptr;

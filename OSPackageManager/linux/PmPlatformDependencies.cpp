@@ -29,7 +29,11 @@ PmPlatformDependencies::PmPlatformDependencies()
                 std::make_shared<PackageManager::PmCertManager>(std::make_shared<PackageManager::PmCertRetrieverImpl>())
                 )},
         pmComponentManager_{PmPlatformComponentManager(pmPkgUtil_, std::make_shared<PackageManager::FileUtilities>())}
-{}
+{
+    // Set platform configuration on package utility after construction
+    // This enables catalog-based package name resolution
+    pmPkgUtil_->setPlatformConfiguration(&pmConfiguration_);
+}
 
 IPmPlatformConfiguration &PmPlatformDependencies::Configuration()
 {

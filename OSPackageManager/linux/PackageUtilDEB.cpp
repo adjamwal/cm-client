@@ -1,10 +1,14 @@
 #include "PackageUtilDEB.hpp"
 #include "PmLogger.hpp"
+#include "PackageManager/IPmPlatformConfiguration.h"
 #include <string.h>
 #include <fstream>
 #include <algorithm>
 #include <ctime>
 #include <filesystem>
+#include <json/json.h>
+#include <sstream>
+#include <curl/curl.h>
 
 namespace { //anonymous namespace
     const std::string debPackageInstaller {"deb"};
@@ -23,71 +27,166 @@ namespace { //anonymous namespace
         SIG_NOT_SIGNED = 4
     } SIG_STATUS; // based on the return code of dpkg-sig command
     
-    // Extract package name and version from DEB file
-    std::string extractPackageNameVersion(const std::string& packagePath, ICommandExec& commandExecutor) {
+    // Callback function for curl to write response data
+    static size_t WriteCallback(void *contents, size_t size, size_t nmemb, std::string *userp) {
+        userp->append((char*)contents, size * nmemb);
+        return size * nmemb;
+    }
+    
+    // Read package name from catalog server endpoint based on installer path or SHA
+    std::string getPackageNameFromCatalog(const std::string& packagePath, IPmPlatformConfiguration* platformConfig) {
+        if (!platformConfig) {
+            PM_LOG_ERROR("Platform configuration is null");
+            return "";
+        }
+        
+        // Get catalog URL from platform configuration
+        PmUrlList urls;
+        if (!platformConfig->GetPmUrls(urls)) {
+            PM_LOG_ERROR("Failed to get PM URLs from platform configuration");
+            return "";
+        }
+        
+        if (urls.catalogUrl.empty()) {
+            PM_LOG_ERROR("Catalog URL is empty in platform configuration");
+            return "";
+        }
+        
+        const std::string& catalogUrl = urls.catalogUrl;
+        PM_LOG_DEBUG("Using catalog URL from platform config: %s", catalogUrl.c_str());
+        
+        CURL *curl;
+        CURLcode res;
+        std::string catalogContent;
+        
+        curl = curl_easy_init();
+        if (!curl) {
+            PM_LOG_ERROR("Failed to initialize curl");
+            return "";
+        }
+        
+        curl_easy_setopt(curl, CURLOPT_URL, catalogUrl.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &catalogContent);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L); // 10 second timeout
+        
+        res = curl_easy_perform(curl);
+        curl_easy_cleanup(curl);
+        
+        if (res != CURLE_OK) {
+            PM_LOG_ERROR("Failed to fetch catalog from server: %s", curl_easy_strerror(res));
+            return "";
+        }
+        
+        if (catalogContent.empty()) {
+            PM_LOG_ERROR("Received empty catalog content from server");
+            return "";
+        }
+        
+        Json::Value root;
+        Json::CharReaderBuilder builder;
+        std::string parseErrors;
+        std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+        
+        if (!reader->parse(catalogContent.c_str(), catalogContent.c_str() + catalogContent.length(), &root, &parseErrors)) {
+            PM_LOG_ERROR("Failed to parse catalog JSON: %s", parseErrors.c_str());
+            return "";
+        }
+        
+        if (!root.isMember("packages") || !root["packages"].isArray()) {
+            PM_LOG_ERROR("Invalid catalog format: missing packages array");
+            return "";
+        }
+        
+        // Extract filename from package path for comparison
+        std::string packageFilename;
+        size_t lastSlash = packagePath.find_last_of("/\\");
+        if (lastSlash != std::string::npos) {
+            packageFilename = packagePath.substr(lastSlash + 1);
+        } else {
+            packageFilename = packagePath;
+        }
+        
+        // Also extract potential SHA from filename (remove .deb extension)
+        std::string potentialSha = packageFilename;
+        size_t dotPos = potentialSha.find_last_of(".");
+        if (dotPos != std::string::npos) {
+            potentialSha = potentialSha.substr(0, dotPos);
+        }
+        
+        // Search through packages in catalog
+        const Json::Value& packages = root["packages"];
+        for (const Json::Value& package : packages) {
+            if (package.isMember("installer_uri") && package.isMember("name")) {
+                std::string installerUri = package["installer_uri"].asString();
+                
+                // Extract filename from installer URI
+                size_t uriLastSlash = installerUri.find_last_of("/");
+                if (uriLastSlash != std::string::npos) {
+                    std::string catalogFilename = installerUri.substr(uriLastSlash + 1);
+                    
+                    // Match by filename first
+                    if (catalogFilename == packageFilename) {
+                        std::string catalogName = package["name"].asString();
+                        PM_LOG_DEBUG("Found catalog package name by filename match: %s for file: %s", catalogName.c_str(), packageFilename.c_str());
+                        return catalogName;
+                    }
+                }
+                
+                // If filename didn't match, try matching by SHA256
+                if (package.isMember("installer_sha256")) {
+                    std::string catalogSha = package["installer_sha256"].asString();
+                    if (catalogSha == potentialSha) {
+                        std::string catalogName = package["name"].asString();
+                        PM_LOG_DEBUG("Found catalog package name by SHA256 match: %s for SHA: %s", catalogName.c_str(), potentialSha.c_str());
+                        return catalogName;
+                    }
+                }
+            }
+        }
+        
+        PM_LOG_DEBUG("Package not found in catalog for file: %s (SHA: %s)", packageFilename.c_str(), potentialSha.c_str());
+        return "";
+    }
+    
+    // Extract package name and version from DEB file - CATALOG ONLY
+    // Try catalog first for consistency, fallback to DEB metadata if catalog unavailable
+    std::string extractPackageNameVersion(const std::string& packagePath, ICommandExec& commandExecutor, IPmPlatformConfiguration* platformConfig) {
         PM_LOG_DEBUG("Extracting package name and version from: %s", packagePath.c_str());
         
-        // Try to query the package name and version from the DEB file
-        std::vector<std::string> queryArgv = {"/usr/bin/dpkg-deb", "-f", packagePath};
+        std::string packageName;
+        
+        // FORCE catalog lookup - no fallback to DEB metadata
+        if (platformConfig == nullptr) {
+            PM_LOG_ERROR("Platform configuration is null - cannot perform catalog lookup");
+            return "";
+        }
+        
+        packageName = getPackageNameFromCatalog(packagePath, platformConfig);
+        if (packageName.empty()) {
+            PM_LOG_ERROR("REQUIRED catalog lookup failed for package: %s - no fallback allowed", packagePath.c_str());
+            return "";
+        }
+        
+        PM_LOG_DEBUG("Successfully got package name from catalog: %s", packageName.c_str());
+        
+        // Query package version from DEB file (still need this for version info)
+        std::vector<std::string> versionQueryArgv = {"/usr/bin/dpkg-deb", "-f", packagePath, "Version"};
         int exitCode = 0;
-        std::string dpkgOutput;
+        std::string packageVersion;
         
-        int ret = commandExecutor.ExecuteCommandCaptureOutput("/usr/bin/dpkg-deb", queryArgv, exitCode, dpkgOutput);
-        PM_LOG_DEBUG("dpkg-deb command result: ret=%d, exitCode=%d, output length=%zu", ret, exitCode, dpkgOutput.length());
-        PM_LOG_DEBUG("dpkg-deb output: %s", dpkgOutput.c_str());
-        
-        if (ret == 0 && exitCode == 0 && !dpkgOutput.empty()) {
-            // Parse the output to extract name and version
-            std::string packageName, version;
-            std::istringstream iss(dpkgOutput);
-            std::string line;
+        int ret = commandExecutor.ExecuteCommandCaptureOutput("/usr/bin/dpkg-deb", versionQueryArgv, exitCode, packageVersion);
+        if (ret == 0 && exitCode == 0 && !packageVersion.empty()) {
+            // Remove any trailing whitespace/newlines
+            packageVersion.erase(packageVersion.find_last_not_of(" \n\r\t") + 1);
             
-            while (std::getline(iss, line)) {
-                PM_LOG_DEBUG("Parsing line: %s", line.c_str());
-                if (line.find("Package: ") == 0) {
-                    packageName = line.substr(9); // Remove "Package: "
-                    PM_LOG_DEBUG("Found package name: %s", packageName.c_str());
-                } else if (line.find("Version: ") == 0) {
-                    version = line.substr(9); // Remove "Version: "
-                    PM_LOG_DEBUG("Found version: %s", version.c_str());
-                }
-            }
-            
-            if (!packageName.empty() && !version.empty()) {
-                // Trim whitespace
-                packageName.erase(packageName.find_last_not_of(" \n\r\t") + 1);
-                version.erase(version.find_last_not_of(" \n\r\t") + 1);
-                
-                // Clean up version by removing build suffixes (e.g., "5.7.0-1.linux" -> "5.7.0")
-                size_t dashPos = version.find('-');
-                if (dashPos != std::string::npos) {
-                    version = version.substr(0, dashPos);
-                }
-                
-                std::string result = packageName + "_" + version;
-                PM_LOG_DEBUG("Successfully extracted package name_version: %s", result.c_str());
-                return result;
-            } else {
-                PM_LOG_DEBUG("Failed to extract package name or version from dpkg-deb output");
-            }
+            std::string result = packageName + "_" + packageVersion;
+            PM_LOG_DEBUG("Successfully created package name_version from catalog: %s", result.c_str());
+            return result;
         } else {
-            PM_LOG_DEBUG("dpkg-deb command failed or returned empty output");
+            PM_LOG_ERROR("Failed to extract version from DEB file: %s", packagePath.c_str());
+            return ""; // Return empty string to indicate failure
         }
-        
-        // Fallback: extract from filename if DEB query fails
-        PM_LOG_DEBUG("Using filename fallback for package path: %s", packagePath.c_str());
-        size_t lastSlash = packagePath.find_last_of("/\\");
-        std::string filename = (lastSlash != std::string::npos) ? 
-                              packagePath.substr(lastSlash + 1) : packagePath;
-        
-        // Remove the .deb extension if present
-        size_t extPos = filename.rfind(".deb");
-        if (extPos != std::string::npos) {
-            filename = filename.substr(0, extPos);
-        }
-        
-        PM_LOG_DEBUG("Fallback filename result: %s", filename.c_str());
-        return filename;
     }
     
     // Save installer output to log file
@@ -150,7 +249,16 @@ namespace { //anonymous namespace
     }
 }
 
-PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor) : commandExecutor_( commandExecutor ) {
+PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor) : commandExecutor_( commandExecutor ), platformConfig_(nullptr) {
+}
+
+PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor, IPmPlatformConfiguration* platformConfig) : commandExecutor_( commandExecutor ), platformConfig_(platformConfig) {
+    PM_LOG_DEBUG("PackageUtilDEB constructed with platform configuration");
+}
+
+void PackageUtilDEB::setPlatformConfiguration(IPmPlatformConfiguration* platformConfig) {
+    platformConfig_ = platformConfig;
+    PM_LOG_DEBUG("Platform configuration set for PackageUtilDEB");
 }
 
 bool PackageUtilDEB::isValidInstallerType(const std::string &installerType) const {
@@ -231,7 +339,7 @@ bool PackageUtilDEB::installPackage(const std::string& packagePath, const std::m
     PM_LOG_INFO("[BUILD_TRACK] PackageUtilDEB::installPackage - Version with debug logs and dpkg-deb fixes - 2025-07-05-16:09");
     
     // Extract product name and version from DEB file for logging
-    std::string packageNameVersion = extractPackageNameVersion(packagePath, commandExecutor_);
+    std::string packageNameVersion = extractPackageNameVersion(packagePath, commandExecutor_, platformConfig_);
     std::string logFileName = packageNameVersion;
     std::string logFilePath = "/var/logs/cisco/secureclient/cloudmanagement/" + logFileName + ".log";
     
@@ -282,7 +390,8 @@ bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) cons
 }
 
 // NOTE: packagePath is expected to be the complete path to the debian package (e.g., "/home/Downloads/package-1.0.0-1.x86_64.deb")
-bool PackageUtilDEB::verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const {
+bool PackageUtilDEB::verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const {;
+    
     if (signerKeyID.empty()) {
         PM_LOG_ERROR("Invalid Signer key ID provided.");
         return false;

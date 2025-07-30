@@ -3,6 +3,9 @@
 #include "IPackageUtil.hpp"
 #include "OSPackageManager/common/ICommandExec.hpp"
 
+// Forward declaration
+class IPmPlatformConfiguration;
+
 /**
  * @brief A class that implements the 'PackageUtil' utility to perform package-related operations for DEB.
  * Implements the IPackageUtil interface.
@@ -11,9 +14,20 @@ class PackageUtilDEB : public IPackageUtil {
 public:
 
     /**
-     * @brief Constructor to load librpm for RPM package operations.
+     * @brief Constructor for DEB package operations.
      */
     PackageUtilDEB(ICommandExec &commandExecutor);
+    
+    /**
+     * @brief Constructor for DEB package operations with platform configuration.
+     */
+    PackageUtilDEB(ICommandExec &commandExecutor, IPmPlatformConfiguration* platformConfig);
+
+    /**
+     * @brief Set platform configuration after construction.
+     * @param platformConfig Pointer to platform configuration interface
+     */
+    void setPlatformConfiguration(IPmPlatformConfiguration* platformConfig) override;
 
     ~PackageUtilDEB() = default;
 
@@ -27,4 +41,5 @@ public:
 
 private:
     ICommandExec &commandExecutor_;
+    IPmPlatformConfiguration* platformConfig_;
 };
