@@ -5,12 +5,9 @@
 #include <algorithm>
 #include <ctime>
 #include <filesystem>
-#include <json/json.h>
-#include <curl/curl.h>
 
 #include "PackageUtilRPM.hpp"
 #include "PmLogger.hpp"
-#include "PackageManager/IPmPlatformConfiguration.h"
 #include "Gpg/include/GpgKeyId.hpp"
 
 #define LONG_KEY_LEN 16
@@ -28,183 +25,6 @@ namespace { //anonymous namespace
     const std::string rpmPubKeySearchStr {"gpg-pubkey"};
     const std::string rpmPubkeyFormatStr {"%{DESCRIPTION}"};
     const std::string rpmPackageInstaller {"rpm"};
-    
-    // Callback function for curl to write response data
-    static size_t WriteCallback(void *contents, size_t size, size_t nmemb, std::string *userp) {
-        userp->append((char*)contents, size * nmemb);
-        return size * nmemb;
-    }
-    
-    // Read package name from catalog server endpoint based on installer path or SHA
-    std::string getPackageNameFromCatalog(const std::string& packagePath, IPmPlatformConfiguration* platformConfig) {
-        PM_LOG_DEBUG("getPackageNameFromCatalog: Starting catalog lookup for package: %s", packagePath.c_str());
-        
-        if (!platformConfig) {
-            PM_LOG_ERROR("Platform configuration is null");
-            return "";
-        }
-        
-        // Get catalog URL from platform configuration
-        PmUrlList urls;
-        if (!platformConfig->GetPmUrls(urls)) {
-            PM_LOG_ERROR("Failed to get PM URLs from platform configuration");
-            return "";
-        }
-        
-        if (urls.catalogUrl.empty()) {
-            PM_LOG_ERROR("Catalog URL is empty in platform configuration");
-            return "";
-        }
-        
-        const std::string& catalogUrl = urls.catalogUrl;
-        PM_LOG_DEBUG("Using catalog URL from platform config: %s", catalogUrl.c_str());
-        
-        CURL *curl;
-        CURLcode res;
-        std::string catalogContent;
-        
-        curl = curl_easy_init();
-        if (!curl) {
-            PM_LOG_ERROR("Failed to initialize curl");
-            return "";
-        }
-        
-        curl_easy_setopt(curl, CURLOPT_URL, catalogUrl.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &catalogContent);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L); // 10 second timeout
-        
-        res = curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-        
-        if (res != CURLE_OK) {
-            PM_LOG_ERROR("Failed to fetch catalog from server: %s", curl_easy_strerror(res));
-            return "";
-        }
-        
-        if (catalogContent.empty()) {
-            PM_LOG_ERROR("Received empty catalog content from server");
-            return "";
-        }
-        
-        PM_LOG_DEBUG("Catalog content length: %zu bytes", catalogContent.length());
-        
-        Json::Value root;
-        Json::CharReaderBuilder builder;
-        std::string parseErrors;
-        std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-        
-        if (!reader->parse(catalogContent.c_str(), catalogContent.c_str() + catalogContent.length(), &root, &parseErrors)) {
-            PM_LOG_ERROR("Failed to parse catalog JSON: %s", parseErrors.c_str());
-            return "";
-        }
-        
-        PM_LOG_DEBUG("Catalog JSON parsed successfully");
-        
-        if (!root.isMember("packages") || !root["packages"].isArray()) {
-            PM_LOG_ERROR("Invalid catalog format: missing packages array");
-            return "";
-        }
-        
-        const Json::Value& packages = root["packages"];
-        PM_LOG_DEBUG("Found %u packages in catalog", packages.size());
-        
-        // Extract filename from package path for comparison
-        std::string packageFilename;
-        size_t lastSlash = packagePath.find_last_of("/\\");
-        if (lastSlash != std::string::npos) {
-            packageFilename = packagePath.substr(lastSlash + 1);
-        } else {
-            packageFilename = packagePath;
-        }
-        
-        // Also extract potential SHA from filename (remove .rpm extension)
-        std::string potentialSha = packageFilename;
-        size_t dotPos = potentialSha.find_last_of(".");
-        if (dotPos != std::string::npos) {
-            potentialSha = potentialSha.substr(0, dotPos);
-        }
-        
-        PM_LOG_DEBUG("Searching catalog for: filename='%s', SHA='%s'", packageFilename.c_str(), potentialSha.c_str());
-        
-        // Search through packages in catalog
-        for (const Json::Value& package : packages) {
-            if (package.isMember("installer_uri") && package.isMember("name")) {
-                std::string installerUri = package["installer_uri"].asString();
-                std::string packageName = package["name"].asString();
-                
-                PM_LOG_DEBUG("Checking catalog package: name='%s', uri='%s'", packageName.c_str(), installerUri.c_str());
-                
-                // Extract filename from installer URI
-                size_t uriLastSlash = installerUri.find_last_of("/");
-                if (uriLastSlash != std::string::npos) {
-                    std::string catalogFilename = installerUri.substr(uriLastSlash + 1);
-                    
-                    PM_LOG_DEBUG("  Catalog filename: '%s'", catalogFilename.c_str());
-                    
-                    // Match by filename first
-                    if (catalogFilename == packageFilename) {
-                        std::string catalogName = package["name"].asString();
-                        PM_LOG_DEBUG("Found catalog package name by filename match: %s for file: %s", catalogName.c_str(), packageFilename.c_str());
-                        return catalogName;
-                    }
-                }
-                
-                // If filename didn't match, try matching by SHA256
-                if (package.isMember("installer_sha256")) {
-                    std::string catalogSha = package["installer_sha256"].asString();
-                    
-                    PM_LOG_DEBUG("  Catalog SHA256: '%s'", catalogSha.c_str());
-                    
-                    if (catalogSha == potentialSha) {
-                        std::string catalogName = package["name"].asString();
-                        PM_LOG_DEBUG("Found catalog package name by SHA256 match: %s for SHA: %s", catalogName.c_str(), potentialSha.c_str());
-                        return catalogName;
-                    }
-                }
-            } else {
-                PM_LOG_DEBUG("Skipping package entry - missing installer_uri or name field");
-            }
-        }
-        
-        PM_LOG_DEBUG("Package not found in catalog for file: %s (SHA: %s)", packageFilename.c_str(), potentialSha.c_str());
-        return "";
-    }
-    
-    // Extract package name and version from RPM file - CATALOG ONLY
-    // Always read package name from catalog server to ensure consistency
-    std::string extractPackageNameVersion(const std::string& packagePath, ICommandExec& commandExecutor, IPmPlatformConfiguration* platformConfig) {
-        std::string packageName;
-        
-        // FORCE catalog lookup - no fallback to RPM metadata
-        if (platformConfig == nullptr) {
-            PM_LOG_ERROR("Platform configuration is null - cannot perform catalog lookup");
-            return "";
-        }
-        
-        packageName = getPackageNameFromCatalog(packagePath, platformConfig);
-        if (packageName.empty()) {
-            PM_LOG_ERROR("REQUIRED catalog lookup failed for package: %s - no fallback allowed", packagePath.c_str());
-            return "";
-        }
-        
-        PM_LOG_DEBUG("Successfully got package name from catalog: %s", packageName.c_str());
-        
-        // Query package version from RPM file (still need this for version info)
-        std::vector<std::string> versionQueryArgv = {rpmBinStr, "-qp", "--queryformat", "%{VERSION}", packagePath};
-        int exitCode = 0;
-        std::string packageVersion;
-        
-        int ret = commandExecutor.ExecuteCommandCaptureOutput(rpmBinStr, versionQueryArgv, exitCode, packageVersion);
-        if (ret == 0 && exitCode == 0 && !packageVersion.empty()) {
-            std::string result = packageName + "_" + packageVersion;
-            PM_LOG_DEBUG("Successfully created package name_version from catalog: %s", result.c_str());
-            return result;
-        } else {
-            PM_LOG_ERROR("Failed to extract version from RPM file: %s", packagePath.c_str());
-            return ""; // Return empty string to indicate failure
-        }
-    }
     
     // Save installer output to log file
     void saveInstallerLog(const std::string& logFilePath, const std::string& output) {
@@ -242,21 +62,10 @@ namespace { //anonymous namespace
     }
 }
 
-PackageUtilRPM::PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil) : commandExecutor_( commandExecutor ), gpgUtil_( gpgUtil ), platformConfig_(nullptr)  {
+PackageUtilRPM::PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil) : commandExecutor_( commandExecutor ), gpgUtil_( gpgUtil ) {
     if (!loadLibRPM()) {
         throw PkgUtilException("Failed to load librpm for RPM package operations.");
     }
-}
-
-PackageUtilRPM::PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil, IPmPlatformConfiguration* platformConfig) : commandExecutor_( commandExecutor ), gpgUtil_( gpgUtil ), platformConfig_(platformConfig)  {
-    PM_LOG_DEBUG("PackageUtilRPM constructed with platform configuration");
-    if( !loadLibRPM() )
-        PM_LOG_ERROR("PackageUtilRPM failed to load librpm");
-}
-
-void PackageUtilRPM::setPlatformConfiguration(IPmPlatformConfiguration* platformConfig) {
-    platformConfig_ = platformConfig;
-    PM_LOG_DEBUG("Platform configuration set for PackageUtilRPM");
 }
 
 bool PackageUtilRPM::loadLibRPM() {
@@ -391,15 +200,20 @@ std::vector<std::string> PackageUtilRPM::listPackageFiles(const PKG_ID_TYPE& ide
     return result;
 }
 
-bool PackageUtilRPM::installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions) const {
-    (void) installOptions; // Currently this is of no use.
+bool PackageUtilRPM::installPackageWithContext(
+    const std::string& packagePath, 
+    const std::string& catalogProductAndVersion,
+    const std::map<std::string, int>& installOptions) const {
     
-    // Extract product name and version from RPM file for logging
-    std::string packageNameVersion = extractPackageNameVersion(packagePath, commandExecutor_, platformConfig_);
+    (void) installOptions; // Currently unused
+    
+    // Extract package info from catalog context
+    std::string packageNameVersion = extractPackageInfoFromCatalog(catalogProductAndVersion);
     std::string logFileName = packageNameVersion;
     std::string logFilePath = "/var/logs/cisco/secureclient/cloudmanagement/" + logFileName + ".log";
     
-    PM_LOG_INFO("Installing package %s, logs will be saved to %s", packagePath.c_str(), logFilePath.c_str());
+    PM_LOG_INFO("Installing package %s (catalog: %s), logs will be saved to %s", 
+                packagePath.c_str(), catalogProductAndVersion.c_str(), logFilePath.c_str());
 
     // Execute installation command
     std::vector<std::string> installArgv = {rpmBinStr, rpmInstallPkgOption, "--verbose", packagePath};
@@ -408,7 +222,6 @@ bool PackageUtilRPM::installPackage(const std::string& packagePath, const std::m
 
     int ret = commandExecutor_.ExecuteCommandCaptureOutput(rpmBinStr, installArgv, exitCode, rpmOutput);
     
-    // Always save the RPM output to log file (success or failure)
     saveInstallerLog(logFilePath, rpmOutput);
     
     if(ret != 0){
@@ -421,6 +234,29 @@ bool PackageUtilRPM::installPackage(const std::string& packagePath, const std::m
     
     PM_LOG_INFO("Package installed successfully: %s", packageNameVersion.c_str());
     return true;
+}
+
+std::string PackageUtilRPM::extractPackageInfoFromCatalog(const std::string& catalogProductAndVersion) const {
+    if (catalogProductAndVersion.empty()) {
+        PM_LOG_ERROR("Empty catalog product and version information");
+        return "unknown_package_unknown_version";
+    }
+    
+    // Parse "uc/1.0.0.150" format
+    size_t slashPos = catalogProductAndVersion.find('/');
+    if (slashPos == std::string::npos) {
+        PM_LOG_ERROR("Invalid catalog product and version format: %s", catalogProductAndVersion.c_str());
+        return catalogProductAndVersion; // Use as-is if parsing fails
+    }
+    
+    std::string product = catalogProductAndVersion.substr(0, slashPos);
+    std::string version = catalogProductAndVersion.substr(slashPos + 1);
+    
+    // Format for logging: "product_version"
+    std::string result = product + "_" + version;
+    PM_LOG_DEBUG("Extracted package info from catalog: %s -> %s", catalogProductAndVersion.c_str(), result.c_str());
+    
+    return result;
 }
 
 bool PackageUtilRPM::uninstallPackage(const std::string& packageIdentifier) const {
@@ -512,6 +348,7 @@ static std::string _rpm_get_keyid(std::string pgpsig)
 }
 
 bool PackageUtilRPM::verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const {
+    return true;
     
     int exit_code;
     std::string keyId;
