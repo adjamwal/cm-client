@@ -242,8 +242,6 @@ bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) cons
 
 // NOTE: packagePath is expected to be the complete path to the debian package (e.g., "/home/Downloads/package-1.0.0-1.x86_64.deb")
 bool PackageUtilDEB::verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const {
-    return true;
-    
     if (signerKeyID.empty()) {
         PM_LOG_ERROR("Invalid Signer key ID provided.");
         return false;

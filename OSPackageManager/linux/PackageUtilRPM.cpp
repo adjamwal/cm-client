@@ -62,7 +62,7 @@ namespace { //anonymous namespace
     }
 }
 
-PackageUtilRPM::PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil) : commandExecutor_( commandExecutor ), gpgUtil_( gpgUtil ) {
+PackageUtilRPM::PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil) : commandExecutor_(commandExecutor), gpgUtil_(gpgUtil) {
     if (!loadLibRPM()) {
         throw PkgUtilException("Failed to load librpm for RPM package operations.");
     }
@@ -348,8 +348,6 @@ static std::string _rpm_get_keyid(std::string pgpsig)
 }
 
 bool PackageUtilRPM::verifyPackage(const std::string& packagePath, const std::string& signerKeyID) const {
-    return true;
-    
     int exit_code;
     std::string keyId;
     std::string pgpkey;
