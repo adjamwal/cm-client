@@ -1,4 +1,5 @@
 #include "PackageUtilDEB.hpp"
+#include "PmPlatformConfiguration.hpp"
 #include "PmLogger.hpp"
 #include <string.h>
 #include <fstream>
@@ -84,7 +85,8 @@ namespace { //anonymous namespace
     }
 }
 
-PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor) : commandExecutor_( commandExecutor ) {
+PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor, IPmPlatformConfiguration &platformConfig)
+    : commandExecutor_(commandExecutor), platformConfig_(platformConfig) {
 }
 
 bool PackageUtilDEB::isValidInstallerType(const std::string &installerType) const {
@@ -166,9 +168,8 @@ bool PackageUtilDEB::installPackageWithContext(
     (void) installOptions; // Currently unused
     
     // Extract package info from catalog context
-    std::string packageNameVersion = extractPackageInfoFromCatalog(catalogProductAndVersion);
-    std::string logFileName = packageNameVersion;
-    std::string logFilePath = "/var/logs/cisco/secureclient/cloudmanagement/" + logFileName + ".log";
+    std::string logFileName = extractPackageInfoFromCatalog(catalogProductAndVersion);
+    std::string logFilePath = static_cast<const PmPlatformConfiguration&>(platformConfig_).GetLogDirectory() + logFileName + ".log";
     
     PM_LOG_INFO("Installing package %s (catalog: %s), logs will be saved to %s", 
                 packagePath.c_str(), catalogProductAndVersion.c_str(), logFilePath.c_str());

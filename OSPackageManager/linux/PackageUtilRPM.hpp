@@ -3,6 +3,7 @@
 #include "IPackageUtil.hpp"
 #include "Gpg/include/IGpgUtil.hpp"
 #include "OSPackageManager/common/ICommandExec.hpp"
+#include "PackageManager/IPmPlatformConfiguration.h"
 #include <dlfcn.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
@@ -27,7 +28,7 @@ public:
     /**
      * @brief Constructor to load librpm for RPM package operations.
      */
-    PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil);
+    PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil, IPmPlatformConfiguration &platformConfig);
 
     /**
      * @brief Destructor to unload librpm for RPM package operations.
@@ -92,6 +93,7 @@ private:
 
     ICommandExec &commandExecutor_;
     IGpgUtil &gpgUtil_;
+    IPmPlatformConfiguration &platformConfig_;
 
     // Function pointers for librpm functions
     fpRpmReadConfigFiles_t fpRpmReadConfigFiles_ = nullptr;

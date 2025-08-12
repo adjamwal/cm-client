@@ -171,7 +171,7 @@ std::string PmPlatformConfiguration::GetInstallDirectory()
     return static_cast<std::string>(kCmidDaemonPath);
 }
 
-std::string PmPlatformConfiguration::GetLogDirectory()
+std::string PmPlatformConfiguration::GetLogDirectory() const
 {
     return static_cast<std::string>(kCmSharedLogPath);
 }

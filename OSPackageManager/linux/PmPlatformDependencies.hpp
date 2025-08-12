@@ -23,7 +23,7 @@ public:
 private:
     std::shared_ptr<IGpgUtil>   gpgUtil_;
     std::shared_ptr<ICommandExec> commandExec_;
+    PmPlatformConfiguration pmConfiguration_;     // Moved before pmPkgUtil_
     std::shared_ptr<IPackageUtil> pmPkgUtil_;
-    PmPlatformConfiguration pmConfiguration_;
     PmPlatformComponentManager pmComponentManager_;
 };

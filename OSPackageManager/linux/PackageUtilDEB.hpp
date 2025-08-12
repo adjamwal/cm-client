@@ -2,6 +2,7 @@
 
 #include "IPackageUtil.hpp"
 #include "OSPackageManager/common/ICommandExec.hpp"
+#include "PackageManager/IPmPlatformConfiguration.h"
 
 /**
  * @brief A class that implements the 'PackageUtil' utility to perform package-related operations for DEB.
@@ -13,7 +14,7 @@ public:
     /**
      * @brief Constructor for DEB package operations.
      */
-    PackageUtilDEB(ICommandExec &commandExecutor);
+    PackageUtilDEB(ICommandExec &commandExecutor, IPmPlatformConfiguration &platformConfig);
 
     ~PackageUtilDEB() = default;
 
@@ -39,6 +40,7 @@ public:
 
 private:
     ICommandExec &commandExecutor_;
+    IPmPlatformConfiguration &platformConfig_;
     
     /**
      * @brief Extracts package info from catalog context (e.g. "uc/1.0.0.150" -> "uc_1.0.0.150").

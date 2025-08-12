@@ -7,6 +7,7 @@
 #include <filesystem>
 
 #include "PackageUtilRPM.hpp"
+#include "PmPlatformConfiguration.hpp"
 #include "PmLogger.hpp"
 #include "Gpg/include/GpgKeyId.hpp"
 
@@ -62,7 +63,8 @@ namespace { //anonymous namespace
     }
 }
 
-PackageUtilRPM::PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil) : commandExecutor_(commandExecutor), gpgUtil_(gpgUtil) {
+PackageUtilRPM::PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil, IPmPlatformConfiguration &platformConfig)
+    : commandExecutor_(commandExecutor), gpgUtil_(gpgUtil), platformConfig_(platformConfig) {
     if (!loadLibRPM()) {
         throw PkgUtilException("Failed to load librpm for RPM package operations.");
     }
@@ -208,9 +210,8 @@ bool PackageUtilRPM::installPackageWithContext(
     (void) installOptions; // Currently unused
     
     // Extract package info from catalog context
-    std::string packageNameVersion = extractPackageInfoFromCatalog(catalogProductAndVersion);
-    std::string logFileName = packageNameVersion;
-    std::string logFilePath = "/var/logs/cisco/secureclient/cloudmanagement/" + logFileName + ".log";
+    std::string logFileName = extractPackageInfoFromCatalog(catalogProductAndVersion);
+    std::string logFilePath = static_cast<const PmPlatformConfiguration&>(platformConfig_).GetLogDirectory() + logFileName + ".log";
     
     PM_LOG_INFO("Installing package %s (catalog: %s), logs will be saved to %s", 
                 packagePath.c_str(), catalogProductAndVersion.c_str(), logFilePath.c_str());
