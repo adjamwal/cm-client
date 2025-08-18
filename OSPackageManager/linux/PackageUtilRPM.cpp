@@ -232,8 +232,7 @@ bool PackageUtilRPM::installPackageWithContext(
         PM_LOG_ERROR("Failed to install package. Exit code: %d", exitCode);
         return false;
     }
-    
-    PM_LOG_INFO("Package installed successfully: %s", packageNameVersion.c_str());
+    PM_LOG_INFO("Package installed successfully: %s", logFileName.c_str());
     return true;
 }
 

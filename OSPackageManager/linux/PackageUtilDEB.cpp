@@ -197,7 +197,7 @@ bool PackageUtilDEB::installPackageWithContext(
         return false;
     }
     
-    PM_LOG_INFO("Package installed successfully: %s", packageNameVersion.c_str());
+    PM_LOG_INFO("Package installed successfully: %s", logFileName.c_str());
     return true;
 }
 
