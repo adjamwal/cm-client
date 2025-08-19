@@ -185,13 +185,11 @@ PM_STATUS PmAgentController::killIfRunning()
         }
     }
 #elif __linux__
-    PM_STATUS status = PM_STATUS::PM_ERROR;
     auto pids =  pProcessWrapper_->getRunningProcesses();
     for (pid_t pid : pids) {
         std::string exeName;
         if (pProcessWrapper_->getProcessInfo(pid, exeName)) {
-            std::string exeNameString = exeName.c_str();
-            if(PM_AGENT_BINARY == exeNameString) {
+            if(PM_AGENT_BINARY == exeName) {
                 try {
                     pProcessWrapper_->kill(pid);
                     CM_LOG_DEBUG("Process name = [%s] with pid = [%d] terminated.", PM_AGENT_BINARY, pid );
