@@ -179,13 +179,16 @@ bool FakeProcessWrapper::getProcessInfo(pid_t pid, proc_bsdinfo* pProcInfo)
     return true;
 }
 #else
-bool FakeProcessWrapper::getProcessInfo(pid_t pid, void* pProcInfo)
+bool FakeProcessWrapper::getProcessInfo(pid_t pid, std::string& exeName)
 {
-    if (pProcInfo == nullptr)
+    if (m_processName.empty())
     {
         return false;
     }
-    return false;
+
+    exeName = m_processName;
+
+    return true;
 }
 #endif //__APPLE__
 
