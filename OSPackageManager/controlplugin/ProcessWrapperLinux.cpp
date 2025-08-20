@@ -14,7 +14,10 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <system_error>
-
+#include <dirent.h>
+#define PROC_DIR "/proc/"
+#define MAX_LENGTH 1024
+#define PATH_DELIMITER "/"
 namespace
 {
     const pid_t kInvalidPid = -1;
@@ -96,20 +99,54 @@ void ProcessWrapper::kill(pid_t pid)
 
 std::vector<pid_t> ProcessWrapper::getRunningProcesses()
 {
-    std::vector<pid_t> ret;
-
-    /** @todo Implement for Linux */
-
-    return ret;
+    std::vector<pid_t> pids;
+    DIR* pDir = opendir(PROC_DIR);
+    if (!pDir) {
+        CM_LOG_ERROR("Failed to open directory %s", PROC_DIR);
+        return pids;
+    }
+    struct dirent* pDirent = nullptr;
+    while ((pDirent = readdir(pDir)) != nullptr) {
+        if (strspn(pDirent->d_name, "0123456789") == strlen(pDirent->d_name)) {
+            pid_t pid = atoi(pDirent->d_name);
+            if (pid > 0) {
+                pids.push_back(pid);
+            }
+        }
+    }
+    closedir(pDir);
+    return pids;
 }
 
-bool ProcessWrapper::getProcessInfo(pid_t pid, void* pProcInfo)
+bool ProcessWrapper::getProcessInfo(pid_t pid, std::string& exeName)
 {
-    if (pProcInfo == nullptr)
-    {
+    // Buffer for storing the proc path and executable name
+    char szProcPath[MAX_LENGTH] = {0};
+    char szBuf[MAX_LENGTH] = {0};
+
+    // Construct the /proc/<pid>/exe path
+    snprintf(szProcPath, sizeof(szProcPath), "/proc/%d/exe", pid);
+
+    // Read the symbolic link to get the executable path
+    ssize_t len = readlink(szProcPath, szBuf, sizeof(szBuf) - 1);
+    if (len == -1) {
         return false;
     }
-    return false;
+    szBuf[len] = '\0'; // Null-terminate the path
+
+
+    // Convert the buffer to a std::string
+    std::string strProcessName = szBuf;
+
+    // Extract the process name by finding the last path delimiter
+    size_t nPos = strProcessName.find_last_of(PATH_DELIMITER);
+    if (nPos != std::string::npos) {
+        exeName = strProcessName.substr(nPos + 1);
+    } else {
+        exeName = strProcessName;
+    }
+
+    return true;
 }
 
 void ProcessWrapper::execv(const std::vector<char *>& processArgs)
