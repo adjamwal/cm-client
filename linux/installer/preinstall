@@ -20,62 +20,36 @@ log() {
 
 log "Installing Cisco Secure Client CM"
 
-# Detect package manager and check for previous installation
+# Check for existing installation and get package info
+INSTALLED_VERSION="None"
 if command -v rpm &>/dev/null; then
     log "Detected RPM-based system"
     INSTALLED=$(rpm -qa | grep -E "^${CM_PACKAGE_ID}-")
-    
     if [[ -n "${INSTALLED}" ]]; then
         INSTALLED_VERSION=$(echo "${INSTALLED}" | sed -n 's/.*-\([0-9]\+\.[0-9]\+\.[0-9]\+\)-[0-9]\+\..*/\1/p')
-        log "Found previous installation: ${INSTALLED}"
-    else
-        INSTALLED_VERSION="None"
-        log "Fresh installation detected - no previous package found"
+        log "Current package information from rpm -qi:"
+        rpm -qi "${INSTALLED}" 2>/dev/null | while read line; do
+            log "  $line"
+        done
     fi
 elif command -v dpkg &>/dev/null; then
     log "Detected Debian-based system"
     INSTALLED=$(dpkg -l | awk '{print $2}' | grep -E "^${CM_PACKAGE_ID}$")
-    
     if [[ -n "${INSTALLED}" ]]; then
         INSTALLED_VERSION=$(dpkg-query -W -f='${Version}' ${CM_PACKAGE_ID} 2>/dev/null | sed 's/-[0-9]\+$//')
-        log "Found previous installation: ${INSTALLED}"
-    else
-        INSTALLED_VERSION="None"
-        log "Fresh installation detected"
+        log "Current package information from dpkg -s:"
+        dpkg -s "${CM_PACKAGE_ID}" 2>/dev/null | while read line; do
+            log "  $line"
+        done
     fi
-else
+else 
     log "Unsupported package manager. Exiting."
     exit 1
 fi
 
-# Determine installation type
+# Determine installation type and backup configuration if necessary
 if [[ -n "${INSTALLED}" ]]; then
     log "This is an upgrade installation - previous version: ${INSTALLED_VERSION}"
-else
-    log "This is a fresh installation"
-fi
-
-# Get current package information before installation
-if command -v rpm &>/dev/null; then
-    log "Current package information from rpm -qi:"
-    # Get any installed package matching the pattern
-    PACKAGE=$(rpm -qa | grep "${CM_PACKAGE_ID}" | head -1)
-    if [ -n "${PACKAGE}" ]; then
-        rpm -qi ${PACKAGE} 2>/dev/null | while read line; do
-            log "  $line"
-        done
-    else
-        log "  Package not found in RPM database"
-    fi
-elif command -v dpkg &>/dev/null; then
-    log "Current package information from dpkg -s:"
-    dpkg -s ${CM_PACKAGE_ID} 2>/dev/null | while read line; do
-        log "  $line"
-    done
-fi
-
-# Backup configuration if previous installation exists
-if [[ -n "${INSTALLED}" ]]; then
     log "Backing up configuration files to ${TMP_DIR}"
     
     rm -rf "${TMP_DIR}"

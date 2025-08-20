@@ -17,41 +17,33 @@ log() {
 log "Starting CM uninstallation process"
 log "First argument (action): $1"
 
-# Detect package manager and handle arguments accordingly
-SHOULD_STOP_SERVICE=false
+# Determine if this is an uninstall or an upgrade
+IS_UNINSTALL=false
 
 if command -v rpm &>/dev/null; then
     log "Detected RPM-based system"
     # RPM argument meanings:
     # $1 = 0: package is being removed/uninstalled
     # $1 = 1: package is being upgraded (old version being removed)
-    
     if [ "$1" = "0" ]; then
-        log "Package removal/uninstallation (RPM)"
-        SHOULD_STOP_SERVICE=true
-    else
-        log "Package upgrade - service will remain running (RPM)"
+        IS_UNINSTALL=true
     fi
 elif command -v dpkg &>/dev/null; then
     log "Detected Debian-based system"
     # DPKG argument meanings:
     # $1 = "remove": package is being removed/uninstalled
     # $1 = "upgrade": package is being upgraded
-    
     if [ "$1" = "remove" ]; then
-        log "Package removal/uninstallation (DPKG)"
-        SHOULD_STOP_SERVICE=true
-    else
-        log "Package upgrade - service will remain running (DPKG)"
+        IS_UNINSTALL=true
     fi
 else
-    log "Unknown package manager - assuming removal"
-    SHOULD_STOP_SERVICE=true
+    log "Error: Unknown package manager. Exiting."
+    exit 1
 fi
 
 # Stop and disable service only during actual uninstall (not upgrades)
-if [ "$SHOULD_STOP_SERVICE" = "true" ]; then
-    log "Stopping and disabling CM service"
+if [ "$IS_UNINSTALL" = "true" ]; then
+    log "Operation type: UNINSTALL (argument: $1) - stopping and disabling CM service"
     
     if systemctl is-active --quiet ${CM_SERVICE}; then
         log "Stopping CM service"
@@ -62,7 +54,6 @@ if [ "$SHOULD_STOP_SERVICE" = "true" ]; then
         fi
         
         # Verify service stopped
-        sleep 1
         if systemctl is-active --quiet ${CM_SERVICE}; then
             log "Warning: Service still appears to be active after stop command"
         fi
@@ -79,7 +70,7 @@ if [ "$SHOULD_STOP_SERVICE" = "true" ]; then
     
     log "Service cleanup completed for uninstallation"
 else
-    log "Old package version being replaced during upgrade"
+    log "Operation type: UPGRADE (argument: $1) - service will remain running"
 fi
 
 log "Preuninstall operations completed"
