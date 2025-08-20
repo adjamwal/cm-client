@@ -82,9 +82,7 @@ fi
 
 if [ -f "${CM_BINARY}" ]; then
     CM_VERSION=$(strings "${CM_BINARY}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-    if [ -n "${CM_VERSION}" ]; then
-        log "Installed version: ${CM_VERSION}"
-    else
+    if [ -z "${CM_VERSION}" ]; then
         log "Version extraction failed - no version string found in binary"
     fi
 else
@@ -95,14 +93,6 @@ fi
 PREV_VERSION=""
 if [ -f "${TMP_DIR}/cm_previous_version" ]; then
     PREV_VERSION=$(cat "${TMP_DIR}/cm_previous_version" 2>/dev/null)
-    log "Previous version: ${PREV_VERSION}"
-fi
-
-# Determine installation type
-if [[ -n "${PREV_VERSION}" && "${PREV_VERSION}" != "None" && "${PREV_VERSION}" != "" ]]; then
-    log "This is an upgrade installation"
-else
-    log "This is a fresh installation"
 fi
 
 # Restore configuration files if available

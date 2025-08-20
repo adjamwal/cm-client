@@ -1,8 +1,6 @@
 #!/bin/bash
 
 CM_SERVICE="csccloudmanagement"
-PREFIX="/opt/cisco/secureclient"
-CM_DIR="${PREFIX}/cloudmanagement"
 
 # Function to log messages
 log() {
