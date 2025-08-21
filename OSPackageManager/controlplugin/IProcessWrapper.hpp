@@ -40,7 +40,7 @@ public:
 #else
     /** @note need to create a generic type for proc info to allow this to
      * work on both Mac and Linux */
-    virtual bool getProcessInfo(pid_t pid, void* pProcInfo) = 0;
+    virtual bool getProcessInfo(pid_t pid, std::string& exeName) = 0;
 #endif
     virtual void execv(const std::vector<char *>& processArgs) = 0;
     virtual void exit(int nStatus) = 0;
