@@ -8,35 +8,73 @@ BOOTSTRAP_FILE="bs.json"
 CM_CONFIG_FILE="cm_config.json"
 CM_PACKAGE_ID="cisco-secure-client-cloudmanagement-client"
 
-# Detect package manager
+# Function to log messages
+log() {
+    # Get epoch seconds and convert to readable format with seconds (Linux only)
+    local epoch=$(date +%s)
+    local datetime=$(date -d "@${epoch}" '+%Y-%m-%d %H:%M')
+    local seconds=$((epoch % 60))
+    local timestamp="${datetime}:$(printf '%02d' ${seconds})"
+    echo "[${timestamp}] [PREINSTALL] $*"
+}
+
+log "Installing Cisco Secure Client CM"
+
+# Check for existing installation and get package info
+INSTALLED_VERSION="None"
 if command -v rpm &>/dev/null; then
-    # RPM-based system (RHEL, CentOS, Fedora)
-    INSTALLED=$( rpm -qa | grep -E "^${CM_PACKAGE_ID}-" )
+    log "Detected RPM-based system"
+    INSTALLED=$(rpm -qa | grep -E "^${CM_PACKAGE_ID}-")
+    if [[ -n "${INSTALLED}" ]]; then
+        INSTALLED_VERSION=$(echo "${INSTALLED}" | sed -n 's/.*-\([0-9]\+\.[0-9]\+\.[0-9]\+\)-[0-9]\+\..*/\1/p')
+        log "Current package information from rpm -qi:"
+        rpm -qi "${INSTALLED}" 2>/dev/null | while read line; do
+            log "  $line"
+        done
+    fi
 elif command -v dpkg &>/dev/null; then
-    # Debian-based system (Ubuntu, Debian)
-    INSTALLED=$( dpkg -l | awk '{print $2}' | grep -E "^${CM_PACKAGE_ID}$" )
-else
-    echo "Unsupported package manager. Exiting."
+    log "Detected Debian-based system"
+    INSTALLED=$(dpkg -l | awk '{print $2}' | grep -E "^${CM_PACKAGE_ID}$")
+    if [[ -n "${INSTALLED}" ]]; then
+        INSTALLED_VERSION=$(dpkg-query -W -f='${Version}' ${CM_PACKAGE_ID} 2>/dev/null | sed 's/-[0-9]\+$//')
+        log "Current package information from dpkg -s:"
+        dpkg -s "${CM_PACKAGE_ID}" 2>/dev/null | while read line; do
+            log "  $line"
+        done
+    fi
+else 
+    log "Unsupported package manager. Exiting."
     exit 1
 fi
 
+# Determine installation type and backup configuration if necessary
 if [[ -n "${INSTALLED}" ]]; then
-    echo "previous installation found."
-    echo "saving config files to a temporary location"
-
+    log "This is an upgrade installation - previous version: ${INSTALLED_VERSION}"
+    log "Backing up configuration files to ${TMP_DIR}"
+    
     rm -rf "${TMP_DIR}"
     mkdir -p "${TMP_DIR}"
-
+    
+    # Save version information for postinstall
+    echo "${INSTALLED_VERSION}" > "${TMP_DIR}/cm_previous_version" 2>/dev/null || true
+    
+    # Backup configuration files
     if [ -f "${ETC_DIR}/${BOOTSTRAP_FILE}" ]; then
         cp -f "${ETC_DIR}/${BOOTSTRAP_FILE}" "${TMP_DIR}"
-    else
-        echo "${BOOTSTRAP_FILE} not found."
+        log "Backed up bootstrap file"
     fi
+    
     if [ -f "${ETC_DIR}/${CM_CONFIG_FILE}" ]; then
-        cp -f "${ETC_DIR}/${CM_CONFIG_FILE}" "${TMP_DIR}" 
-    else
-        echo "${CM_CONFIG_FILE} not found."
+        cp -f "${ETC_DIR}/${CM_CONFIG_FILE}" "${TMP_DIR}"
+        log "Backed up config file"
     fi
+    
+    log "Configuration backup process completed"
+else
+    # Create temp directory and save version info even for fresh installs
+    mkdir -p "${TMP_DIR}" 2>/dev/null || true
+    echo "${INSTALLED_VERSION}" > "${TMP_DIR}/cm_previous_version" 2>/dev/null || true
+    log "Fresh installation - no configuration to backup"
 fi
 
-exit 0
+log "Preinstall operations completed successfully"

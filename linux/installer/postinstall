@@ -7,32 +7,171 @@ ETC_DIR="${CM_DIR}/etc"
 TMP_DIR="${PREFIX}/tmp"
 BOOTSTRAP_FILE="bs.json"
 CONFIG_FILE="cm_config.json"
+LATEST_PACKAGE=""
 
-if [[ -d "${TMP_DIR}"  &&  ( -f "${TMP_DIR}/${BOOTSTRAP_FILE}" || -f "${TMP_DIR}/${CONFIG_FILE}" ) ]]; then
-    
-    echo "copying existing config files."
-    
+# Function to log messages 
+log() {
+    # Get epoch seconds and convert to readable format with seconds (Linux only)
+    local epoch=$(date +%s)
+    local datetime=$(date -d "@${epoch}" '+%Y-%m-%d %H:%M')
+    local seconds=$((epoch % 60))
+    local timestamp="${datetime}:$(printf '%02d' ${seconds})"
+    echo "[${timestamp}] [POSTINSTALL] $*"
+}
+
+log "Postinstall script started"
+
+# Get installed version from binary
+CM_BINARY="${CM_DIR}/bin/${CM_SERVICE}"
+log "Binary detection phase started - checking binary at path: ${CM_BINARY}"
+
+# Get current package information after installation
+CM_PACKAGE_ID="cisco-secure-client-cloudmanagement-client"
+
+# Handle package information based on package manager
+if command -v rpm &>/dev/null; then
+    log "Detected RPM-based system"
+    # Get only the most recently installed package to avoid duplicates during upgrade
+    LATEST_PACKAGE=$(rpm -qa --qf "%{INSTALLTIME} %{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n" | grep "${CM_PACKAGE_ID}" | sort -n | tail -1 | awk '{print $2}')
+    if [ -n "${LATEST_PACKAGE}" ]; then
+        # Show package info
+        rpm -qi ${LATEST_PACKAGE} 2>/dev/null | while read line; do
+            log "  $line"
+        done
+
+        # List all files installed by the package
+        log "Files installed by package:"
+        rpm -ql ${LATEST_PACKAGE} 2>/dev/null | while read file; do
+            if [ -f "${file}" ]; then
+                FILE_SIZE=$(stat -c %s "${file}" 2>/dev/null || echo "unknown")
+                FILE_PERMS=$(stat -c %a "${file}" 2>/dev/null || echo "unknown")
+                log "  ${file} (${FILE_SIZE} bytes, perms: ${FILE_PERMS})"
+            elif [ -d "${file}" ]; then
+                DIR_PERMS=$(stat -c %a "${file}" 2>/dev/null || echo "unknown")
+                log "  ${file}/ (directory, perms: ${DIR_PERMS})"
+            else
+                log "  ${file} (missing or special file)"
+            fi
+        done
+    else
+        log "  Package not found in RPM database"
+    fi
+elif command -v dpkg &>/dev/null; then
+    log "Detected Debian-based system"
+    dpkg -s ${CM_PACKAGE_ID} 2>/dev/null | while read line; do
+        log "  $line"
+    done
+
+    log "Files installed by package:"
+    dpkg -L ${CM_PACKAGE_ID} 2>/dev/null | while read file; do
+        if [ -f "${file}" ]; then
+            FILE_SIZE=$(stat -c %s "${file}" 2>/dev/null || echo "unknown")
+            FILE_PERMS=$(stat -c %a "${file}" 2>/dev/null || echo "unknown")
+            log "  ${file} (${FILE_SIZE} bytes, perms: ${FILE_PERMS})"
+        elif [ -d "${file}" ]; then
+            DIR_PERMS=$(stat -c %a "${file}" 2>/dev/null || echo "unknown")
+            log "  ${file}/ (directory, perms: ${DIR_PERMS})"
+        else
+            log "  ${file} (missing or special file)"
+        fi
+    done
+else
+    log "Error: Could not determine package manager (rpm/dpkg not found)"
+    exit 1
+fi
+
+if [ -f "${CM_BINARY}" ]; then
+    CM_VERSION=$(strings "${CM_BINARY}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+    if [ -z "${CM_VERSION}" ]; then
+        log "Version extraction failed - no version string found in binary"
+    fi
+else
+    log "Binary not found at path: ${CM_BINARY}"
+fi
+
+# Get previous version from saved file
+PREV_VERSION=""
+if [ -f "${TMP_DIR}/cm_previous_version" ]; then
+    PREV_VERSION=$(cat "${TMP_DIR}/cm_previous_version" 2>/dev/null)
+fi
+
+# Restore configuration files if available
+if [[ -d "${TMP_DIR}" ]]; then
+    # Restore bootstrap file
     if [ -f "${TMP_DIR}/${BOOTSTRAP_FILE}" ]; then
         cp -f "${TMP_DIR}/${BOOTSTRAP_FILE}" "${ETC_DIR}"
-    else
-        echo "${BOOTSTRAP_FILE} not found."
+        log "Restored ${BOOTSTRAP_FILE} from backup"
     fi
     
+    # Restore config file
     if [ -f "${TMP_DIR}/${CONFIG_FILE}" ]; then
         cp -f "${TMP_DIR}/${CONFIG_FILE}" "${ETC_DIR}"
-    else
-        echo "${CONFIG_FILE} not found."
+        log "Restored ${CONFIG_FILE} from backup"
     fi
 
     rm -rf "${TMP_DIR}"
-
 fi
+
+# Configure and start the service
+log "Configuring system services"
 
 systemctl daemon-reload
-systemctl enable ${CM_SERVICE}
-if systemctl is-active --quiet ${CM_SERVICE}; then
-    systemctl restart ${CM_SERVICE}
-else
-    systemctl start ${CM_SERVICE}
+DAEMON_RELOAD_EXIT=$?
+if [ ${DAEMON_RELOAD_EXIT} -ne 0 ]; then
+    log "systemctl daemon-reload failed with exit code: ${DAEMON_RELOAD_EXIT}"
 fi
+
+systemctl enable ${CM_SERVICE}
+ENABLE_EXIT_CODE=$?
+if [ ${ENABLE_EXIT_CODE} -ne 0 ]; then
+    log "systemctl enable failed with exit code: ${ENABLE_EXIT_CODE}"
+fi
+
+INITIAL_SERVICE_STATUS=$(systemctl is-active ${CM_SERVICE} 2>/dev/null || echo "inactive")
+
+if systemctl is-active --quiet ${CM_SERVICE}; then
+    log "Service is currently active, performing restart"
+    systemctl restart ${CM_SERVICE}
+    RESTART_EXIT_CODE=$?
+    if [ ${RESTART_EXIT_CODE} -ne 0 ]; then
+        log "Service restart failed with exit code: ${RESTART_EXIT_CODE}"
+    fi
+else
+    log "Service is not active, performing start"
+    systemctl start ${CM_SERVICE}
+    START_EXIT_CODE=$?
+    if [ ${START_EXIT_CODE} -ne 0 ]; then
+        log "Service start failed with exit code: ${START_EXIT_CODE}"
+    fi
+fi
+
+SERVICE_STATUS=$(systemctl is-active ${CM_SERVICE} 2>/dev/null || echo "active")
+
+# Installation summary
+log "=== Installation Summary ==="
+log "Installed version: ${CM_VERSION}"
+
+if [[ -n "${PREV_VERSION}" && "${PREV_VERSION}" != "None" && "${PREV_VERSION}" != "" ]]; then
+    log "CM was upgraded from ${PREV_VERSION} to ${CM_VERSION}"
+else
+    log "Fresh installation of CM version ${CM_VERSION}"
+fi
+
+log "Service status: ${SERVICE_STATUS}"
+log "Installation directory: ${CM_DIR}"
+log "=== End of Summary ==="
+
+# Verify installation directory structure
+if [ -d "${CM_DIR}" ]; then
+    INSTALL_DIR_SIZE=$(du -sh "${CM_DIR}" 2>/dev/null | cut -f1)
+    log "Installation directory size: ${INSTALL_DIR_SIZE}"
+    INSTALL_FILE_COUNT=$(find "${CM_DIR}" -type f 2>/dev/null | wc -l)
+    log "Total files in installation: ${INSTALL_FILE_COUNT}"
+    INSTALL_DIR_PERMS=$(stat -c %a "${CM_DIR}" 2>/dev/null || stat -f %A "${CM_DIR}")
+    log "Installation directory permissions: ${INSTALL_DIR_PERMS}"
+else
+    log "Installation directory missing: ${CM_DIR}"
+fi
+
+log "Installation completed successfully"
 exit 0
