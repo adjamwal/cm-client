@@ -56,9 +56,10 @@ int32_t PmPlatformComponentManager::InstallComponent(const PmComponent &package)
     }
 #endif
 
-    ret = (pkgUtil_->installPackage(package.downloadedInstallerPath)) ? 0 : -1;
+    // Use installPackageWithContext to pass catalog information
+    ret = (pkgUtil_->installPackageWithContext(package.downloadedInstallerPath, package.productAndVersion)) ? 0 : -1;
     
-    PM_LOG_INFO("Package installation status %d", ret);
+    PM_LOG_INFO("Package installation status %d for %s", ret, package.productAndVersion.c_str());
     return ret;
 }
 

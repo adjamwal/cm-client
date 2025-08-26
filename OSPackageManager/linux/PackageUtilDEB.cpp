@@ -1,6 +1,12 @@
 #include "PackageUtilDEB.hpp"
+#include "PmPlatformConfiguration.hpp"
 #include "PmLogger.hpp"
 #include <string.h>
+#include <fstream>
+#include <algorithm>
+#include <ctime>
+#include <filesystem>
+#include <sstream>
 
 namespace { //anonymous namespace
     const std::string debPackageInstaller {"deb"};
@@ -18,6 +24,41 @@ namespace { //anonymous namespace
         SIG_UNKNOWN = 3,
         SIG_NOT_SIGNED = 4
     } SIG_STATUS; // based on the return code of dpkg-sig command
+    
+    // Save installer output to log file
+    void saveInstallerLog(const std::string& logFilePath, const std::string& output) {
+        try {
+            // Ensure the directory exists using filesystem API
+            std::filesystem::path logPath(logFilePath);
+            std::filesystem::path logDir = logPath.parent_path();
+            
+            if (!std::filesystem::exists(logDir)) {
+                std::filesystem::create_directories(logDir);
+            }
+            
+            // Write the log file
+            std::ofstream logFile(logFilePath);
+            if (logFile.is_open()) {
+                // Add a timestamp header
+                time_t now = time(nullptr);
+                char timeStr[100];
+                strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", localtime(&now));
+                
+                logFile << "=== Installation Log - " << timeStr << " ===" << std::endl;
+                logFile << output << std::endl;
+                logFile.close();
+                
+                // Set proper permissions (644) to match other log files
+                std::filesystem::permissions(logFilePath, 
+                    std::filesystem::perms::owner_read | std::filesystem::perms::owner_write |
+                    std::filesystem::perms::group_read | std::filesystem::perms::others_read);
+            } else {
+                PM_LOG_ERROR("Failed to create log file: %s", logFilePath.c_str());
+            }
+        } catch (const std::exception& e) {
+            PM_LOG_ERROR("Error creating log directory or file: %s", e.what());
+        }
+    }
 
     void retrieveFingerprint(const std::string& outputLine, std::string& fingerprint) {
         std::istringstream stream(outputLine);
@@ -44,7 +85,8 @@ namespace { //anonymous namespace
     }
 }
 
-PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor) : commandExecutor_( commandExecutor ) {
+PackageUtilDEB::PackageUtilDEB(ICommandExec &commandExecutor, IPmPlatformConfiguration &platformConfig)
+    : commandExecutor_(commandExecutor), platformConfig_(platformConfig) {
 }
 
 bool PackageUtilDEB::isValidInstallerType(const std::string &installerType) const {
@@ -118,22 +160,68 @@ std::vector<std::string> PackageUtilDEB::listPackageFiles(const PKG_ID_TYPE& ide
     return result;
 }
 
-bool PackageUtilDEB::installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions) const {
-    (void) installOptions; // Currently this is of no use.
-    std::vector<std::string> installArgv = {dpkgBinStr, dpkgInstallPkgOption, packagePath};
-    int exitCode = 0;
+bool PackageUtilDEB::installPackageWithContext(
+    const std::string& packagePath, 
+    const std::string& catalogProductAndVersion,
+    const std::map<std::string, int>& installOptions) const {
+    
+    (void) installOptions; // Currently unused
+    
+    // Extract package info from catalog context
+    std::string logFileName = extractPackageInfoFromCatalog(catalogProductAndVersion);
+    std::string logFilePath = static_cast<const PmPlatformConfiguration&>(platformConfig_).GetLogDirectory() + logFileName + ".log";
+    
+    PM_LOG_INFO("Installing package %s (catalog: %s), logs will be saved to %s", 
+                packagePath.c_str(), catalogProductAndVersion.c_str(), logFilePath.c_str());
 
-    int ret = commandExecutor_.ExecuteCommand(dpkgBinStr, installArgv, exitCode);
+    // Execute installation command (using shell to capture stderr)
+    std::string installCmd = std::string(dpkgBinStr) + " " + dpkgInstallPkgOption + " --force-depends --force-confold '" + packagePath + "' 2>&1";
+    std::vector<std::string> installArgv = {"/bin/sh", "-c", installCmd};
+    int exitCode = 0;
+    std::string dpkgOutput;
+
+    PM_LOG_DEBUG("Executing dpkg command with shell: %s", installCmd.c_str());
+    int ret = commandExecutor_.ExecuteCommandCaptureOutput("/bin/sh", installArgv, exitCode, dpkgOutput);
+    
+    PM_LOG_DEBUG("dpkg installation result: ret=%d, exitCode=%d, output length=%zu", ret, exitCode, dpkgOutput.length());
+    PM_LOG_DEBUG("dpkg installation output: %s", dpkgOutput.c_str());
+    
+    // Save the installation output to log file (matching RPM format)
+    saveInstallerLog(logFilePath, dpkgOutput);
+    
     if(ret != 0){
-        PM_LOG_ERROR("Failed to execute install package command.");
+        PM_LOG_ERROR("Failed to execute install package command. Return code: %d", ret);
         return false;
     } else if(exitCode != 0) {
         PM_LOG_ERROR("Failed to install package. Exit code: %d", exitCode);
         return false;
     }
-
-    PM_LOG_INFO("Package installed successfully.");
+    
+    PM_LOG_INFO("Package installed successfully: %s", logFileName.c_str());
     return true;
+}
+
+std::string PackageUtilDEB::extractPackageInfoFromCatalog(const std::string& catalogProductAndVersion) const {
+    if (catalogProductAndVersion.empty()) {
+        PM_LOG_ERROR("Empty catalog product and version information");
+        return "unknown_package_unknown_version";
+    }
+    
+    // Parse "uc/1.0.0.150" format
+    size_t slashPos = catalogProductAndVersion.find('/');
+    if (slashPos == std::string::npos) {
+        PM_LOG_ERROR("Invalid catalog product and version format: %s", catalogProductAndVersion.c_str());
+        return catalogProductAndVersion; // Use as-is if parsing fails
+    }
+    
+    std::string product = catalogProductAndVersion.substr(0, slashPos);
+    std::string version = catalogProductAndVersion.substr(slashPos + 1);
+    
+    // Format for logging: "product_version"
+    std::string result = product + "_" + version;
+    PM_LOG_DEBUG("Extracted package info from catalog: %s -> %s", catalogProductAndVersion.c_str(), result.c_str());
+    
+    return result;
 }
 
 bool PackageUtilDEB::uninstallPackage(const std::string& packageIdentifier) const {

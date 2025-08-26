@@ -19,15 +19,15 @@ PmPlatformDependencies::PmPlatformDependencies()
         :
         gpgUtil_(std::make_shared<GpgUtil>()),
         commandExec_(std::make_shared<CommandExec>()),
-#ifdef IS_RHEL
-        pmPkgUtil_(std::make_shared<PackageUtilRPM>(*std::move(commandExec_), *std::move(gpgUtil_))),
-#else
-        pmPkgUtil_(std::make_shared<PackageUtilDEB>(*std::move(commandExec_))),
-#endif
         pmConfiguration_ { PmPlatformConfiguration(
                 std::make_shared<CMIDAPIProxy>(), 
                 std::make_shared<PackageManager::PmCertManager>(std::make_shared<PackageManager::PmCertRetrieverImpl>())
                 )},
+#ifdef IS_RHEL
+        pmPkgUtil_(std::make_shared<PackageUtilRPM>(*std::move(commandExec_), *std::move(gpgUtil_), pmConfiguration_)),
+#else
+        pmPkgUtil_(std::make_shared<PackageUtilDEB>(*std::move(commandExec_), pmConfiguration_)),
+#endif
         pmComponentManager_{PmPlatformComponentManager(pmPkgUtil_, std::make_shared<PackageManager::FileUtilities>())}
 {}
 

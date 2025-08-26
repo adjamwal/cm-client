@@ -3,6 +3,7 @@
 #include "IPackageUtil.hpp"
 #include "Gpg/include/IGpgUtil.hpp"
 #include "OSPackageManager/common/ICommandExec.hpp"
+#include "PackageManager/IPmPlatformConfiguration.h"
 #include <dlfcn.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
@@ -27,7 +28,7 @@ public:
     /**
      * @brief Constructor to load librpm for RPM package operations.
      */
-    PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil);
+    PackageUtilRPM(ICommandExec &commandExecutor, IGpgUtil &gpgUtil, IPmPlatformConfiguration &platformConfig);
 
     /**
      * @brief Destructor to unload librpm for RPM package operations.
@@ -67,17 +68,20 @@ public:
     std::vector<std::string> listPackageFiles(const PKG_ID_TYPE& identifierType, const std::string& packageIdentifier) const override;
     
     /**
-     * @brief Installs a package from the specified path onto the specified volume or the default volume.
+     * @brief Installs a package with catalog context information.
      * @param packagePath The path to the package.
+     * @param catalogProductAndVersion Catalog information (e.g. "uc/1.0.0.150") from manifest.
      * @param installOptions Options for installation (optional).
      * @return True if the installation was successful, false otherwise.
      */
-    bool installPackage(const std::string& packagePath, const std::map<std::string, int>&  installOptions = {}) const override;
+    bool installPackageWithContext(
+        const std::string& packagePath, 
+        const std::string& catalogProductAndVersion,
+        const std::map<std::string, int>& installOptions = {}) const override;
     
     /**
      * @brief Uninstalls a package with the specified identifier.
      * @param packageIdentifier The identifier of the package.
-     * @param signerKeyID The keyID of the signer for which we have to explicitly check against.
      * @return True if the uninstallation was successful, false otherwise.
      */
     bool uninstallPackage(const std::string& packageIdentifier) const override;
@@ -89,6 +93,7 @@ private:
 
     ICommandExec &commandExecutor_;
     IGpgUtil &gpgUtil_;
+    IPmPlatformConfiguration &platformConfig_;
 
     // Function pointers for librpm functions
     fpRpmReadConfigFiles_t fpRpmReadConfigFiles_ = nullptr;
@@ -113,4 +118,11 @@ private:
     bool unloadLibRPM();
 
     bool is_trusted_by_system(std::string keyId) const;
+    
+    /**
+     * @brief Extracts package info from catalog context (e.g. "uc/1.0.0.150" -> "uc_1.0.0.150").
+     * @param catalogProductAndVersion The catalog product and version string from manifest.
+     * @return Formatted package name and version for logging.
+     */
+    std::string extractPackageInfoFromCatalog(const std::string& catalogProductAndVersion) const;
 };

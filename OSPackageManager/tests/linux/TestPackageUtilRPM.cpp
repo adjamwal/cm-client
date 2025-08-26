@@ -7,6 +7,7 @@
 #include "gtest/gtest.h"
 #include "Gpg/mock/MockGpgUtil.hpp"
 #include "OSPackageManager/Mocks/MockCommandExec/MockCommandExec.hpp"
+#include "OSPackageManager/Mocks/MockPmPlatformComponentManager/MockPmPlatformConfiguration.hpp"
 #include "OSPackageManager/linux/PackageUtilRPM.hpp"
 #include "OSPackageManager/common/PmLogger.hpp"
 
@@ -21,13 +22,15 @@ protected:
    {
       commandExecutorPtr_ = std::make_unique<MockCommandExec>();
       gpgUtilPtr_ = std::make_unique<MockGpgUtil>();
-      packageUtil_ = std::make_unique<PackageUtilRPM>(*std::move(commandExecutorPtr_), *std::move(gpgUtilPtr_));
+      platformConfigPtr_ = std::make_unique<MockPmPlatformConfiguration>();
+      packageUtil_ = std::make_unique<PackageUtilRPM>(*commandExecutorPtr_, *gpgUtilPtr_, *platformConfigPtr_);
    }
    void TearDown() override
    {
    }
    std::unique_ptr<MockCommandExec> commandExecutorPtr_;
    std::unique_ptr<MockGpgUtil> gpgUtilPtr_;
+   std::unique_ptr<MockPmPlatformConfiguration> platformConfigPtr_;
    std::unique_ptr<PackageUtilRPM> packageUtil_;
 };
 
@@ -140,7 +143,6 @@ TEST_F(PackageUtilTest, verifyValid)
       .WillOnce(Return(GpgKeyId(notTrustedKeyId)))
       .WillOnce(Return(GpgKeyId(trustedKeyId)));
    ASSERT_THAT(packageUtil_->verifyPackage(fakePackage, trustedKeyId), ::testing::IsTrue());
-
 
 }
 

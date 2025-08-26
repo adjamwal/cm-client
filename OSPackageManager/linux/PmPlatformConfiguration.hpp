@@ -70,7 +70,7 @@ public:
     /**
      * @brief Gets the log directory
      */
-    std::string GetLogDirectory();
+    std::string GetLogDirectory() const;
 
     /**
      * @brief Gets the data directory
