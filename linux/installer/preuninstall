@@ -2,9 +2,74 @@
 
 CM_SERVICE="csccloudmanagement"
 
-# stop the service only during uninstall and not during upgrades
-if [$1 -eq 0]; then
-    systemctl stop ${CM_SERVICE}
-    systemctl disable ${CM_SERVICE}
+# Function to log messages
+log() {
+    # Get epoch seconds and convert to readable format with seconds (Linux only)
+    local epoch=$(date +%s)
+    local datetime=$(date -d "@${epoch}" '+%Y-%m-%d %H:%M')
+    local seconds=$((epoch % 60))
+    local timestamp="${datetime}:$(printf '%02d' ${seconds})"
+    echo "[${timestamp}] [PREUNINSTALL] $*"
+}
+
+log "Starting CM uninstallation process"
+log "First argument (action): $1"
+
+# Determine if this is an uninstall or an upgrade
+IS_UNINSTALL=false
+
+if command -v rpm &>/dev/null; then
+    log "Detected RPM-based system"
+    # RPM argument meanings:
+    # $1 = 0: package is being removed/uninstalled
+    # $1 = 1: package is being upgraded (old version being removed)
+    if [ "$1" = "0" ]; then
+        IS_UNINSTALL=true
+    fi
+elif command -v dpkg &>/dev/null; then
+    log "Detected Debian-based system"
+    # DPKG argument meanings:
+    # $1 = "remove": package is being removed/uninstalled
+    # $1 = "upgrade": package is being upgraded
+    if [ "$1" = "remove" ]; then
+        IS_UNINSTALL=true
+    fi
+else
+    log "Error: Unknown package manager. Exiting."
+    exit 1
 fi
+
+# Stop and disable service only during actual uninstall (not upgrades)
+if [ "$IS_UNINSTALL" = "true" ]; then
+    log "Operation type: UNINSTALL (argument: $1) - stopping and disabling CM service"
+    
+    if systemctl is-active --quiet ${CM_SERVICE}; then
+        log "Stopping CM service"
+        systemctl stop ${CM_SERVICE}
+        STOP_EXIT_CODE=$?
+        if [ ${STOP_EXIT_CODE} -ne 0 ]; then
+            log "Service stop failed with exit code: ${STOP_EXIT_CODE}"
+        fi
+        
+        # Verify service stopped
+        if systemctl is-active --quiet ${CM_SERVICE}; then
+            log "Warning: Service still appears to be active after stop command"
+        fi
+    fi
+    
+    SERVICE_ENABLED=$(systemctl is-enabled ${CM_SERVICE} 2>/dev/null || echo "unknown")
+    if [ "${SERVICE_ENABLED}" = "enabled" ]; then
+        systemctl disable ${CM_SERVICE}
+        DISABLE_EXIT_CODE=$?
+        if [ ${DISABLE_EXIT_CODE} -ne 0 ]; then
+            log "Service disable failed with exit code: ${DISABLE_EXIT_CODE}"
+        fi
+    fi
+    
+    log "Service cleanup completed for uninstallation"
+else
+    log "Operation type: UPGRADE (argument: $1) - service will remain running"
+fi
+
+log "Preuninstall operations completed"
 exit 0
