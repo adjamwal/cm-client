@@ -63,7 +63,6 @@ ExternalProject_Add_Step(third-party-${component_name} post_install_symlink_fix
     COMMAND ln -sf libssl.1.1.dylib libssl.dylib
 )
 endif()
-if(LINUX)
 ExternalProject_Add_Step(third-party-ciscossl post_install_linux_fix
     WORKING_DIRECTORY "${CM_THIRDPARTY_EXPORT}"
     DEPENDEES install
@@ -73,5 +72,7 @@ ExternalProject_Add_Step(third-party-ciscossl post_install_linux_fix
     COMMAND sh -c "[ -f lib/libcrypto.so.1.1 ] && mv lib/libcrypto.so.1.1 libshared/libcrypto.so.1.1 || true"
     COMMAND sh -c "[ -f lib/libssl.so ] && mv lib/libssl.so libshared/libssl.so || true"
     COMMAND sh -c "[ -f lib/libssl.so.1.1 ] && mv lib/libssl.so.1.1 libshared/libssl.so.1.1 || true"
+    COMMAND ln -sf libshared/libcrypto.so.1.1  libshared/libcrypto.so
+    COMMAND ln -sf libshared/libssl.so.1.1 libshared/libssl.so
 )
-endif()
+
