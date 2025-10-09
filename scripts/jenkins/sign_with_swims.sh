@@ -13,6 +13,10 @@
 # ./sign_with_swims.sh <swims_signing_tools_root> <build auth token> <path_to_installer> <rpm|deb>
 #
 # NOTE: swims_signing_tools_root is the path to the SWIMS rpm_deb_signing repository of SWIMS tools used for RPM and Debian package signing
+SIGN_BLD=${SIGN_BUILD}
+if [ "OFF" = "${SIGN_BLD}" ]; then
+    exit 0
+fi
 
 if [ $# -ne 4 ]; then
     echo "Usage sign_with_swims.sh <swims_signing_tools_root> <build_auth_token> <path_to_installer> <rpm|deb>"
