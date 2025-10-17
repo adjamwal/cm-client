@@ -63,3 +63,18 @@ ExternalProject_Add_Step(third-party-${component_name} post_install_symlink_fix
     COMMAND ln -sf libssl.1.1.dylib libssl.dylib
 )
 endif()
+if(LINUX)
+    ExternalProject_Add_Step(third-party-ciscossl post_install_linux_fix
+        WORKING_DIRECTORY "${CM_THIRDPARTY_EXPORT}"
+        DEPENDEES copy_exports
+        COMMAND echo "Reorganizing shared libraries for Linux"
+        COMMAND mkdir -p libshared
+        COMMAND sh -c "[ -f lib/libcrypto.so ] && mv lib/libcrypto.so libshared/libcrypto.so || echo 'libcrypto.so not found, skipping'"
+        COMMAND sh -c "[ -f lib/libcrypto.so.1.1 ] && mv lib/libcrypto.so.1.1 libshared/libcrypto.so.1.1 || echo 'libcrypto.so.1.1 not found, skipping'"
+        COMMAND sh -c "[ -f lib/libssl.so ] && mv lib/libssl.so libshared/libssl.so || echo 'libssl.so not found, skipping'"
+        COMMAND sh -c "[ -f lib/libssl.so.1.1 ] && mv lib/libssl.so.1.1 libshared/libssl.so.1.1 || echo 'libssl.so.1.1 not found, skipping'"
+        COMMAND sh -c "[ -f libshared/libcrypto.so.1.1 ] && ln -sf libcrypto.so.1.1 libshared/libcrypto.so || echo 'Skipping libcrypto.so symlink'"
+        COMMAND sh -c "[ -f libshared/libssl.so.1.1 ] && ln -sf libssl.so.1.1 libshared/libssl.so || echo 'Skipping libssl.so symlink'"
+    )
+endif()
+
