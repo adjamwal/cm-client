@@ -188,7 +188,11 @@ std::string PmPlatformConfiguration::GetDataDirectory()
 
 std::string PmPlatformConfiguration::GetPmVersion()
 {
-    return static_cast<std::string>(kPmVersion);
+    #ifdef CM_BUILD_VER
+        return static_cast<std::string>(CM_BUILD_VER);
+    #else
+        return static_cast<std::string>(kPmVersion);
+    #endif
 }
 
 cmid_result_t PmPlatformConfiguration::GetUrl( cmid_url_type_t urlType, std::string& url )
