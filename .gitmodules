@@ -1,6 +1,6 @@
 [submodule "EndpointIdentity"]
 	path = EndpointIdentity
-	url = ../../UnifiedConnector/EndpointIdentity.git
+	url = https://github.com/adjamwal/EndpointIdentity.git
 [submodule "PackageManager"]
 	path = PackageManager
 	url = https://github.com/adjamwal/PackageManager.git
@@ -28,7 +28,7 @@
 	shallow = true
 [submodule "ProxyDiscovery-Mac"]
 	path = ProxyDiscovery-Mac
-	url = ../../UnifiedConnector/ProxyDiscovery-Mac.git
+	url = https://github.com/adjamwal/ProxyDiscovery-Mac.git
 [submodule "third-party/libxml2"]
 	path = third-party/libxml2
 	url = ../../Cloud/libxml2.git
