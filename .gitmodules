@@ -3,7 +3,7 @@
 	url = ../../UnifiedConnector/EndpointIdentity.git
 [submodule "PackageManager"]
 	path = PackageManager
-	url = ../../UnifiedConnector/PackageManager.git
+	url = https://github.com/adjamwal/PackageManager.git
 [submodule "third-party/jsoncpp"]
 	path = third-party/jsoncpp
 	url = ../../Cloud/fireamp-win-jsoncpp.git
